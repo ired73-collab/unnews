@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 
 const POSTS = [
@@ -369,8 +367,8 @@ export default function UnnewsCompletePreview() {
                         onClick={() => {
                           setHeroIndex(index);
                           setSelectedPost(post);
-                          setActiveCategory("전체");
-                          setPage("post");
+                    setActiveCategory("전체");
+                    setPage("post");
                         }}
                         className={`rounded-2xl border px-3 py-3 text-left backdrop-blur-md transition ${
                           heroIndex === index
@@ -466,7 +464,6 @@ export default function UnnewsCompletePreview() {
                   key={post.id}
                   onClick={() => {
                     setSelectedPost(post);
-                    setActiveCategory("전체");
                     setPage("post");
                   }}
                   className="group relative overflow-hidden rounded-[28px] border border-white/50 text-left shadow-[0_24px_60px_rgba(0,0,0,0.08)]"
@@ -641,9 +638,9 @@ export default function UnnewsCompletePreview() {
             </div>
             <button
               onClick={() => {
-                setActiveCategory("전체");
-                setPage("home");
-              }}
+              setActiveCategory("전체");
+              setPage("home");
+            }}
               className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700 backdrop-blur transition hover:bg-white"
             >
               사이트로 이동
