@@ -214,8 +214,11 @@ export default function UnnewsCompletePreview() {
     category: "트렌드",
     body: "",
     image: "",
+    imageFileName: "",
+    uploadedImage: "",
     useAutoImage: true,
   });
+  const [isDragging, setIsDragging] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
 
   const allPosts = useMemo(() => [...drafts, ...POSTS], [drafts]);
@@ -242,16 +245,20 @@ export default function UnnewsCompletePreview() {
   }, [page, heroPosts.length]);
 
   const currentHero = heroPosts[heroIndex] || featured[0] || POSTS[0];
-  const previewImage = form.useAutoImage || !form.image.trim()
-    ? getAutoImage(form.category, form.title)
-    : form.image.trim();
+  const previewImage = form.uploadedImage
+    ? form.uploadedImage
+    : form.useAutoImage || !form.image.trim()
+      ? getAutoImage(form.category, form.title)
+      : form.image.trim();
 
   const submitDraft = () => {
     if (!form.title.trim() || !form.body.trim()) return;
 
-    const resolvedImage = form.useAutoImage || !form.image.trim()
-      ? getAutoImage(form.category, form.title)
-      : form.image.trim();
+    const resolvedImage = form.uploadedImage
+      ? form.uploadedImage
+      : form.useAutoImage || !form.image.trim()
+        ? getAutoImage(form.category, form.title)
+        : form.image.trim();
 
     const newPost = {
       id: Date.now(),
@@ -268,6 +275,8 @@ export default function UnnewsCompletePreview() {
       category: "트렌드",
       body: "",
       image: "",
+      imageFileName: "",
+      uploadedImage: "",
       useAutoImage: true,
     });
     setSelectedPost(newPost);
@@ -369,8 +378,8 @@ export default function UnnewsCompletePreview() {
                         onClick={() => {
                           setHeroIndex(index);
                           setSelectedPost(post);
-                    setActiveCategory("전체");
-                    setPage("post");
+                          setActiveCategory("전체");
+                          setPage("post");
                         }}
                         className={`rounded-2xl border px-3 py-3 text-left backdrop-blur-md transition ${
                           heroIndex === index
@@ -640,9 +649,9 @@ export default function UnnewsCompletePreview() {
             </div>
             <button
               onClick={() => {
-              setActiveCategory("전체");
-              setPage("home");
-            }}
+                setActiveCategory("전체");
+                setPage("home");
+              }}
               className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700 backdrop-blur transition hover:bg-white"
             >
               사이트로 이동
@@ -678,10 +687,79 @@ export default function UnnewsCompletePreview() {
                   <label className="mb-2 block text-sm font-medium text-neutral-600">대표 이미지 URL</label>
                   <input
                     value={form.image}
-                    onChange={(e) => setForm({ ...form, image: e.target.value, useAutoImage: false })}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        image: e.target.value,
+                        uploadedImage: "",
+                        imageFileName: "",
+                        useAutoImage: false,
+                      })
+                    }
                     className="w-full rounded-[20px] border border-black/10 bg-white px-4 py-3.5 outline-none transition focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(0,0,0,0.04)]"
                     placeholder="이미지 URL을 입력하거나 자동 추천을 사용하세요"
                   />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-neutral-600">이미지 파일 업로드</label>
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragging(true);
+                    }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (!file || !file.type.startsWith("image/")) return;
+                      const objectUrl = URL.createObjectURL(file);
+                      setForm({
+                        ...form,
+                        uploadedImage: objectUrl,
+                        imageFileName: file.name,
+                        image: "",
+                        useAutoImage: false,
+                      });
+                    }}
+                    className={`rounded-[20px] border border-dashed px-4 py-4 transition ${
+                      isDragging
+                        ? "border-neutral-900 bg-neutral-100"
+                        : "border-black/10 bg-white hover:border-black/20 hover:bg-neutral-50"
+                    }`}
+                  >
+                    <label className="flex cursor-pointer items-center justify-between gap-4 text-sm text-neutral-600">
+                      <div>
+                        <div className="font-medium text-neutral-800">
+                          {form.imageFileName ? form.imageFileName : "내 컴퓨터에서 이미지 선택"}
+                        </div>
+                        <div className="mt-1 text-xs text-neutral-400">
+                          이미지를 드래그해서 놓거나 파일 선택 버튼을 눌러주세요
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-neutral-900 px-3 py-1 text-xs font-semibold text-white">
+                        파일 선택
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const objectUrl = URL.createObjectURL(file);
+                          setForm({
+                            ...form,
+                            uploadedImage: objectUrl,
+                            imageFileName: file.name,
+                            image: "",
+                            useAutoImage: false,
+                          });
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 <label className="flex items-center gap-3 rounded-[18px] border border-black/5 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
@@ -697,7 +775,7 @@ export default function UnnewsCompletePreview() {
                   <div className="mb-3 flex items-center justify-between">
                     <p className="text-sm font-medium text-neutral-700">이미지 미리보기</p>
                     <span className="text-xs text-neutral-400">
-                      {form.useAutoImage || !form.image.trim() ? "자동 추천 이미지" : "직접 입력 이미지"}
+                      {form.uploadedImage ? "업로드 이미지" : form.useAutoImage || !form.image.trim() ? "자동 추천 이미지" : "직접 입력 이미지"}
                     </span>
                   </div>
                   <div className="overflow-hidden rounded-[18px] bg-white">
@@ -732,6 +810,7 @@ export default function UnnewsCompletePreview() {
               <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
                 <p className="text-sm font-medium text-neutral-500">이미지 정책</p>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-700">
+                  <li className="rounded-2xl bg-neutral-50 px-4 py-3">업로드한 이미지 파일 우선 사용</li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">직접 입력한 이미지 URL 우선 사용</li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">이미지가 없으면 카테고리 기반 자동 추천</li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">등록 즉시 카드와 상세에 대표 이미지 반영</li>
