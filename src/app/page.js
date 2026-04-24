@@ -258,7 +258,7 @@ export default function Page() {
     category1: "트렌드",
     category2: "AI",
     category: "AI",
-    body: ""
+    body: "",
     image: "",
     imageFileName: "",
     uploadedImage: "",
@@ -436,7 +436,7 @@ export default function Page() {
         category1: "트렌드",
         category2: "AI",
         category: "AI",
-        body: ""
+        body: "",
         image: "",
         imageFileName: "",
         uploadedImage: "",
