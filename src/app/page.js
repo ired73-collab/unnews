@@ -407,9 +407,9 @@ export default function Page() {
               <img
                 src={currentHero.image}
                 alt={currentHero.title}
-                className="block h-[560px] w-full object-cover transition duration-700"
+                className="block h-[520px] w-full object-cover transition duration-700"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.64),rgba(0,0,0,0.22),rgba(0,0,0,0.08))]" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.56),rgba(0,0,0,0.18),transparent)]" />
 
               <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
                 <span className="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur-md">
@@ -429,7 +429,7 @@ export default function Page() {
                     setSelectedPost(currentHero);
                     setPage("post");
                   }}
-                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white hover:shadow-[0_10px_28px_rgba(255,255,255,0.25)]"
+                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
                 >
                   지금 읽기 →
                 </button>
@@ -455,10 +455,10 @@ export default function Page() {
                         setHeroIndex(index);
                         setSelectedPost(post);
                       }}
-                      className={`group rounded-[24px] border px-5 py-4 text-left text-white shadow-[0_18px_45px_rgba(0,0,0,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 ${
+                      className={`group rounded-[22px] border px-5 py-4 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
                         heroIndex === index
-                          ? "border-white/50 bg-white/22"
-                          : "border-white/22 bg-black/22 hover:border-white/45 hover:bg-white/18"
+                          ? "border-white/45 bg-white/18"
+                          : "border-white/25 bg-white/10 hover:border-white/35 hover:bg-white/16"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
