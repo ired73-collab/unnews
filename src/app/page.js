@@ -69,6 +69,28 @@ const POSTS = [
     category: "AI",
     readTime: "1분 읽기",
   },
+  {
+    id: 7,
+    title: "취준, 이게 현실",
+    body: "취업 준비가 힘든 이유는 정보가 없어서가 아니라, 정보가 너무 많아서입니다. 스펙, 자소서, 인턴, 자격증, 면접 준비까지 다 중요해 보이니 기준이 흐려집니다. 그래서 요즘 취준은 더 열심히 하는 것보다, 무엇을 먼저 할지 정리하는 힘이 더 중요해졌습니다.",
+    summary:
+      "취업 준비는 정보 부족보다 정보 과잉 때문에 더 어려워지고 있습니다.\n스펙, 자소서, 인턴, 면접 준비가 모두 중요해 보이면 기준이 흐려집니다.\n무엇을 먼저 할지 정리하는 힘이 취준의 핵심이 되고 있습니다.",
+    image:
+      "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80",
+    category: "커리어",
+    readTime: "1분 읽기",
+  },
+  {
+    id: 8,
+    title: "콘텐츠, 짧아야 봄",
+    body: "긴 글을 끝까지 읽는 일은 점점 어려워지고 있습니다. 대신 핵심이 빨리 보이고, 한 장면 안에 분위기와 메시지가 함께 담긴 콘텐츠가 더 잘 읽힙니다. 요즘 콘텐츠는 더 많이 설명하는 것보다, 더 빨리 이해되는 구조가 중요합니다.",
+    summary:
+      "긴 글보다 핵심이 빨리 보이는 콘텐츠가 더 잘 읽힙니다.\n한 장면 안에 분위기와 메시지가 함께 담길 때 전달력이 높아집니다.\n요즘 콘텐츠는 많이 설명하는 것보다 빨리 이해되는 구조가 중요합니다.",
+    image:
+      "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=1200&q=80",
+    category: "트렌드",
+    readTime: "1분 읽기",
+  },
 ];
 
 const CATEGORIES = ["전체", "트렌드", "커리어", "AI", "라이프"];
@@ -80,14 +102,14 @@ function clip(text, max = 130) {
 
 function fallbackSummary(text) {
   if (!text) return "";
-  const sentences = text
-    .replace(/\s+/g, " ")
-    .split(/(?<=[.!?。]|다\.|요\.)\s+/)
+  const compact = text.replace(/\s+/g, " ").trim();
+  const sentences = compact
+    .split(/(?<=다\.|요\.|니다\.|[.!?])\s+/)
     .filter(Boolean)
     .slice(0, 3);
 
   if (sentences.length >= 2) return sentences.join("\n");
-  return clip(text, 160);
+  return clip(compact, 160);
 }
 
 function getAutoImage(category, title = "") {
@@ -108,6 +130,44 @@ function getAutoImage(category, title = "") {
   return "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80";
 }
 
+function IconTile({ children }) {
+  return <div className="flex items-center justify-center text-neutral-950">{children}</div>;
+}
+
+function ShortcutGridIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4" y="4" width="6" height="6" rx="1.8" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="14" y="4" width="6" height="6" rx="1.8" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="4" y="14" width="6" height="6" rx="1.8" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="14" y="14" width="6" height="6" rx="1.8" fill="#2563EB" />
+    </svg>
+  );
+}
+
+function ShortcutArticleIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7 3.8h7l3.2 3.2V19a1.2 1.2 0 0 1-1.2 1.2H7A1.2 1.2 0 0 1 5.8 19V5A1.2 1.2 0 0 1 7 3.8Z" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M14 3.8V7h3.2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8.6 11.2h6.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M8.6 15h4.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="15.8" cy="15.2" r="1.9" fill="#7C3AED" />
+    </svg>
+  );
+}
+
+function ShortcutAdminIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3.8 18 6v4.6c0 4-2.4 7-6 8.4-3.6-1.4-6-4.4-6-8.4V6l6-2.2Z" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m9.8 11.8 1.6 1.6 3.1-3.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M18.5 18.5h2.7" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="18.5" cy="18.5" r="1.8" fill="#F59E0B" />
+    </svg>
+  );
+}
+
 function SiteFooter() {
   return (
     <footer className="mt-16 bg-black text-white">
@@ -115,15 +175,13 @@ function SiteFooter() {
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="text-lg font-semibold">UNNEWS</div>
-            <div className="mt-2 text-sm text-white/60">
-              대학연합신문 · 이미지 중심 콘텐츠 플랫폼
-            </div>
+            <div className="mt-2 text-sm text-white/60">대학연합신문 · 이미지 중심 콘텐츠 플랫폼</div>
           </div>
 
           <div className="flex gap-6 text-sm text-white/70">
-            <span>About</span>
-            <span>Contact</span>
-            <span>Privacy</span>
+            <span className="cursor-pointer hover:text-white">About</span>
+            <span className="cursor-pointer hover:text-white">Contact</span>
+            <span className="cursor-pointer hover:text-white">Privacy</span>
           </div>
         </div>
 
@@ -281,7 +339,7 @@ export default function Page() {
             }}
             className="flex items-center gap-3"
           >
-            <div className="rounded-2xl bg-neutral-950 px-3.5 py-1.5 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)]">
+            <div className="rounded-2xl bg-neutral-950 px-3.5 py-1.5 text-sm font-semibold tracking-[-0.02em] text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)]">
               UNNEWS
             </div>
             <span className="hidden text-sm text-neutral-500 md:block">대학연합신문</span>
@@ -383,27 +441,38 @@ export default function Page() {
 
               <div className="rounded-[24px] border border-white/60 bg-white/78 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.05)] backdrop-blur">
                 <p className="text-xs font-medium text-neutral-500">바로 보기</p>
-                <div className="mt-4 grid grid-cols-3 gap-3">
+                <div className="mt-4 grid grid-cols-3 items-stretch gap-3">
                   <button
                     onClick={() => setPage("category")}
-                    className="flex min-h-[148px] flex-col items-center justify-center rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center text-sm font-semibold hover:bg-white hover:shadow-md"
+                    className="flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md active:scale-95"
                   >
-                    카테고리
+                    <IconTile>
+                      <ShortcutGridIcon />
+                    </IconTile>
+                    <div className="text-sm font-semibold text-neutral-900">카테고리</div>
                   </button>
+
                   <button
                     onClick={() => {
                       setSelectedPost(currentHero);
                       setPage("post");
                     }}
-                    className="flex min-h-[148px] flex-col items-center justify-center rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center text-sm font-semibold hover:bg-white hover:shadow-md"
+                    className="flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md active:scale-95"
                   >
-                    글 상세
+                    <IconTile>
+                      <ShortcutArticleIcon />
+                    </IconTile>
+                    <div className="text-sm font-semibold text-neutral-900">글 상세</div>
                   </button>
+
                   <button
                     onClick={() => setPage("admin")}
-                    className="flex min-h-[148px] flex-col items-center justify-center rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center text-sm font-semibold hover:bg-white hover:shadow-md"
+                    className="flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md active:scale-95"
                   >
-                    관리자
+                    <IconTile>
+                      <ShortcutAdminIcon />
+                    </IconTile>
+                    <div className="text-sm font-semibold text-neutral-900">관리자</div>
                   </button>
                 </div>
               </div>
@@ -457,10 +526,10 @@ export default function Page() {
                     setActiveCategory(category);
                     setPage("category");
                   }}
-                  className={`rounded-full px-4 py-2.5 text-sm font-medium ${
+                  className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
                     activeCategory === category
-                      ? "bg-neutral-950 text-white"
-                      : "border border-black/5 bg-white/80 text-neutral-600"
+                      ? "bg-neutral-950 text-white shadow-[0_10px_24px_rgba(0,0,0,0.16)]"
+                      : "border border-black/5 bg-white/80 text-neutral-600 backdrop-blur hover:bg-white"
                   }`}
                 >
                   {category}
@@ -477,7 +546,7 @@ export default function Page() {
                     setSelectedPost(post);
                     setPage("post");
                   }}
-                  className="flex items-center gap-4 rounded-[24px] border border-white/60 bg-white/78 p-3.5 text-left shadow-[0_16px_42px_rgba(0,0,0,0.06)] backdrop-blur transition hover:-translate-y-1"
+                  className="flex items-center gap-4 rounded-[24px] border border-white/60 bg-white/78 p-3.5 text-left shadow-[0_16px_42px_rgba(0,0,0,0.06)] backdrop-blur transition hover:-translate-y-1 hover:shadow-[0_22px_52px_rgba(0,0,0,0.08)]"
                 >
                   <img
                     src={post.image}
@@ -519,10 +588,10 @@ export default function Page() {
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`rounded-full px-4 py-2.5 text-sm font-medium ${
+                className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
                   activeCategory === category
-                    ? "bg-neutral-950 text-white"
-                    : "border border-black/5 bg-white/80 text-neutral-600"
+                    ? "bg-neutral-950 text-white shadow-[0_10px_24px_rgba(0,0,0,0.16)]"
+                    : "border border-black/5 bg-white/80 text-neutral-600 backdrop-blur hover:bg-white"
                 }`}
               >
                 {category}
