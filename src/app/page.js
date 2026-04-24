@@ -119,7 +119,31 @@ const POSTS = [
   },
 ];
 
-const CATEGORIES = ["전체", "트렌드", "커리어", "AI", "라이프"];
+const CATEGORY_MAP = {
+  뉴스: ["대학뉴스", "교육", "사회", "문화", "지역"],
+  커뮤니티: ["캠퍼스", "학생생활", "인터뷰", "칼럼", "제보"],
+  "취업/공모전": ["취업", "인턴", "공모전", "대외활동", "창업"],
+  트렌드: ["AI", "라이프", "커리어", "소비문화", "콘텐츠"],
+};
+
+const PRIMARY_CATEGORIES = ["전체", ...Object.keys(CATEGORY_MAP)];
+
+function getCategory1(post) {
+  if (post.category1) return post.category1;
+  if (["AI", "라이프", "커리어", "트렌드"].includes(post.category)) return "트렌드";
+  return post.category || "트렌드";
+}
+
+function getCategory2(post) {
+  if (post.category2) return post.category2;
+  if (["AI", "라이프", "커리어"].includes(post.category)) return post.category;
+  if (post.category === "트렌드") return "콘텐츠";
+  return post.category || "콘텐츠";
+}
+
+function getCategoryLabel(post) {
+  return `${getCategory1(post)} · ${getCategory2(post)}`;
+}
 
 function clip(text, max = 130) {
   if (!text) return "";
@@ -222,6 +246,7 @@ function SiteFooter() {
 export default function Page() {
   const [page, setPage] = useState("home");
   const [activeCategory, setActiveCategory] = useState("전체");
+  const [activeSubCategory, setActiveSubCategory] = useState("전체");
   const [selectedPost, setSelectedPost] = useState(POSTS[0]);
   const [drafts, setDrafts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
@@ -230,8 +255,10 @@ export default function Page() {
 
   const [form, setForm] = useState({
     title: "",
-    category: "트렌드",
-    body: "",
+    category1: "트렌드",
+    category2: "AI",
+    category: "AI",
+    body: ""
     image: "",
     imageFileName: "",
     uploadedImage: "",
@@ -247,8 +274,13 @@ export default function Page() {
 
   const visiblePosts = useMemo(() => {
     if (activeCategory === "전체") return allPosts;
-    return allPosts.filter((post) => post.category === activeCategory);
-  }, [activeCategory, allPosts]);
+
+    return allPosts.filter((post) => {
+      const matchPrimary = getCategory1(post) === activeCategory;
+      const matchSub = activeSubCategory === "전체" || getCategory2(post) === activeSubCategory;
+      return matchPrimary && matchSub;
+    });
+  }, [activeCategory, activeSubCategory, allPosts]);
 
   const heroPosts = allPosts.slice(0, 3);
   const featured = allPosts.slice(0, 4);
@@ -258,7 +290,7 @@ export default function Page() {
   const previewImage = form.uploadedImage
     ? form.uploadedImage
     : form.useAutoImage || !form.image.trim()
-      ? getAutoImage(form.category, form.title)
+      ? getAutoImage(form.category2, form.title)
       : form.image.trim();
 
   useEffect(() => {
@@ -373,7 +405,7 @@ export default function Page() {
       ? form.uploadedImage
       : form.image.trim()
         ? form.image.trim()
-        : getAutoImage(form.category, form.title);
+        : getAutoImage(form.category2, form.title);
 
     const resolvedSummary = summary.trim() || fallbackSummary(form.body.trim());
 
@@ -381,7 +413,9 @@ export default function Page() {
       title: form.title.trim(),
       body: form.body.trim(),
       summary: resolvedSummary,
-      category: form.category,
+      category1: form.category1,
+      category2: form.category2,
+      category: form.category2,
       readTime: "1분 읽기",
       image: resolvedImage,
       createdAt: serverTimestamp(),
@@ -399,8 +433,10 @@ export default function Page() {
       setDrafts((prev) => [newPost, ...prev]);
       setForm({
         title: "",
-        category: "트렌드",
-        body: "",
+        category1: "트렌드",
+        category2: "AI",
+        category: "AI",
+        body: ""
         image: "",
         imageFileName: "",
         uploadedImage: "",
@@ -438,11 +474,12 @@ export default function Page() {
           </button>
 
           <nav className="hidden items-center gap-5 md:flex">
-            {CATEGORIES.slice(1).map((item) => (
+            {PRIMARY_CATEGORIES.slice(1).map((item) => (
               <button
                 key={item}
                 onClick={() => {
                   setActiveCategory(item);
+                  setActiveSubCategory("전체");
                   setPage("category");
                 }}
                 className="text-sm font-medium text-neutral-500 hover:text-neutral-900"
@@ -474,7 +511,7 @@ export default function Page() {
 
               <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
                 <span className="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur-md">
-                  {currentHero.category}
+                  {getCategory2(currentHero)}
                 </span>
 
                 <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] md:text-[3.7rem]">
@@ -524,7 +561,7 @@ export default function Page() {
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-xs font-semibold text-white/75">
-                          {post.category}
+                          {getCategory2(post)}
                         </span>
                         <span className="h-1.5 w-1.5 rounded-full bg-white/60 opacity-0 transition group-hover:opacity-100" />
                       </div>
@@ -627,7 +664,7 @@ export default function Page() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                    <span className="text-xs opacity-80">{post.category}</span>
+                    <span className="text-xs opacity-80">{getCategory2(post)}</span>
                     <h3 className="mt-1 text-[1.08rem] font-semibold leading-6 tracking-[-0.03em]">
                       {post.title}
                     </h3>
@@ -639,11 +676,12 @@ export default function Page() {
 
           <section>
             <div className="mb-4 flex gap-2 overflow-auto pb-1">
-              {CATEGORIES.map((category) => (
+              {PRIMARY_CATEGORIES.map((category) => (
                 <button
                   key={category}
                   onClick={() => {
                     setActiveCategory(category);
+                    setActiveSubCategory("전체");
                     setPage("category");
                   }}
                   className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
@@ -676,7 +714,7 @@ export default function Page() {
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center gap-2">
                       <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-500">
-                        {post.category}
+                        {getCategory2(post)}
                       </span>
                       <span className="text-xs text-neutral-400">{post.readTime}</span>
                     </div>
@@ -699,12 +737,12 @@ export default function Page() {
           <div className="mb-6">
             <p className="text-sm text-neutral-500">Category</p>
             <h1 className="text-[2.3rem] font-semibold tracking-[-0.045em]">
-              {activeCategory}
+              {activeCategory === "전체" ? "전체 글" : activeCategory}
             </h1>
           </div>
 
           <div className="mb-5 flex gap-2 overflow-auto pb-1">
-            {CATEGORIES.map((category) => (
+            {PRIMARY_CATEGORIES.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
@@ -737,7 +775,7 @@ export default function Page() {
                 />
                 <div className="min-w-0 flex-1">
                   <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-500">
-                    {post.category}
+                    {getCategory2(post)}
                   </span>
                   <h3 className="mt-2 line-clamp-2 text-[1rem] font-semibold leading-6 tracking-[-0.03em]">
                     {post.title}
@@ -774,7 +812,7 @@ export default function Page() {
             <div className="p-7 md:p-9">
               <div className="mb-3 flex items-center gap-2">
                 <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-500">
-                  {selectedPost.category}
+                  {getCategoryLabel(selectedPost)}
                 </span>
                 <span className="text-xs text-neutral-400">{selectedPost.readTime}</span>
               </div>
@@ -835,17 +873,46 @@ export default function Page() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-neutral-600">
-                    카테고리
+                    1차 카테고리
                   </label>
                   <select
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    value={form.category1}
+                    onChange={(e) => {
+                      const nextPrimary = e.target.value;
+                      const nextSub = CATEGORY_MAP[nextPrimary]?.[0] || "콘텐츠";
+                      setForm({
+                        ...form,
+                        category1: nextPrimary,
+                        category2: nextSub,
+                        category: nextSub,
+                      });
+                    }}
                     className="w-full rounded-[20px] border border-black/10 bg-white px-4 py-3.5 outline-none"
                   >
-                    <option>트렌드</option>
-                    <option>커리어</option>
-                    <option>AI</option>
-                    <option>라이프</option>
+                    {Object.keys(CATEGORY_MAP).map((primary) => (
+                      <option key={primary}>{primary}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-neutral-600">
+                    2차 카테고리
+                  </label>
+                  <select
+                    value={form.category2}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        category2: e.target.value,
+                        category: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-[20px] border border-black/10 bg-white px-4 py-3.5 outline-none"
+                  >
+                    {(CATEGORY_MAP[form.category1] || []).map((sub) => (
+                      <option key={sub}>{sub}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -997,7 +1064,7 @@ export default function Page() {
                     업로드 완료 후 이미지 URL 자동 적용
                   </li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">
-                    이미지가 없으면 카테고리 기반 자동 추천
+                    이미지가 없으면 2차 카테고리 기반 자동 추천
                   </li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">
                     본문 입력 시 3줄 요약 자동 생성
@@ -1027,7 +1094,7 @@ export default function Page() {
                         />
                       </div>
                       <strong>{post.title}</strong>
-                      <div className="mt-1 text-xs text-neutral-400">{post.category}</div>
+                      <div className="mt-1 text-xs text-neutral-400">{getCategory2(post)}</div>
                     </button>
                   ))}
                 </div>
