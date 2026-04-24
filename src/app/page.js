@@ -72,6 +72,28 @@ const POSTS = [
     category: "AI",
     readTime: "1분 읽기",
   },
+  {
+    id: 7,
+    title: "취준, 이게 현실",
+    body: "취업 준비가 힘든 이유는 정보가 없어서가 아니라, 정보가 너무 많아서입니다. 스펙, 자소서, 인턴, 자격증, 면접 준비까지 다 중요해 보이니 기준이 흐려집니다. 그래서 요즘 취준은 더 열심히 하는 것보다, 무엇을 먼저 할지 정리하는 힘이 더 중요해졌습니다.",
+    summary:
+      "취업 준비는 정보 부족보다 정보 과잉 때문에 더 어려워지고 있습니다.\n스펙, 자소서, 인턴, 면접 준비가 모두 중요해 보이면 기준이 흐려집니다.\n무엇을 먼저 할지 정리하는 힘이 취준의 핵심이 되고 있습니다.",
+    image:
+      "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80",
+    category: "커리어",
+    readTime: "1분 읽기",
+  },
+  {
+    id: 8,
+    title: "콘텐츠, 짧아야 봄",
+    body: "긴 글을 끝까지 읽는 일은 점점 어려워지고 있습니다. 대신 핵심이 빨리 보이고, 한 장면 안에 분위기와 메시지가 함께 담긴 콘텐츠가 더 잘 읽힙니다. 요즘 콘텐츠는 더 많이 설명하는 것보다, 더 빨리 이해되는 구조가 중요합니다.",
+    summary:
+      "긴 글보다 핵심이 빨리 보이는 콘텐츠가 더 잘 읽힙니다.\n한 장면 안에 분위기와 메시지가 함께 담길 때 전달력이 높아집니다.\n요즘 콘텐츠는 많이 설명하는 것보다 빨리 이해되는 구조가 중요합니다.",
+    image:
+      "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=1200&q=80",
+    category: "트렌드",
+    readTime: "1분 읽기",
+  },
 ];
 
 const CATEGORIES = ["전체", "트렌드", "커리어", "AI", "라이프"];
@@ -99,9 +121,11 @@ function getAutoImage(category, title = "") {
   if (keyword.includes("AI")) {
     return "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1200&q=80";
   }
+
   if (keyword.includes("커리어") || keyword.includes("포폴") || keyword.includes("취준")) {
     return "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80";
   }
+
   if (keyword.includes("라이프") || keyword.includes("루틴") || keyword.includes("캠퍼스")) {
     return "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=1200&q=80";
   }
@@ -274,21 +298,23 @@ export default function Page() {
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Cloudinary upload error:", errorText);
         throw new Error("이미지 업로드 실패");
       }
 
       const data = await response.json();
 
-      setForm({
-        ...form,
+      setForm((prev) => ({
+        ...prev,
         uploadedImage: data.secure_url,
         imageFileName: file.name,
         image: data.secure_url,
         useAutoImage: false,
-      });
+      }));
     } catch (error) {
       console.error(error);
-      alert("이미지 업로드에 실패했습니다. Cloudinary 설정을 확인해주세요.");
+      alert("이미지 업로드에 실패했습니다. Cloudinary preset과 cloud name을 확인해주세요.");
     } finally {
       setIsUploading(false);
     }
@@ -299,9 +325,9 @@ export default function Page() {
 
     const resolvedImage = form.uploadedImage
       ? form.uploadedImage
-      : form.useAutoImage || !form.image.trim()
-        ? getAutoImage(form.category, form.title)
-        : form.image.trim();
+      : form.image.trim()
+        ? form.image.trim()
+        : getAutoImage(form.category, form.title);
 
     const resolvedSummary = summary.trim() || fallbackSummary(form.body.trim());
 
