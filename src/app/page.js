@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
+const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
+
 const POSTS = [
   {
     id: 1,
@@ -69,28 +72,6 @@ const POSTS = [
     category: "AI",
     readTime: "1분 읽기",
   },
-  {
-    id: 7,
-    title: "취준, 이게 현실",
-    body: "취업 준비가 힘든 이유는 정보가 없어서가 아니라, 정보가 너무 많아서입니다. 스펙, 자소서, 인턴, 자격증, 면접 준비까지 다 중요해 보이니 기준이 흐려집니다. 그래서 요즘 취준은 더 열심히 하는 것보다, 무엇을 먼저 할지 정리하는 힘이 더 중요해졌습니다.",
-    summary:
-      "취업 준비는 정보 부족보다 정보 과잉 때문에 더 어려워지고 있습니다.\n스펙, 자소서, 인턴, 면접 준비가 모두 중요해 보이면 기준이 흐려집니다.\n무엇을 먼저 할지 정리하는 힘이 취준의 핵심이 되고 있습니다.",
-    image:
-      "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80",
-    category: "커리어",
-    readTime: "1분 읽기",
-  },
-  {
-    id: 8,
-    title: "콘텐츠, 짧아야 봄",
-    body: "긴 글을 끝까지 읽는 일은 점점 어려워지고 있습니다. 대신 핵심이 빨리 보이고, 한 장면 안에 분위기와 메시지가 함께 담긴 콘텐츠가 더 잘 읽힙니다. 요즘 콘텐츠는 더 많이 설명하는 것보다, 더 빨리 이해되는 구조가 중요합니다.",
-    summary:
-      "긴 글보다 핵심이 빨리 보이는 콘텐츠가 더 잘 읽힙니다.\n한 장면 안에 분위기와 메시지가 함께 담길 때 전달력이 높아집니다.\n요즘 콘텐츠는 많이 설명하는 것보다 빨리 이해되는 구조가 중요합니다.",
-    image:
-      "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=1200&q=80",
-    category: "트렌드",
-    readTime: "1분 읽기",
-  },
 ];
 
 const CATEGORIES = ["전체", "트렌드", "커리어", "AI", "라이프"];
@@ -118,11 +99,9 @@ function getAutoImage(category, title = "") {
   if (keyword.includes("AI")) {
     return "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1200&q=80";
   }
-
   if (keyword.includes("커리어") || keyword.includes("포폴") || keyword.includes("취준")) {
     return "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80";
   }
-
   if (keyword.includes("라이프") || keyword.includes("루틴") || keyword.includes("캠퍼스")) {
     return "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=1200&q=80";
   }
@@ -213,6 +192,7 @@ export default function Page() {
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const allPosts = useMemo(() => [...drafts, ...POSTS], [drafts]);
 
@@ -275,18 +255,43 @@ export default function Page() {
     return () => clearTimeout(timer);
   }, [form.body]);
 
-  const handleImageFile = (file) => {
+  const handleImageFile = async (file) => {
     if (!file || !file.type.startsWith("image/")) return;
 
-    const objectUrl = URL.createObjectURL(file);
+    try {
+      setIsUploading(true);
 
-    setForm({
-      ...form,
-      uploadedImage: objectUrl,
-      imageFileName: file.name,
-      image: "",
-      useAutoImage: false,
-    });
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: uploadData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("이미지 업로드 실패");
+      }
+
+      const data = await response.json();
+
+      setForm({
+        ...form,
+        uploadedImage: data.secure_url,
+        imageFileName: file.name,
+        image: data.secure_url,
+        useAutoImage: false,
+      });
+    } catch (error) {
+      console.error(error);
+      alert("이미지 업로드에 실패했습니다. Cloudinary 설정을 확인해주세요.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const submitDraft = () => {
@@ -774,19 +779,24 @@ export default function Page() {
                     <label className="flex cursor-pointer items-center justify-between gap-4 text-sm text-neutral-600">
                       <div>
                         <div className="font-medium text-neutral-800">
-                          {form.imageFileName ? form.imageFileName : "내 컴퓨터에서 이미지 선택"}
+                          {isUploading
+                            ? "Cloudinary에 이미지 업로드 중..."
+                            : form.imageFileName
+                              ? form.imageFileName
+                              : "내 컴퓨터에서 이미지 선택"}
                         </div>
                         <div className="mt-1 text-xs text-neutral-400">
                           이미지를 드래그해서 놓거나 파일 선택 버튼을 눌러주세요
                         </div>
                       </div>
                       <span className="shrink-0 rounded-full bg-neutral-900 px-3 py-1 text-xs font-semibold text-white">
-                        파일 선택
+                        {isUploading ? "업로드 중" : "파일 선택"}
                       </span>
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
+                        disabled={isUploading}
                         onChange={(e) => handleImageFile(e.target.files?.[0])}
                       />
                     </label>
@@ -807,7 +817,7 @@ export default function Page() {
                     <p className="text-sm font-medium text-neutral-700">이미지 미리보기</p>
                     <span className="text-xs text-neutral-400">
                       {form.uploadedImage
-                        ? "업로드 이미지"
+                        ? "Cloudinary 업로드 이미지"
                         : form.useAutoImage || !form.image.trim()
                           ? "자동 추천 이미지"
                           : "직접 입력 이미지"}
@@ -853,7 +863,8 @@ export default function Page() {
 
                 <button
                   onClick={submitDraft}
-                  className="rounded-full bg-neutral-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 active:scale-95"
+                  disabled={isUploading}
+                  className="rounded-full bg-neutral-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   글 등록 미리보기
                 </button>
@@ -865,10 +876,10 @@ export default function Page() {
                 <p className="text-sm font-medium text-neutral-500">이미지 정책</p>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-700">
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">
-                    업로드한 이미지 파일 우선 사용
+                    Cloudinary에 업로드한 이미지 파일 우선 사용
                   </li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">
-                    직접 입력한 이미지 URL 우선 사용
+                    업로드 완료 후 이미지 URL 자동 적용
                   </li>
                   <li className="rounded-2xl bg-neutral-50 px-4 py-3">
                     이미지가 없으면 카테고리 기반 자동 추천
