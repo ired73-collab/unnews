@@ -1,9 +1,32 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { initializeApp, getApp, getApps } from "firebase/app";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
 
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAwyJMVfKR1XguC12QuYyfAVycmEX1f5O0",
+  authDomain: "unnews-b0818.firebaseapp.com",
+  projectId: "unnews-b0818",
+  storageBucket: "unnews-b0818.firebasestorage.app",
+  messagingSenderId: "843632495033",
+  appId: "1:843632495033:web:97bae4ed05b458c76cce68",
+  measurementId: "G-CTGB10GEV3",
+};
+
+const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 const POSTS = [
   {
@@ -201,6 +224,8 @@ export default function Page() {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [selectedPost, setSelectedPost] = useState(POSTS[0]);
   const [drafts, setDrafts] = useState([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [isSavingPost, setIsSavingPost] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
 
   const [form, setForm] = useState({
@@ -235,6 +260,27 @@ export default function Page() {
     : form.useAutoImage || !form.image.trim()
       ? getAutoImage(form.category, form.title)
       : form.image.trim();
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setIsLoadingPosts(true);
+        const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(postsQuery);
+        const savedPosts = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDrafts(savedPosts);
+      } catch (error) {
+        console.error("Firestore load error:", error);
+      } finally {
+        setIsLoadingPosts(false);
+      }
+    };
+
+    loadPosts();
+  }, []);
 
   useEffect(() => {
     if (page !== "home" || heroPosts.length <= 1) return undefined;
@@ -320,8 +366,8 @@ export default function Page() {
     }
   };
 
-  const submitDraft = () => {
-    if (!form.title.trim() || !form.body.trim()) return;
+  const submitDraft = async () => {
+    if (!form.title.trim() || !form.body.trim() || isSavingPost) return;
 
     const resolvedImage = form.uploadedImage
       ? form.uploadedImage
@@ -331,29 +377,44 @@ export default function Page() {
 
     const resolvedSummary = summary.trim() || fallbackSummary(form.body.trim());
 
-    const newPost = {
-      id: Date.now(),
+    const newPostData = {
       title: form.title.trim(),
       body: form.body.trim(),
       summary: resolvedSummary,
       category: form.category,
       readTime: "1분 읽기",
       image: resolvedImage,
+      createdAt: serverTimestamp(),
     };
 
-    setDrafts((prev) => [newPost, ...prev]);
-    setForm({
-      title: "",
-      category: "트렌드",
-      body: "",
-      image: "",
-      imageFileName: "",
-      uploadedImage: "",
-      useAutoImage: true,
-    });
-    setSummary("");
-    setSelectedPost(newPost);
-    setPage("post");
+    try {
+      setIsSavingPost(true);
+      const docRef = await addDoc(collection(db, "posts"), newPostData);
+      const newPost = {
+        id: docRef.id,
+        ...newPostData,
+        createdAt: new Date().toISOString(),
+      };
+
+      setDrafts((prev) => [newPost, ...prev]);
+      setForm({
+        title: "",
+        category: "트렌드",
+        body: "",
+        image: "",
+        imageFileName: "",
+        uploadedImage: "",
+        useAutoImage: true,
+      });
+      setSummary("");
+      setSelectedPost(newPost);
+      setPage("post");
+    } catch (error) {
+      console.error("Firestore save error:", error);
+      alert("글 저장에 실패했습니다. Firestore 보안 규칙과 Firebase 설정을 확인해주세요.");
+    } finally {
+      setIsSavingPost(false);
+    }
   };
 
   return (
@@ -917,10 +978,10 @@ export default function Page() {
 
                 <button
                   onClick={submitDraft}
-                  disabled={isUploading}
+                  disabled={isUploading || isSavingPost}
                   className="rounded-full bg-neutral-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  글 등록 미리보기
+                  {isSavingPost ? "Firestore에 저장 중..." : "글 등록 미리보기"}
                 </button>
               </div>
             </div>
@@ -945,7 +1006,9 @@ export default function Page() {
               </div>
 
               <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
-                <p className="text-sm font-medium text-neutral-500">등록된 글 미리보기</p>
+                <p className="text-sm font-medium text-neutral-500">
+                  등록된 글 미리보기 {isLoadingPosts ? "· 불러오는 중" : ""}
+                </p>
                 <div className="mt-4 space-y-3">
                   {allPosts.slice(0, 5).map((post) => (
                     <button
