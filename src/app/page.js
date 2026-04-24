@@ -741,21 +741,25 @@ export default function Page() {
             </h1>
           </div>
 
-          <div className="mb-5 flex gap-2 overflow-auto pb-1">
-            {PRIMARY_CATEGORIES.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
-                  activeCategory === category
-                    ? "bg-neutral-950 text-white shadow-[0_10px_24px_rgba(0,0,0,0.16)]"
-                    : "border border-black/5 bg-white/80 text-neutral-600 backdrop-blur hover:bg-white"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          $1
+
+          {activeCategory !== "전체" && (
+            <div className="mb-5 flex gap-2 overflow-auto pb-1">
+              {["전체", ...(CATEGORY_MAP[activeCategory] || [])].map((subCategory) => (
+                <button
+                  key={subCategory}
+                  onClick={() => setActiveSubCategory(subCategory)}
+                  className={`rounded-full px-4 py-2 text-xs font-medium transition ${
+                    activeSubCategory === subCategory
+                      ? "bg-neutral-900 text-white"
+                      : "border border-black/5 bg-white/80 text-neutral-500 hover:bg-white"
+                  }`}
+                >
+                  {subCategory}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="grid gap-5 xl:grid-cols-2">
             {visiblePosts.map((post) => (
