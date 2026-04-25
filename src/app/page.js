@@ -514,7 +514,7 @@ export default function Page() {
                   {getCategory2(currentHero)}
                 </span>
 
-                <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] md:text-[3.7rem]">
+                <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] md:text-[3.7rem] line-clamp-2 break-keep">
                   {currentHero.title}
                 </h1>
 
