@@ -3,6 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { initializeApp, getApp, getApps } from "firebase/app";
 import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import {
   addDoc,
   collection,
   deleteDoc,
@@ -17,7 +23,6 @@ import {
 
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
-const ADMIN_PASSWORD = "unnews2026";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwyJMVfKR1XguC12QuYyfAVycmEX1f5O0",
@@ -31,6 +36,7 @@ const firebaseConfig = {
 
 const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
 
 const POSTS = [
   {
@@ -358,8 +364,10 @@ function SiteFooter() {
 export default function Page() {
   const [page, setPage] = useState("home");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [adminError, setAdminError] = useState("");
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [activeCategory, setActiveCategory] = useState("전체");
   const [activeSubCategory, setActiveSubCategory] = useState("전체");
   const [selectedPost, setSelectedPost] = useState(POSTS[0]);
@@ -412,6 +420,15 @@ export default function Page() {
     : form.useAutoImage || !form.image.trim()
       ? getAutoImage(form.category2, `${form.title} ${form.body}`)
       : form.image.trim();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAdmin(Boolean(user));
+      setIsAuthChecking(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -650,23 +667,36 @@ export default function Page() {
     }
   };
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
+    setAdminError("");
 
-    if (adminPassword === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      setAdminPassword("");
-      setAdminError("");
-      setPage("admin");
+    if (!adminEmail.trim() || !adminPassword.trim()) {
+      setAdminError("이메일과 비밀번호를 모두 입력해주세요.");
       return;
     }
 
-    setAdminError("비밀번호가 올바르지 않습니다.");
+    try {
+      await signInWithEmailAndPassword(auth, adminEmail.trim(), adminPassword);
+      setAdminEmail("");
+      setAdminPassword("");
+      setAdminError("");
+      setPage("admin");
+    } catch (error) {
+      console.error("Firebase Auth login error:", error);
+      setAdminError("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.");
+    }
   };
 
-  const handleAdminLogout = () => {
+  const handleAdminLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Firebase Auth logout error:", error);
+    }
     setIsAdmin(false);
     setEditingId(null);
+    setAdminEmail("");
     setAdminPassword("");
     setAdminError("");
     setPage("home");
@@ -711,7 +741,7 @@ export default function Page() {
               onClick={() => setPage("admin")}
               className="rounded-full border border-black/10 px-4 py-2 text-sm text-neutral-700"
             >
-              {isAdmin ? "Admin" : "Admin Login"}
+              {isAuthChecking ? "Checking..." : isAdmin ? "Admin" : "Admin Login"}
             </button>
           </nav>
         </div>
@@ -1106,10 +1136,23 @@ export default function Page() {
               관리자 로그인
             </h1>
             <p className="mt-3 text-sm leading-6 text-neutral-600">
-              콘텐츠 등록·수정·삭제는 관리자 로그인 후 사용할 수 있습니다.
+              Firebase Auth에 등록된 관리자 이메일과 비밀번호로 로그인합니다.
             </p>
 
             <form onSubmit={handleAdminLogin} className="mt-6 space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-neutral-600">
+                  관리자 이메일
+                </label>
+                <input
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full rounded-[18px] border border-black/10 bg-white px-4 py-3.5 outline-none"
+                  placeholder="admin@unnews.co.kr"
+                />
+              </div>
+
               <div>
                 <label className="mb-2 block text-sm font-medium text-neutral-600">
                   관리자 비밀번호
