@@ -393,6 +393,10 @@ export default function Page() {
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [contentBlocks, setContentBlocks] = useState([
+    { id: Date.now(), type: "text", value: "" },
+  ]);
+  const [uploadingBlockId, setUploadingBlockId] = useState(null);
 
   const allPosts = useMemo(() => {
     // 실제 서비스에서는 Firestore에 저장된 글만 노출합니다.
@@ -462,7 +466,7 @@ export default function Page() {
   }, [page, heroPosts.length]);
 
   useEffect(() => {
-    const text = form.body.trim();
+    const text = getPlainBodyFromBlocks(contentBlocks);
 
     if (text.length < 60) {
       setSummary("");
@@ -492,39 +496,45 @@ export default function Page() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [form.body]);
+  }, [form.body, contentBlocks]);
+
+  const uploadImageToCloudinary = async (file) => {
+    if (!file || !file.type.startsWith("image/")) return "";
+
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: uploadData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Cloudinary upload error:", errorText);
+      throw new Error("이미지 업로드 실패");
+    }
+
+    const data = await response.json();
+    return data.secure_url;
+  };
 
   const handleImageFile = async (file) => {
     if (!file || !file.type.startsWith("image/")) return;
 
     try {
       setIsUploading(true);
-
-      const uploadData = new FormData();
-      uploadData.append("file", file);
-      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: "POST",
-          body: uploadData,
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Cloudinary upload error:", errorText);
-        throw new Error("이미지 업로드 실패");
-      }
-
-      const data = await response.json();
+      const imageUrl = await uploadImageToCloudinary(file);
 
       setForm((prev) => ({
         ...prev,
-        uploadedImage: data.secure_url,
+        uploadedImage: imageUrl,
         imageFileName: file.name,
-        image: data.secure_url,
+        image: imageUrl,
         useAutoImage: false,
       }));
     } catch (error) {
@@ -533,6 +543,90 @@ export default function Page() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const addTextBlock = () => {
+    setContentBlocks((prev) => [
+      ...prev,
+      { id: Date.now() + Math.random(), type: "text", value: "" },
+    ]);
+  };
+
+  const addImageBlock = () => {
+    setContentBlocks((prev) => [
+      ...prev,
+      { id: Date.now() + Math.random(), type: "image", url: "", caption: "" },
+    ]);
+  };
+
+  const updateBlock = (blockId, patch) => {
+    setContentBlocks((prev) =>
+      prev.map((block) => (block.id === blockId ? { ...block, ...patch } : block))
+    );
+  };
+
+  const removeBlock = (blockId) => {
+    setContentBlocks((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((block) => block.id !== blockId);
+    });
+  };
+
+  const moveBlock = (blockId, direction) => {
+    setContentBlocks((prev) => {
+      const index = prev.findIndex((block) => block.id === blockId);
+      const nextIndex = index + direction;
+      if (index < 0 || nextIndex < 0 || nextIndex >= prev.length) return prev;
+      const next = [...prev];
+      const [target] = next.splice(index, 1);
+      next.splice(nextIndex, 0, target);
+      return next;
+    });
+  };
+
+  const uploadBlockImage = async (blockId, file) => {
+    if (!file || !file.type.startsWith("image/")) return;
+
+    try {
+      setUploadingBlockId(blockId);
+      const imageUrl = await uploadImageToCloudinary(file);
+      updateBlock(blockId, { url: imageUrl, fileName: file.name });
+    } catch (error) {
+      console.error(error);
+      alert("본문 이미지 업로드에 실패했습니다.");
+    } finally {
+      setUploadingBlockId(null);
+    }
+  };
+
+  const getPlainBodyFromBlocks = (blocks) => {
+    const text = blocks
+      .filter((block) => block.type === "text")
+      .map((block) => block.value || "")
+      .join("
+
+")
+      .trim();
+
+    return text || form.body.trim();
+  };
+
+  const getCleanContentBlocks = () => {
+    return contentBlocks
+      .map((block) => {
+        if (block.type === "text") {
+          return { type: "text", value: (block.value || "").trim() };
+        }
+        return {
+          type: "image",
+          url: block.url || "",
+          caption: (block.caption || "").trim(),
+        };
+      })
+      .filter((block) => {
+        if (block.type === "text") return block.value;
+        return block.url;
+      });
   };
 
   const resetForm = () => {
@@ -549,22 +643,27 @@ export default function Page() {
     });
     setSummary("");
     setEditingId(null);
+    setContentBlocks([{ id: Date.now(), type: "text", value: "" }]);
   };
 
   const submitDraft = async () => {
-    if (!form.title.trim() || !form.body.trim() || isSavingPost) return;
+    const cleanBlocks = getCleanContentBlocks();
+    const plainBody = getPlainBodyFromBlocks(contentBlocks);
+
+    if (!form.title.trim() || !plainBody || isSavingPost) return;
 
     const resolvedImage = form.uploadedImage
       ? form.uploadedImage
       : form.image.trim()
         ? form.image.trim()
-        : getAutoImage(form.category2, `${form.title} ${form.body}`);
+        : getAutoImage(form.category2, `${form.title} ${plainBody}`);
 
-    const resolvedSummary = summary.trim() || fallbackSummary(form.body.trim());
+    const resolvedSummary = summary.trim() || fallbackSummary(plainBody);
 
     const postData = {
       title: form.title.trim(),
-      body: form.body.trim(),
+      body: plainBody,
+      contentBlocks: cleanBlocks.length > 0 ? cleanBlocks : [{ type: "text", value: plainBody }],
       summary: resolvedSummary,
       category1: form.category1,
       category2: form.category2,
@@ -642,6 +741,17 @@ export default function Page() {
       useAutoImage: false,
     });
     setSummary(post.summary || fallbackSummary(post.body || ""));
+    setContentBlocks(
+      Array.isArray(post.contentBlocks) && post.contentBlocks.length > 0
+        ? post.contentBlocks.map((block, index) => ({
+            id: Date.now() + index,
+            type: block.type,
+            value: block.value || "",
+            url: block.url || "",
+            caption: block.caption || "",
+          }))
+        : [{ id: Date.now(), type: "text", value: post.body || "" }]
+    );
     setPage("admin");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -1118,10 +1228,36 @@ export default function Page() {
               </div>
 
               <div className="mt-6 text-[15px] leading-8 text-neutral-700">
-                <p>{selectedPost.body}</p>
-                <p className="mt-4">
-                  UNNEWS는 긴 설명보다 짧은 핵심과 강한 이미지로 읽히는 흐름을 만듭니다. 콘텐츠 구조는 단순하지만, 내용은 실제 대학생의 생활과 고민에 더 가깝게 채워서 공감과 정보가 함께 남도록 구성합니다.
-                </p>
+                {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
+                  <div className="space-y-6">
+                    {selectedPost.contentBlocks.map((block, index) => {
+                      if (block.type === "image") {
+                        return (
+                          <figure key={index} className="overflow-hidden rounded-[24px] bg-neutral-50">
+                            <img
+                              src={block.url}
+                              alt={block.caption || selectedPost.title}
+                              className="max-h-[520px] w-full object-cover"
+                            />
+                            {block.caption && (
+                              <figcaption className="px-4 py-3 text-xs text-neutral-500">
+                                {block.caption}
+                              </figcaption>
+                            )}
+                          </figure>
+                        );
+                      }
+
+                      return (
+                        <p key={index} className="whitespace-pre-line">
+                          {block.value}
+                        </p>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="whitespace-pre-line">{selectedPost.body}</p>
+                )}
               </div>
             </div>
           </div>
@@ -1362,16 +1498,124 @@ export default function Page() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-neutral-600">
-                    본문
-                  </label>
-                  <textarea
-                    value={form.body}
-                    onChange={(e) => setForm({ ...form, body: e.target.value })}
-                    rows={7}
-                    className="w-full rounded-[20px] border border-black/10 bg-white px-4 py-3.5 outline-none"
-                    placeholder="본문을 입력하면 AI가 자동으로 3줄 요약을 생성합니다"
-                  />
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-600">
+                        본문 블록 편집
+                      </label>
+                      <p className="mt-1 text-xs text-neutral-400">
+                        텍스트와 이미지를 원하는 순서로 추가할 수 있습니다.
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        onClick={addTextBlock}
+                        className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+                      >
+                        + 텍스트
+                      </button>
+                      <button
+                        type="button"
+                        onClick={addImageBlock}
+                        className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white"
+                      >
+                        + 이미지
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {contentBlocks.map((block, index) => (
+                      <div
+                        key={block.id}
+                        className="rounded-[20px] border border-black/5 bg-neutral-50 p-4"
+                      >
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-500">
+                            {index + 1}. {block.type === "text" ? "텍스트" : "이미지"}
+                          </span>
+                          <div className="flex gap-1">
+                            <button
+                              type="button"
+                              onClick={() => moveBlock(block.id, -1)}
+                              className="rounded-full bg-white px-2.5 py-1 text-xs text-neutral-500 hover:text-neutral-900"
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveBlock(block.id, 1)}
+                              className="rounded-full bg-white px-2.5 py-1 text-xs text-neutral-500 hover:text-neutral-900"
+                            >
+                              ↓
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeBlock(block.id)}
+                              className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-500 hover:bg-red-100"
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        </div>
+
+                        {block.type === "text" ? (
+                          <textarea
+                            value={block.value || ""}
+                            onChange={(e) => {
+                              updateBlock(block.id, { value: e.target.value });
+                              setForm((prev) => ({ ...prev, body: getPlainBodyFromBlocks(contentBlocks) }));
+                            }}
+                            rows={5}
+                            className="w-full rounded-[18px] border border-black/10 bg-white px-4 py-3 text-sm leading-7 outline-none"
+                            placeholder="텍스트를 입력하세요"
+                          />
+                        ) : (
+                          <div className="space-y-3">
+                            {block.url ? (
+                              <div className="overflow-hidden rounded-[18px] bg-white">
+                                <img
+                                  src={block.url}
+                                  alt="본문 이미지"
+                                  className="h-56 w-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="rounded-[18px] border border-dashed border-black/10 bg-white px-4 py-8 text-center text-sm text-neutral-400">
+                                아직 이미지가 없습니다.
+                              </div>
+                            )}
+
+                            <label className="flex cursor-pointer items-center justify-between rounded-[18px] border border-black/10 bg-white px-4 py-3 text-sm text-neutral-600">
+                              <span>
+                                {uploadingBlockId === block.id
+                                  ? "본문 이미지 업로드 중..."
+                                  : block.fileName || "본문 이미지 선택"}
+                              </span>
+                              <span className="rounded-full bg-neutral-950 px-3 py-1 text-xs font-semibold text-white">
+                                파일 선택
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                disabled={uploadingBlockId === block.id}
+                                onChange={(e) => uploadBlockImage(block.id, e.target.files?.[0])}
+                              />
+                            </label>
+
+                            <input
+                              value={block.caption || ""}
+                              onChange={(e) => updateBlock(block.id, { caption: e.target.value })}
+                              className="w-full rounded-[18px] border border-black/10 bg-white px-4 py-3 text-sm outline-none"
+                              placeholder="이미지 설명 또는 캡션을 입력하세요"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="rounded-[22px] border border-black/5 bg-neutral-50 p-4">
