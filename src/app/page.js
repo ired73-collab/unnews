@@ -17,6 +17,7 @@ import {
 
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
+const ADMIN_PASSWORD = "unnews2026";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwyJMVfKR1XguC12QuYyfAVycmEX1f5O0",
@@ -356,6 +357,9 @@ function SiteFooter() {
 
 export default function Page() {
   const [page, setPage] = useState("home");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminError, setAdminError] = useState("");
   const [activeCategory, setActiveCategory] = useState("전체");
   const [activeSubCategory, setActiveSubCategory] = useState("전체");
   const [selectedPost, setSelectedPost] = useState(POSTS[0]);
@@ -646,6 +650,28 @@ export default function Page() {
     }
   };
 
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      setAdminPassword("");
+      setAdminError("");
+      setPage("admin");
+      return;
+    }
+
+    setAdminError("비밀번호가 올바르지 않습니다.");
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    setEditingId(null);
+    setAdminPassword("");
+    setAdminError("");
+    setPage("home");
+  };
+
   return (
     <div
       className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f7f5_45%,_#f3f2ef_100%)] text-neutral-900"
@@ -685,7 +711,7 @@ export default function Page() {
               onClick={() => setPage("admin")}
               className="rounded-full border border-black/10 px-4 py-2 text-sm text-neutral-700"
             >
-              Admin
+              {isAdmin ? "Admin" : "Admin Login"}
             </button>
           </nav>
         </div>
@@ -1031,6 +1057,25 @@ export default function Page() {
                 <span className="text-xs text-neutral-400">{selectedPost.readTime}</span>
               </div>
 
+              {isAdmin && typeof selectedPost.id !== "number" && (
+                <div className="mb-4 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleEditPost(selectedPost)}
+                    className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100"
+                  >
+                    수정
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePost(selectedPost.id)}
+                    className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100"
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
+
               <h1 className="text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.045em]">
                 {selectedPost.title}
               </h1>
@@ -1053,7 +1098,44 @@ export default function Page() {
         </main>
       )}
 
-      {page === "admin" && (
+      {page === "admin" && !isAdmin && (
+        <main className="mx-auto max-w-[520px] px-5 py-16 md:px-8">
+          <div className="rounded-[28px] border border-white/70 bg-white/85 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.07)] backdrop-blur">
+            <p className="text-sm text-neutral-500">Admin Login</p>
+            <h1 className="mt-1 text-[2rem] font-semibold tracking-[-0.045em]">
+              관리자 로그인
+            </h1>
+            <p className="mt-3 text-sm leading-6 text-neutral-600">
+              콘텐츠 등록·수정·삭제는 관리자 로그인 후 사용할 수 있습니다.
+            </p>
+
+            <form onSubmit={handleAdminLogin} className="mt-6 space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-neutral-600">
+                  관리자 비밀번호
+                </label>
+                <input
+                  type="password"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="w-full rounded-[18px] border border-black/10 bg-white px-4 py-3.5 outline-none"
+                  placeholder="비밀번호를 입력하세요"
+                />
+                {adminError && <p className="mt-2 text-xs text-red-500">{adminError}</p>}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-full bg-neutral-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)]"
+              >
+                로그인
+              </button>
+            </form>
+          </div>
+        </main>
+      )}
+
+      {page === "admin" && isAdmin && (
         <main className="mx-auto max-w-[1180px] px-5 py-8 md:px-8 md:py-10">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -1062,12 +1144,20 @@ export default function Page() {
                 {editingId ? "콘텐츠 수정" : "콘텐츠 관리"}
               </h1>
             </div>
-            <button
-              onClick={() => setPage("home")}
-              className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700"
-            >
-              사이트로 이동
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage("home")}
+                className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700"
+              >
+                사이트로 이동
+              </button>
+              <button
+                onClick={handleAdminLogout}
+                className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white"
+              >
+                로그아웃
+              </button>
+            </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-[1fr_0.9fr]">
