@@ -603,9 +603,7 @@ export default function Page() {
     const text = blocks
       .filter((block) => block.type === "text")
       .map((block) => block.value || "")
-      .join("
-
-")
+      .join("\n\n")
       .trim();
 
     return text || form.body.trim();
