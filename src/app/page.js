@@ -298,6 +298,112 @@ function getAutoImage(category, text = "") {
   return "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80";
 }
 
+const IMAGE_SUGGESTION_POOLS = {
+  ai: [
+    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
+  ],
+  drinking: [
+    "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1525268323446-0505b6fe7778?auto=format&fit=crop&w=1200&q=80",
+  ],
+  relationship: [
+    "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=1200&q=80",
+  ],
+  career: [
+    "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
+  ],
+  activity: [
+    "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80",
+  ],
+  campus: [
+    "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
+  ],
+  society: [
+    "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80",
+  ],
+  culture: [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
+  ],
+  lifestyle: [
+    "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
+  ],
+};
+
+function getSuggestionTopic(category, text = "") {
+  const keyword = `${category} ${text}`.toLowerCase();
+
+  if (keyword.includes("ai") || keyword.includes("인공지능") || keyword.includes("챗gpt") || keyword.includes("chatgpt") || keyword.includes("기술") || keyword.includes("디지털") || keyword.includes("로봇") || keyword.includes("데이터")) {
+    return { key: "ai", label: "AI·기술" };
+  }
+
+  if (keyword.includes("음주") || keyword.includes("술") || keyword.includes("주류") || keyword.includes("회식") || keyword.includes("맥주") || keyword.includes("소주") || keyword.includes("음주문화")) {
+    return { key: "drinking", label: "음주문화·모임" };
+  }
+
+  if (keyword.includes("연애") || keyword.includes("사랑") || keyword.includes("관계") || keyword.includes("데이트") || keyword.includes("커플") || keyword.includes("썸") || keyword.includes("이별")) {
+    return { key: "relationship", label: "연애·관계" };
+  }
+
+  if (keyword.includes("취업") || keyword.includes("인턴") || keyword.includes("채용") || keyword.includes("면접") || keyword.includes("자소서") || keyword.includes("포트폴리오") || keyword.includes("포폴") || keyword.includes("커리어") || keyword.includes("스펙")) {
+    return { key: "career", label: "취업·커리어" };
+  }
+
+  if (keyword.includes("공모전") || keyword.includes("대외활동") || keyword.includes("서포터즈") || keyword.includes("창업") || keyword.includes("아이디어") || keyword.includes("프로젝트")) {
+    return { key: "activity", label: "공모전·대외활동" };
+  }
+
+  if (keyword.includes("대학") || keyword.includes("캠퍼스") || keyword.includes("교육") || keyword.includes("수업") || keyword.includes("강의") || keyword.includes("학과") || keyword.includes("학생") || keyword.includes("학사") || keyword.includes("의대")) {
+    return { key: "campus", label: "대학·캠퍼스" };
+  }
+
+  if (keyword.includes("지역") || keyword.includes("사회") || keyword.includes("도시") || keyword.includes("정책") || keyword.includes("청년") || keyword.includes("지자체")) {
+    return { key: "society", label: "사회·지역" };
+  }
+
+  if (keyword.includes("문화") || keyword.includes("콘텐츠") || keyword.includes("공연") || keyword.includes("전시") || keyword.includes("영화") || keyword.includes("음악") || keyword.includes("축제")) {
+    return { key: "culture", label: "문화·콘텐츠" };
+  }
+
+  return { key: "lifestyle", label: "대학생 라이프" };
+}
+
+function getSmartImageSuggestions(category, title, body) {
+  const topic = getSuggestionTopic(category, `${title} ${body}`);
+  const pool = IMAGE_SUGGESTION_POOLS[topic.key] || IMAGE_SUGGESTION_POOLS.lifestyle;
+
+  return pool.map((url, index) => ({
+    id: `${topic.key}-${index}`,
+    url,
+    label: topic.label,
+  }));
+}
+
 function IconTile({ children }) {
   return <div className="flex items-center justify-center text-neutral-950">{children}</div>;
 }
@@ -397,6 +503,9 @@ export default function Page() {
     { id: Date.now(), type: "text", value: "" },
   ]);
   const [uploadingBlockId, setUploadingBlockId] = useState(null);
+  const [suggestedImages, setSuggestedImages] = useState([]);
+  const [isSuggestingImages, setIsSuggestingImages] = useState(false);
+  const [suggestionLabel, setSuggestionLabel] = useState("");
 
   const allPosts = useMemo(() => {
     // 실제 서비스에서는 Firestore에 저장된 글만 노출합니다.
@@ -597,6 +706,35 @@ export default function Page() {
     } finally {
       setUploadingBlockId(null);
     }
+  };
+
+  const handleSuggestImages = () => {
+    const plainBody = getPlainBodyFromBlocks(contentBlocks);
+
+    if (!form.title.trim() && !plainBody) {
+      alert("제목이나 본문을 먼저 입력하면 더 정확하게 추천됩니다.");
+      return;
+    }
+
+    setIsSuggestingImages(true);
+    const topic = getSuggestionTopic(form.category2, `${form.title} ${plainBody}`);
+    const suggestions = getSmartImageSuggestions(form.category2, form.title, plainBody);
+
+    window.setTimeout(() => {
+      setSuggestionLabel(topic.label);
+      setSuggestedImages(suggestions);
+      setIsSuggestingImages(false);
+    }, 350);
+  };
+
+  const applySuggestedImage = (url) => {
+    setForm((prev) => ({
+      ...prev,
+      image: url,
+      uploadedImage: "",
+      imageFileName: "AI 추천 이미지",
+      useAutoImage: false,
+    }));
   };
 
   const getPlainBodyFromBlocks = (blocks) => {
@@ -1474,6 +1612,56 @@ export default function Page() {
                   />
                   적절한 이미지가 없으면 자동 추천 이미지 사용
                 </label>
+
+                <div className="rounded-[22px] border border-black/5 bg-neutral-50 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-neutral-700">AI 이미지 추천</p>
+                      <p className="mt-1 text-xs text-neutral-400">
+                        제목·본문·카테고리를 분석해 어울리는 무료 이미지를 추천합니다.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleSuggestImages}
+                      disabled={isSuggestingImages}
+                      className="shrink-0 rounded-full bg-neutral-950 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                    >
+                      {isSuggestingImages ? "추천 중..." : "AI 이미지 추천"}
+                    </button>
+                  </div>
+
+                  {suggestedImages.length > 0 && (
+                    <div>
+                      <div className="mb-3 text-xs text-neutral-500">
+                        추천 주제: <strong>{suggestionLabel}</strong>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {suggestedImages.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => applySuggestedImage(item.url)}
+                            className={`overflow-hidden rounded-[18px] border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md ${
+                              form.image === item.url
+                                ? "border-neutral-950"
+                                : "border-black/5"
+                            }`}
+                          >
+                            <img
+                              src={item.url}
+                              alt={item.label}
+                              className="h-28 w-full object-cover"
+                            />
+                            <div className="px-3 py-2 text-xs font-medium text-neutral-600">
+                              이 이미지 사용
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <div className="rounded-[22px] border border-black/5 bg-neutral-50 p-4">
                   <div className="mb-3 flex items-center justify-between">
