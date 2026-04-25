@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -383,7 +382,11 @@ export default function Page() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const allPosts = useMemo(() => [...drafts, ...POSTS], [drafts]);
+  const allPosts = useMemo(() => {
+    // 실제 서비스에서는 Firestore에 저장된 글만 노출합니다.
+    // Firestore 글이 하나도 없을 때만 기본 예시 글을 보여줍니다.
+    return drafts.length > 0 ? drafts : POSTS;
+  }, [drafts]);
 
   const visiblePosts = useMemo(() => {
     if (activeCategory === "전체") return allPosts;
