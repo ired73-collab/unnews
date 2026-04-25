@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -5,11 +6,14 @@ import { initializeApp, getApp, getApps } from "firebase/app";
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   getFirestore,
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
@@ -359,6 +363,7 @@ export default function Page() {
   const [drafts, setDrafts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [isSavingPost, setIsSavingPost] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [heroIndex, setHeroIndex] = useState(0);
 
   const [form, setForm] = useState({
@@ -506,6 +511,22 @@ export default function Page() {
     }
   };
 
+  const resetForm = () => {
+    setForm({
+      title: "",
+      category1: "트렌드",
+      category2: "AI",
+      category: "AI",
+      body: "",
+      image: "",
+      imageFileName: "",
+      uploadedImage: "",
+      useAutoImage: true,
+    });
+    setSummary("");
+    setEditingId(null);
+  };
+
   const submitDraft = async () => {
     if (!form.title.trim() || !form.body.trim() || isSavingPost) return;
 
@@ -517,7 +538,7 @@ export default function Page() {
 
     const resolvedSummary = summary.trim() || fallbackSummary(form.body.trim());
 
-    const newPostData = {
+    const postData = {
       title: form.title.trim(),
       body: form.body.trim(),
       summary: resolvedSummary,
@@ -526,38 +547,99 @@ export default function Page() {
       category: form.category2,
       readTime: "1분 읽기",
       image: resolvedImage,
-      createdAt: serverTimestamp(),
     };
 
     try {
       setIsSavingPost(true);
+
+      if (editingId) {
+        const updatedPostData = {
+          ...postData,
+          updatedAt: serverTimestamp(),
+        };
+
+        await updateDoc(doc(db, "posts", editingId), updatedPostData);
+
+        const localUpdatedPost = {
+          id: editingId,
+          ...postData,
+          updatedAt: new Date().toISOString(),
+        };
+
+        setDrafts((prev) =>
+          prev.map((post) => (post.id === editingId ? localUpdatedPost : post))
+        );
+        setSelectedPost(localUpdatedPost);
+        resetForm();
+        setPage("post");
+        return;
+      }
+
+      const newPostData = {
+        ...postData,
+        createdAt: serverTimestamp(),
+      };
+
       const docRef = await addDoc(collection(db, "posts"), newPostData);
       const newPost = {
         id: docRef.id,
-        ...newPostData,
+        ...postData,
         createdAt: new Date().toISOString(),
       };
 
       setDrafts((prev) => [newPost, ...prev]);
-      setForm({
-        title: "",
-        category1: "트렌드",
-        category2: "AI",
-        category: "AI",
-        body: "",
-        image: "",
-        imageFileName: "",
-        uploadedImage: "",
-        useAutoImage: true,
-      });
-      setSummary("");
+      resetForm();
       setSelectedPost(newPost);
       setPage("post");
     } catch (error) {
-      console.error("Firestore save error:", error);
+      console.error("Firestore save/update error:", error);
       alert("글 저장에 실패했습니다. Firestore 보안 규칙과 Firebase 설정을 확인해주세요.");
     } finally {
       setIsSavingPost(false);
+    }
+  };
+
+  const handleEditPost = (post) => {
+    if (!post || typeof post.id === "number") {
+      alert("기본 예시 글은 수정할 수 없습니다. Firestore에 저장된 글만 수정됩니다.");
+      return;
+    }
+
+    setEditingId(post.id);
+    setForm({
+      title: post.title || "",
+      category1: getCategory1(post),
+      category2: getCategory2(post),
+      category: getCategory2(post),
+      body: post.body || "",
+      image: post.image || "",
+      imageFileName: "",
+      uploadedImage: post.image || "",
+      useAutoImage: false,
+    });
+    setSummary(post.summary || fallbackSummary(post.body || ""));
+    setPage("admin");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDeletePost = async (postId) => {
+    if (!postId || typeof postId === "number") {
+      alert("기본 예시 글은 삭제할 수 없습니다. Firestore에 저장된 글만 삭제됩니다.");
+      return;
+    }
+
+    if (!confirm("정말 이 글을 삭제할까요?")) return;
+
+    try {
+      await deleteDoc(doc(db, "posts", postId));
+      setDrafts((prev) => prev.filter((post) => post.id !== postId));
+      if (selectedPost?.id === postId) {
+        setSelectedPost(POSTS[0]);
+        setPage("home");
+      }
+    } catch (error) {
+      console.error("Firestore delete error:", error);
+      alert("글 삭제에 실패했습니다. Firestore 보안 규칙을 확인해주세요.");
     }
   };
 
@@ -974,7 +1056,7 @@ export default function Page() {
             <div>
               <p className="text-sm text-neutral-500">Admin</p>
               <h1 className="text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.045em]">
-                콘텐츠 관리
+                {editingId ? "콘텐츠 수정" : "콘텐츠 관리"}
               </h1>
             </div>
             <button
@@ -1172,13 +1254,31 @@ export default function Page() {
                   </div>
                 </div>
 
-                <button
-                  onClick={submitDraft}
-                  disabled={isUploading || isSavingPost}
-                  className="rounded-full bg-neutral-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSavingPost ? "Firestore에 저장 중..." : "글 등록 미리보기"}
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={submitDraft}
+                    disabled={isUploading || isSavingPost}
+                    className="rounded-full bg-neutral-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isSavingPost
+                      ? editingId
+                        ? "수정 저장 중..."
+                        : "Firestore에 저장 중..."
+                      : editingId
+                        ? "수정 저장하기"
+                        : "글 등록 미리보기"}
+                  </button>
+
+                  {editingId && (
+                    <button
+                      onClick={resetForm}
+                      type="button"
+                      className="rounded-full border border-black/10 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+                    >
+                      수정 취소
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1223,7 +1323,30 @@ export default function Page() {
                         />
                       </div>
                       <strong>{post.title}</strong>
-                      <div className="mt-1 text-xs text-neutral-400">{getCategory2(post)}</div>
+                      <div className="mt-1 text-xs text-neutral-400">{getCategoryLabel(post)}</div>
+
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditPost(post);
+                          }}
+                          className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-100"
+                        >
+                          수정
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePost(post.id);
+                          }}
+                          className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-100"
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </button>
                   ))}
                 </div>
