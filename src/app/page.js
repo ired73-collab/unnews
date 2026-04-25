@@ -162,21 +162,129 @@ function fallbackSummary(text) {
   return clip(compact, 160);
 }
 
-function getAutoImage(category, title = "") {
-  const keyword = `${category} ${title}`;
+function getAutoImage(category, text = "") {
+  const keyword = `${category} ${text}`.toLowerCase();
 
-  if (keyword.includes("AI")) {
-    return "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1200&q=80";
+  // AI / 기술
+  if (
+    keyword.includes("ai") ||
+    keyword.includes("인공지능") ||
+    keyword.includes("챗gpt") ||
+    keyword.includes("chatgpt") ||
+    keyword.includes("디지털") ||
+    keyword.includes("기술") ||
+    keyword.includes("로봇") ||
+    keyword.includes("데이터")
+  ) {
+    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80";
   }
 
-  if (keyword.includes("커리어") || keyword.includes("포폴") || keyword.includes("취준")) {
-    return "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80";
+  // 음주 / 술 / 대학 음주문화
+  if (
+    keyword.includes("음주") ||
+    keyword.includes("술") ||
+    keyword.includes("주류") ||
+    keyword.includes("회식") ||
+    keyword.includes("맥주") ||
+    keyword.includes("소주") ||
+    keyword.includes("음주문화")
+  ) {
+    return "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80";
   }
 
-  if (keyword.includes("라이프") || keyword.includes("루틴") || keyword.includes("캠퍼스")) {
+  // 연애 / 관계 / 데이트
+  if (
+    keyword.includes("연애") ||
+    keyword.includes("사랑") ||
+    keyword.includes("관계") ||
+    keyword.includes("데이트") ||
+    keyword.includes("커플") ||
+    keyword.includes("썸") ||
+    keyword.includes("이별")
+  ) {
+    return "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  // 취업 / 인턴 / 포트폴리오 / 커리어
+  if (
+    keyword.includes("취업") ||
+    keyword.includes("인턴") ||
+    keyword.includes("채용") ||
+    keyword.includes("면접") ||
+    keyword.includes("자소서") ||
+    keyword.includes("포트폴리오") ||
+    keyword.includes("포폴") ||
+    keyword.includes("커리어") ||
+    keyword.includes("스펙")
+  ) {
+    return "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  // 공모전 / 대외활동 / 창업
+  if (
+    keyword.includes("공모전") ||
+    keyword.includes("대외활동") ||
+    keyword.includes("서포터즈") ||
+    keyword.includes("창업") ||
+    keyword.includes("아이디어") ||
+    keyword.includes("프로젝트")
+  ) {
+    return "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  // 대학 / 캠퍼스 / 교육 / 학사
+  if (
+    keyword.includes("대학") ||
+    keyword.includes("캠퍼스") ||
+    keyword.includes("교육") ||
+    keyword.includes("수업") ||
+    keyword.includes("강의") ||
+    keyword.includes("학과") ||
+    keyword.includes("학생") ||
+    keyword.includes("학사") ||
+    keyword.includes("의대")
+  ) {
+    return "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  // 지역 / 사회 / 도시
+  if (
+    keyword.includes("지역") ||
+    keyword.includes("사회") ||
+    keyword.includes("도시") ||
+    keyword.includes("정책") ||
+    keyword.includes("청년") ||
+    keyword.includes("지자체")
+  ) {
+    return "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  // 문화 / 콘텐츠 / 공연 / 전시
+  if (
+    keyword.includes("문화") ||
+    keyword.includes("콘텐츠") ||
+    keyword.includes("공연") ||
+    keyword.includes("전시") ||
+    keyword.includes("영화") ||
+    keyword.includes("음악") ||
+    keyword.includes("축제")
+  ) {
+    return "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  // 라이프 / 생활 / 루틴
+  if (
+    keyword.includes("라이프") ||
+    keyword.includes("생활") ||
+    keyword.includes("루틴") ||
+    keyword.includes("일상") ||
+    keyword.includes("습관") ||
+    keyword.includes("건강")
+  ) {
     return "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=1200&q=80";
   }
 
+  // 기본 이미지
   return "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80";
 }
 
@@ -290,7 +398,7 @@ export default function Page() {
   const previewImage = form.uploadedImage
     ? form.uploadedImage
     : form.useAutoImage || !form.image.trim()
-      ? getAutoImage(form.category2, form.title)
+      ? getAutoImage(form.category2, `${form.title} ${form.body}`)
       : form.image.trim();
 
   useEffect(() => {
@@ -405,7 +513,7 @@ export default function Page() {
       ? form.uploadedImage
       : form.image.trim()
         ? form.image.trim()
-        : getAutoImage(form.category2, form.title);
+        : getAutoImage(form.category2, `${form.title} ${form.body}`);
 
     const resolvedSummary = summary.trim() || fallbackSummary(form.body.trim());
 
@@ -741,7 +849,24 @@ export default function Page() {
             </h1>
           </div>
 
-          $1
+          <div className="mb-3 flex gap-2 overflow-auto pb-1">
+            {PRIMARY_CATEGORIES.map((category) => (
+              <button
+                key={category}
+                onClick={() => {
+                  setActiveCategory(category);
+                  setActiveSubCategory("전체");
+                }}
+                className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
+                  activeCategory === category
+                    ? "bg-neutral-950 text-white shadow-[0_10px_24px_rgba(0,0,0,0.16)]"
+                    : "border border-black/5 bg-white/80 text-neutral-600 backdrop-blur hover:bg-white"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
 
           {activeCategory !== "전체" && (
             <div className="mb-5 flex gap-2 overflow-auto pb-1">
