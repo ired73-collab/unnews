@@ -299,6 +299,12 @@ function getAutoImage(category, text = "") {
 }
 
 const IMAGE_SUGGESTION_POOLS = {
+  medical: [
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1200&q=80",
+  ],
   ai: [
     "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
     "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
@@ -358,36 +364,91 @@ const IMAGE_SUGGESTION_POOLS = {
 function getSuggestionTopic(category, text = "") {
   const keyword = `${category} ${text}`.toLowerCase();
 
-  if (keyword.includes("ai") || keyword.includes("인공지능") || keyword.includes("챗gpt") || keyword.includes("chatgpt") || keyword.includes("기술") || keyword.includes("디지털") || keyword.includes("로봇") || keyword.includes("데이터")) {
-    return { key: "ai", label: "AI·기술" };
-  }
+  const topicRules = [
+    {
+      key: "medical",
+      label: "의료·보건",
+      words: [
+        "의료",
+        "의대",
+        "의학",
+        "의사",
+        "간호",
+        "병원",
+        "환자",
+        "진료",
+        "수술",
+        "보건",
+        "의료현장",
+        "응급",
+        "임상",
+        "교수",
+        "칼럼",
+        "건강",
+      ],
+    },
+    {
+      key: "ai",
+      label: "AI·기술",
+      words: ["ai", "인공지능", "챗gpt", "chatgpt", "기술", "디지털", "로봇", "데이터"],
+    },
+    {
+      key: "drinking",
+      label: "음주문화·모임",
+      words: ["음주", "술", "주류", "회식", "맥주", "소주", "음주문화"],
+    },
+    {
+      key: "relationship",
+      label: "연애·관계",
+      words: ["연애", "사랑", "관계", "데이트", "커플", "썸", "이별"],
+    },
+    {
+      key: "career",
+      label: "취업·커리어",
+      words: ["취업", "인턴", "채용", "면접", "자소서", "포트폴리오", "포폴", "커리어", "스펙"],
+    },
+    {
+      key: "activity",
+      label: "공모전·대외활동",
+      words: ["공모전", "대외활동", "서포터즈", "창업", "아이디어", "프로젝트"],
+    },
+    {
+      key: "campus",
+      label: "대학·캠퍼스",
+      words: ["대학", "캠퍼스", "교육", "수업", "강의", "학과", "학생", "학사"],
+    },
+    {
+      key: "society",
+      label: "사회·지역",
+      words: ["지역", "사회", "도시", "정책", "청년", "지자체"],
+    },
+    {
+      key: "culture",
+      label: "문화·콘텐츠",
+      words: ["문화", "콘텐츠", "공연", "전시", "영화", "음악", "축제"],
+    },
+    {
+      key: "lifestyle",
+      label: "대학생 라이프",
+      words: ["라이프", "생활", "루틴", "일상", "습관"],
+    },
+  ];
 
-  if (keyword.includes("음주") || keyword.includes("술") || keyword.includes("주류") || keyword.includes("회식") || keyword.includes("맥주") || keyword.includes("소주") || keyword.includes("음주문화")) {
-    return { key: "drinking", label: "음주문화·모임" };
-  }
+  const scores = topicRules.map((rule) => {
+    const score = rule.words.reduce((total, word) => {
+      const titleWeight = keyword.indexOf(word) >= 0 ? 1 : 0;
+      const strongWeight = text.toLowerCase().slice(0, 80).includes(word) ? 2 : 0;
+      const repeatWeight = keyword.split(word).length - 1;
+      return total + titleWeight + strongWeight + repeatWeight;
+    }, 0);
 
-  if (keyword.includes("연애") || keyword.includes("사랑") || keyword.includes("관계") || keyword.includes("데이트") || keyword.includes("커플") || keyword.includes("썸") || keyword.includes("이별")) {
-    return { key: "relationship", label: "연애·관계" };
-  }
+    return { ...rule, score };
+  });
 
-  if (keyword.includes("취업") || keyword.includes("인턴") || keyword.includes("채용") || keyword.includes("면접") || keyword.includes("자소서") || keyword.includes("포트폴리오") || keyword.includes("포폴") || keyword.includes("커리어") || keyword.includes("스펙")) {
-    return { key: "career", label: "취업·커리어" };
-  }
+  const best = scores.sort((a, b) => b.score - a.score)[0];
 
-  if (keyword.includes("공모전") || keyword.includes("대외활동") || keyword.includes("서포터즈") || keyword.includes("창업") || keyword.includes("아이디어") || keyword.includes("프로젝트")) {
-    return { key: "activity", label: "공모전·대외활동" };
-  }
-
-  if (keyword.includes("대학") || keyword.includes("캠퍼스") || keyword.includes("교육") || keyword.includes("수업") || keyword.includes("강의") || keyword.includes("학과") || keyword.includes("학생") || keyword.includes("학사") || keyword.includes("의대")) {
-    return { key: "campus", label: "대학·캠퍼스" };
-  }
-
-  if (keyword.includes("지역") || keyword.includes("사회") || keyword.includes("도시") || keyword.includes("정책") || keyword.includes("청년") || keyword.includes("지자체")) {
-    return { key: "society", label: "사회·지역" };
-  }
-
-  if (keyword.includes("문화") || keyword.includes("콘텐츠") || keyword.includes("공연") || keyword.includes("전시") || keyword.includes("영화") || keyword.includes("음악") || keyword.includes("축제")) {
-    return { key: "culture", label: "문화·콘텐츠" };
+  if (best && best.score > 0) {
+    return { key: best.key, label: best.label };
   }
 
   return { key: "lifestyle", label: "대학생 라이프" };
@@ -506,6 +567,7 @@ export default function Page() {
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [isSuggestingImages, setIsSuggestingImages] = useState(false);
   const [suggestionLabel, setSuggestionLabel] = useState("");
+  const [autoImageReady, setAutoImageReady] = useState(false);
 
   const allPosts = useMemo(() => {
     // 실제 서비스에서는 Firestore에 저장된 글만 노출합니다.
@@ -530,9 +592,9 @@ export default function Page() {
 
   const previewImage = form.uploadedImage
     ? form.uploadedImage
-    : form.useAutoImage || !form.image.trim()
-      ? getAutoImage(form.category2, `${form.title} ${form.body}`)
-      : form.image.trim();
+    : form.image.trim()
+      ? form.image.trim()
+      : suggestedImages?.[0]?.url || getAutoImage(form.category2, `${form.title} ${form.body}`);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -573,6 +635,23 @@ export default function Page() {
 
     return () => clearInterval(timer);
   }, [page, heroPosts.length]);
+
+  useEffect(() => {
+    const text = getPlainBodyFromBlocks(contentBlocks);
+
+    if (form.title.trim() || text.length >= 20) {
+      const timer = setTimeout(() => {
+        buildImageSuggestions();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+
+    setSuggestedImages([]);
+    setSuggestionLabel("");
+    setAutoImageReady(false);
+    return undefined;
+  }, [form.title, form.category2, contentBlocks]);
 
   useEffect(() => {
     const text = getPlainBodyFromBlocks(contentBlocks);
@@ -708,6 +787,18 @@ export default function Page() {
     }
   };
 
+  const buildImageSuggestions = () => {
+    const plainBody = getPlainBodyFromBlocks(contentBlocks);
+    const topic = getSuggestionTopic(form.category2, `${form.title} ${plainBody}`);
+    const suggestions = getSmartImageSuggestions(form.category2, form.title, plainBody);
+
+    setSuggestionLabel(topic.label);
+    setSuggestedImages(suggestions);
+    setAutoImageReady(true);
+
+    return suggestions;
+  };
+
   const handleSuggestImages = () => {
     const plainBody = getPlainBodyFromBlocks(contentBlocks);
 
@@ -717,14 +808,17 @@ export default function Page() {
     }
 
     setIsSuggestingImages(true);
-    const topic = getSuggestionTopic(form.category2, `${form.title} ${plainBody}`);
-    const suggestions = getSmartImageSuggestions(form.category2, form.title, plainBody);
 
     window.setTimeout(() => {
-      setSuggestionLabel(topic.label);
-      setSuggestedImages(suggestions);
+      buildImageSuggestions();
       setIsSuggestingImages(false);
     }, 350);
+  };
+
+  const getAutoRecommendedImage = () => {
+    const plainBody = getPlainBodyFromBlocks(contentBlocks);
+    const suggestions = getSmartImageSuggestions(form.category2, form.title, plainBody);
+    return suggestions?.[0]?.url || getAutoImage(form.category2, `${form.title} ${plainBody}`);
   };
 
   const applySuggestedImage = (url) => {
@@ -780,6 +874,9 @@ export default function Page() {
     setSummary("");
     setEditingId(null);
     setContentBlocks([{ id: Date.now(), type: "text", value: "" }]);
+    setSuggestedImages([]);
+    setSuggestionLabel("");
+    setAutoImageReady(false);
   };
 
   const submitDraft = async () => {
@@ -792,7 +889,7 @@ export default function Page() {
       ? form.uploadedImage
       : form.image.trim()
         ? form.image.trim()
-        : getAutoImage(form.category2, `${form.title} ${plainBody}`);
+        : getAutoRecommendedImage();
 
     const resolvedSummary = summary.trim() || fallbackSummary(plainBody);
 
