@@ -465,6 +465,26 @@ function getSmartImageSuggestions(category, title, body) {
   }));
 }
 
+function BrandLogo() {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-neutral-950 text-white shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
+        <div className="absolute inset-[5px] rounded-xl border border-white/18" />
+        <span className="text-[15px] font-black tracking-[-0.08em]">UN</span>
+        <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-blue-500 ring-4 ring-white" />
+      </div>
+      <div className="leading-none">
+        <div className="text-[18px] font-black tracking-[-0.06em] text-neutral-950">
+          UNNEWS
+        </div>
+        <div className="mt-1 text-[11px] font-medium tracking-[0.16em] text-neutral-400">
+          대학연합신문
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function IconTile({ children }) {
   return <div className="flex items-center justify-center text-neutral-950">{children}</div>;
 }
@@ -595,6 +615,17 @@ export default function Page() {
     : form.image.trim()
       ? form.image.trim()
       : suggestedImages?.[0]?.url || getAutoImage(form.category2, `${form.title} ${form.body}`);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const path = window.location.pathname;
+
+    if (params.get("admin") === "1" || path === "/admin") {
+      setPage("admin");
+    }
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -1055,14 +1086,15 @@ export default function Page() {
           <button
             onClick={() => {
               setActiveCategory("전체");
+              setActiveSubCategory("전체");
               setPage("home");
+              if (typeof window !== "undefined") {
+                window.history.replaceState({}, "", "/");
+              }
             }}
             className="flex items-center gap-3"
           >
-            <div className="rounded-2xl bg-neutral-950 px-3.5 py-1.5 text-sm font-semibold tracking-[-0.02em] text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)]">
-              UNNEWS
-            </div>
-            <span className="hidden text-sm text-neutral-500 md:block">대학연합신문</span>
+            <BrandLogo />
           </button>
 
           <nav className="hidden items-center gap-5 md:flex">
@@ -1079,13 +1111,6 @@ export default function Page() {
                 {item}
               </button>
             ))}
-
-            <button
-              onClick={() => setPage("admin")}
-              className="rounded-full border border-black/10 px-4 py-2 text-sm text-neutral-700"
-            >
-              {isAuthChecking ? "Checking..." : isAdmin ? "Admin" : "Admin Login"}
-            </button>
           </nav>
         </div>
       </header>
