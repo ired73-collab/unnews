@@ -1129,7 +1129,7 @@ export default function Page() {
                   activeCategory === item
                     ? "text-[#4dbbff]"
                     : "text-neutral-700 hover:text-[#4dbbff]"
-                }`
+                }`}
               >
                 {item}
               </button>
