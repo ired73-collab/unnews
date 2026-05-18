@@ -35,20 +35,47 @@ import {
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
 
+const COLORS = ["#4F46E5", "#14B8A6", "#F59E0B"];
+
 const chartData = [
-  { name: "뉴스", posts: 12 },
-  { name: "커뮤니티", posts: 8 },
-  { name: "취업", posts: 5 },
-  { name: "트렌드", posts: 10 },
+  {
+    name: "뉴스",
+    posts: drafts.filter((post) => post.category === "뉴스").length,
+  },
+  {
+    name: "커뮤니티",
+    posts: drafts.filter((post) => post.category === "커뮤니티").length,
+  },
+  {
+    name: "취업",
+    posts: drafts.filter((post) => post.category === "취업").length,
+  },
+  {
+    name: "트렌드",
+    posts: drafts.filter((post) => post.category === "트렌드").length,
+  },
 ];
+
+const totalViews = drafts.reduce(
+  (sum, post) => sum + (post.views || 0),
+  0
+);
+
+const totalLikes = drafts.reduce(
+  (sum, post) => sum + (post.likes || 0),
+  0
+);
+
+const totalComments = drafts.reduce(
+  (sum, post) => sum + (post.comments || 0),
+  0
+);
 
 const pieData = [
-  { name: "조회수", value: 46 },
-  { name: "좋아요", value: 22 },
-  { name: "댓글", value: 1 },
+  { name: "조회수", value: totalViews },
+  { name: "좋아요", value: totalLikes },
+  { name: "댓글", value: totalComments },
 ];
-
-const COLORS = ["#3B82F6", "#111827", "#10B981"];
 
 const POSTS = [
   {
@@ -580,7 +607,33 @@ export default function Page() {
   const [isSavingPost, setIsSavingPost] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [heroIndex, setHeroIndex] = useState(0);
+const adminChartData = [
+  {
+    name: "뉴스",
+    posts: drafts.filter((post) => getCategory1(post) === "뉴스").length,
+  },
+  {
+    name: "커뮤니티",
+    posts: drafts.filter((post) => getCategory1(post) === "커뮤니티").length,
+  },
+  {
+    name: "취업",
+    posts: drafts.filter((post) => getCategory1(post) === "취업/공모전").length,
+  },
+  {
+    name: "트렌드",
+    posts: drafts.filter((post) => getCategory1(post) === "트렌드").length,
+  },
+];
 
+const adminPieData = [
+  { name: "조회수", value: drafts.reduce((sum, post) => sum + (post.views || 0), 0) },
+  { name: "좋아요", value: drafts.reduce((sum, post) => sum + (post.likes || 0), 0) },
+  {
+    name: "댓글",
+    value: drafts.reduce((sum, post) => sum + ((post.comments || []).length || 0), 0),
+  },
+];
   const [form, setForm] = useState({
     title: "",
     category1: "트렌드",
@@ -2266,7 +2319,7 @@ const handleAddComment = async () => {
 
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 18, right: 18, left: -10, bottom: 0 }}>
+            <BarChart data={adminChartData} margin={{ top: 18, right: 18, left: -10, bottom: 0 }}>
               <XAxis
                 dataKey="name"
                 axisLine={false}
@@ -2292,7 +2345,7 @@ const handleAddComment = async () => {
                 radius={[14, 14, 8, 8]}
                 label={{ position: "top", fill: "#111827", fontSize: 13, fontWeight: 700 }}
               >
-                {chartData.map((entry, index) => (
+                {adminChartData.map((entry, index) => (
                   <Cell
                     key={`bar-${entry.name}`}
                     fill={["#8B5CF6", "#3B82F6", "#34D399", "#FBBF24"][index % 4]}
@@ -2319,14 +2372,14 @@ const handleAddComment = async () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={pieData}
+                  data={adminPieData}
                   dataKey="value"
                   nameKey="name"
                   innerRadius={68}
                   outerRadius={112}
                   paddingAngle={3}
                 >
-                  {pieData.map((entry, index) => (
+                  {adminPieData.map((entry, index) => (
                     <Cell
                       key={`pie-${entry.name}`}
                       fill={["#4F46E5", "#14B8A6", "#F59E0B"][index % 3]}
