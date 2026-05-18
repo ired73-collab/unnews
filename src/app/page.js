@@ -2299,6 +2299,7 @@ const handleAddComment = async () => {
 
           {adminTab === "write" && (
 
+<>
             
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -2776,6 +2777,7 @@ const handleAddComment = async () => {
               </div>
             </div>
           </div>
+          </>
         </main>
       )}
 
