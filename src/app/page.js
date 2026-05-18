@@ -2777,6 +2777,8 @@ const handleAddComment = async () => {
               </div>
             </div>
           </div>
+          </>
+)}
         </main>
       )}
 
