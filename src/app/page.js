@@ -20,10 +20,35 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
 
+const chartData = [
+  { name: "뉴스", posts: 12 },
+  { name: "커뮤니티", posts: 8 },
+  { name: "취업", posts: 5 },
+  { name: "트렌드", posts: 10 },
+];
 
+const pieData = [
+  { name: "조회수", value: 46 },
+  { name: "좋아요", value: 22 },
+  { name: "댓글", value: 1 },
+];
+
+const COLORS = ["#3B82F6", "#111827", "#10B981"];
 
 const POSTS = [
   {
@@ -2216,7 +2241,61 @@ const handleAddComment = async () => {
     </div>
   </section>
 )}  
-</section>
+{adminTab === "stats" && (
+  <section className="mt-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
+    <div className="mb-6">
+      <p className="text-sm font-semibold text-[#4dbbff]">Statistics</p>
+      <h2 className="text-[2rem] font-black tracking-[-0.05em]">
+        통계 시각화
+      </h2>
+      <p className="mt-2 text-sm text-neutral-500">
+        카테고리별 게시글과 반응 데이터를 그래프로 확인할 수 있습니다.
+      </p>
+    </div>
+
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="rounded-[24px] bg-neutral-50 p-5">
+        <h3 className="mb-4 text-sm font-bold text-neutral-700">
+          카테고리별 게시글
+        </h3>
+        <div className="h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="posts" radius={[10, 10, 0, 0]} fill="#111827" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="rounded-[24px] bg-neutral-50 p-5">
+        <h3 className="mb-4 text-sm font-bold text-neutral-700">
+          반응 데이터 비율
+        </h3>
+        <div className="h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={90}
+                label
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
 
           {adminTab === "write" && (
 
