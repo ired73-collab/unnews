@@ -2371,13 +2371,13 @@ const handleAddComment = async () => {
             <div className="pointer-events-none absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
               <span className="text-xs font-bold text-neutral-400">총 반응</span>
               <span className="text-2xl font-black text-neutral-900">
-                {pieData.reduce((sum, item) => sum + item.value, 0)}
+                {adminPieData.reduce((sum, item) => sum + item.value, 0)}
               </span>
             </div>
           </div>
 
           <div className="space-y-3">
-            {pieData.map((item, index) => (
+            {adminPieData.map((item, index) => (
               <div
                 key={item.name}
                 className="flex items-center justify-between rounded-2xl bg-white/80 px-4 py-3 shadow-sm"
