@@ -2242,57 +2242,158 @@ const handleAddComment = async () => {
   </section>
 )}  
 {adminTab === "stats" && (
-  <section className="mt-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
-    <div className="mb-6">
-      <p className="text-sm font-semibold text-[#4dbbff]">Statistics</p>
-      <h2 className="text-[2rem] font-black tracking-[-0.05em]">
+  <section className="mt-8 rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_24px_70px_rgba(79,70,229,0.10)] backdrop-blur">
+    <div className="mb-8">
+      <p className="text-sm font-bold text-[#4dbbff]">Statistics</p>
+      <h2 className="mt-2 text-[2rem] font-black tracking-[-0.05em]">
         통계 시각화
       </h2>
-      <p className="mt-2 text-sm text-neutral-500">
-        카테고리별 게시글과 반응 데이터를 그래프로 확인할 수 있습니다.
+      <p className="mt-3 text-sm leading-6 text-neutral-500">
+        카테고리별 게시글과 반응 데이터를 한눈에 확인할 수 있습니다.
       </p>
     </div>
 
     <div className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-[24px] bg-neutral-50 p-5">
-        <h3 className="mb-4 text-sm font-bold text-neutral-700">
-          카테고리별 게시글
-        </h3>
-        <div className="h-[260px]">
+      <div className="rounded-[28px] border border-violet-100 bg-[linear-gradient(145deg,#ffffff,#f8f7ff)] p-5 shadow-[0_18px_40px_rgba(124,58,237,0.08)]">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
+            📊
+          </div>
+          <h3 className="text-sm font-black text-neutral-800">
+            카테고리별 게시글
+          </h3>
+        </div>
+
+        <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="posts" radius={[10, 10, 0, 0]} fill="#111827" />
+            <BarChart data={chartData} margin={{ top: 18, right: 18, left: -10, bottom: 0 }}>
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#737373", fontSize: 13 }}
+              />
+              <YAxis
+                allowDecimals={false}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#737373", fontSize: 12 }}
+              />
+              <Tooltip
+                cursor={{ fill: "rgba(124,58,237,0.06)" }}
+                contentStyle={{
+                  borderRadius: "16px",
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
+                }}
+              />
+              <Bar
+                dataKey="posts"
+                radius={[14, 14, 8, 8]}
+                label={{ position: "top", fill: "#111827", fontSize: 13, fontWeight: 700 }}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`bar-${entry.name}`}
+                    fill={["#8B5CF6", "#3B82F6", "#34D399", "#FBBF24"][index % 4]}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="rounded-[24px] bg-neutral-50 p-5">
-        <h3 className="mb-4 text-sm font-bold text-neutral-700">
-          반응 데이터 비율
-        </h3>
-        <div className="h-[260px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={90}
-                label
+      <div className="rounded-[28px] border border-sky-100 bg-[linear-gradient(145deg,#ffffff,#f4fbff)] p-5 shadow-[0_18px_40px_rgba(14,165,233,0.08)]">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+            ◔
+          </div>
+          <h3 className="text-sm font-black text-neutral-800">
+            반응 데이터 비율
+          </h3>
+        </div>
+
+        <div className="grid items-center gap-4 md:grid-cols-[1fr_150px]">
+          <div className="relative h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={68}
+                  outerRadius={112}
+                  paddingAngle={3}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell
+                      key={`pie-${entry.name}`}
+                      fill={["#4F46E5", "#14B8A6", "#F59E0B"][index % 3]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "16px",
+                    border: "1px solid rgba(0,0,0,0.06)",
+                    boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+
+            <div className="pointer-events-none absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+              <span className="text-xs font-bold text-neutral-400">총 반응</span>
+              <span className="text-2xl font-black text-neutral-900">
+                {pieData.reduce((sum, item) => sum + item.value, 0)}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {pieData.map((item, index) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between rounded-2xl bg-white/80 px-4 py-3 shadow-sm"
               >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{
+                      backgroundColor: ["#4F46E5", "#14B8A6", "#F59E0B"][index % 3],
+                    }}
+                  />
+                  <span className="text-sm font-bold text-neutral-700">{item.name}</span>
+                </div>
+                <span className="text-sm font-black text-neutral-900">{item.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+    </div>
+
+    <div className="mt-6 flex items-center justify-between rounded-[24px] bg-[linear-gradient(90deg,#f5f7ff,#f8fbff)] px-5 py-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">
+          ✨
+        </div>
+        <div>
+          <p className="text-sm font-black text-neutral-800">데이터 업데이트 안내</p>
+          <p className="mt-1 text-xs text-neutral-500">
+            통계 데이터는 등록된 콘텐츠 기준으로 자동 집계됩니다.
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => window.location.reload()}
+        className="rounded-full bg-white px-4 py-2 text-xs font-bold text-neutral-600 shadow-sm transition hover:bg-neutral-950 hover:text-white"
+      >
+        새로고침
+      </button>
     </div>
   </section>
 )}
