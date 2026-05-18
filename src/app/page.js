@@ -2774,16 +2774,16 @@ const handleAddComment = async () => {
                         </button>
                       </div>
                     </button>
-                                    ))}
+                                      ))}
                 </div>
               </div>
             </div>
           </div>
         </>
       )}
-
-    </main>
-  )}
+    </section>
+  </main>
+)}
 
       <SiteFooter />
     </div>
