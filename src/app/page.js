@@ -607,7 +607,8 @@ export default function Page() {
   const [isSavingPost, setIsSavingPost] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [heroIndex, setHeroIndex] = useState(0);
-const adminChartData = [
+
+  const adminChartData = [
   {
     name: "뉴스",
     posts: drafts.filter((post) => getCategory1(post) === "뉴스").length,
@@ -634,6 +635,7 @@ const adminPieData = [
     value: drafts.reduce((sum, post) => sum + ((post.comments || []).length || 0), 0),
   },
 ];
+
   const [form, setForm] = useState({
     title: "",
     category1: "트렌드",
