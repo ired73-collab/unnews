@@ -2298,33 +2298,35 @@ const handleAddComment = async () => {
 )}
 
           {adminTab === "write" && (
+  <>
+    <div className="mb-6 flex items-center justify-between">
+      <div>
+        <p className="text-sm text-neutral-500">Admin</p>
+        <h1 className="text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.045em]">
+          {editingId ? "콘텐츠 수정" : "콘텐츠 관리"}
+        </h1>
+      </div>
 
-<>
-            
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-neutral-500">Admin</p>
-              <h1 className="text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.045em]">
-                {editingId ? "콘텐츠 수정" : "콘텐츠 관리"}
-              </h1>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage("home")}
-                className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700"
-              >
-                사이트로 이동
-              </button>
-              <button
-                onClick={handleAdminLogout}
-                className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white"
-              >
-                로그아웃
-              </button>
-            </div>
-          </div>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setPage("home")}
+          className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700"
+        >
+          사이트로 이동
+        </button>
 
-          <div className="grid gap-6 md:grid-cols-[1fr_0.9fr]">
+        <button
+          type="button"
+          onClick={handleAdminLogout}
+          className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white"
+        >
+          로그아웃
+        </button>
+      </div>
+    </div>
+
+    <div className="grid gap-6 md:grid-cols-[1fr_0.9fr]">
             <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
               <div className="space-y-4">
                 <div>
@@ -2772,15 +2774,16 @@ const handleAddComment = async () => {
                         </button>
                       </div>
                     </button>
-                  ))}
+                                    ))}
                 </div>
               </div>
             </div>
           </div>
-          </>
-)}
-        </main>
+        </>
       )}
+
+    </main>
+  )}
 
       <SiteFooter />
     </div>
