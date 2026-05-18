@@ -611,28 +611,37 @@ export default function Page() {
   const adminChartData = [
   {
     name: "뉴스",
-    posts: drafts.filter((post) => getCategory1(post) === "뉴스").length,
+    posts: drafts.filter((post) => post.category1 === "뉴스").length,
   },
   {
     name: "커뮤니티",
-    posts: drafts.filter((post) => getCategory1(post) === "커뮤니티").length,
+    posts: drafts.filter((post) => post.category1 === "커뮤니티").length,
   },
   {
     name: "취업",
-    posts: drafts.filter((post) => getCategory1(post) === "취업/공모전").length,
+    posts: drafts.filter((post) => post.category1 === "취업/공모전").length,
   },
   {
     name: "트렌드",
-    posts: drafts.filter((post) => getCategory1(post) === "트렌드").length,
+    posts: drafts.filter((post) => post.category1 === "트렌드").length,
   },
 ];
 
 const adminPieData = [
-  { name: "조회수", value: drafts.reduce((sum, post) => sum + (post.views || 0), 0) },
-  { name: "좋아요", value: drafts.reduce((sum, post) => sum + (post.likes || 0), 0) },
+  {
+    name: "조회수",
+    value: drafts.reduce((sum, post) => sum + (post.views || 0), 0),
+  },
+  {
+    name: "좋아요",
+    value: drafts.reduce((sum, post) => sum + (post.likes || 0), 0),
+  },
   {
     name: "댓글",
-    value: drafts.reduce((sum, post) => sum + ((post.comments || []).length || 0), 0),
+    value: drafts.reduce(
+      (sum, post) => sum + ((post.comments?.length) || 0),
+      0
+    ),
   },
 ];
 
