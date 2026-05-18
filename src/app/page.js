@@ -37,45 +37,6 @@ const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
 
 const COLORS = ["#4F46E5", "#14B8A6", "#F59E0B"];
 
-const chartData = [
-  {
-    name: "뉴스",
-    posts: drafts.filter((post) => post.category === "뉴스").length,
-  },
-  {
-    name: "커뮤니티",
-    posts: drafts.filter((post) => post.category === "커뮤니티").length,
-  },
-  {
-    name: "취업",
-    posts: drafts.filter((post) => post.category === "취업").length,
-  },
-  {
-    name: "트렌드",
-    posts: drafts.filter((post) => post.category === "트렌드").length,
-  },
-];
-
-const totalViews = drafts.reduce(
-  (sum, post) => sum + (post.views || 0),
-  0
-);
-
-const totalLikes = drafts.reduce(
-  (sum, post) => sum + (post.likes || 0),
-  0
-);
-
-const totalComments = drafts.reduce(
-  (sum, post) => sum + (post.comments || 0),
-  0
-);
-
-const pieData = [
-  { name: "조회수", value: totalViews },
-  { name: "좋아요", value: totalLikes },
-  { name: "댓글", value: totalComments },
-];
 
 const POSTS = [
   {
