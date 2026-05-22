@@ -504,24 +504,79 @@ function ShortcutAdminIcon() {
 
 function SiteFooter() {
   return (
-    <footer className="mt-16 bg-black text-white">
+    <footer className="mt-16 border-t border-neutral-200 bg-white">
       <div className="mx-auto max-w-[1440px] px-6 py-10 md:px-8">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+
+        <div className="flex flex-col gap-8 md:flex-row md:justify-between">
+
           <div>
-            <div className="text-lg font-semibold">UNNEWS</div>
-            <div className="mt-2 text-sm text-white/60">대학연합신문 · 이미지 중심 콘텐츠 플랫폼</div>
+            <div className="text-xl font-bold text-neutral-900">
+              대학연합신문
+            </div>
+
+            <div className="mt-3 text-sm text-neutral-600">
+              사업자번호 : 504-81-47108
+            </div>
+
+            <div className="text-sm text-neutral-600">
+              주소 : 대구 남구 현충로 206 3층(대명동, 신화빌딩)
+            </div>
+
+            <div className="text-sm text-neutral-600">
+              전화 : 053-765-4765
+            </div>
+
+            <div className="text-sm text-neutral-600">
+              팩스 : 053-767-4766
+            </div>
+
+            <div className="text-sm text-neutral-600">
+              이메일 : unnews@daum.net
+            </div>
           </div>
 
-          <div className="flex gap-6 text-sm text-white/70">
-            <span className="cursor-pointer hover:text-white">About</span>
-            <span className="cursor-pointer hover:text-white">Contact</span>
-            <span className="cursor-pointer hover:text-white">Privacy</span>
+          <div className="flex flex-col items-start gap-4 md:items-end">
+
+            <a
+              href="https://www.instagram.com/withcomm_official/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-neutral-600 hover:text-blue-600"
+            >
+              [인스타그램]
+            </a>
+
+            <div className="flex flex-wrap gap-3 text-sm">
+              <span className="cursor-pointer text-red-500 hover:text-red-600">
+                개인정보처리방침
+              </span>
+
+              <span>|</span>
+
+              <span className="cursor-pointer hover:text-blue-600">
+                이용약관
+              </span>
+
+              <span>|</span>
+
+              <span className="cursor-pointer hover:text-blue-600">
+                저작권 정책
+              </span>
+
+              <span>|</span>
+
+              <span className="cursor-pointer hover:text-blue-600">
+                청소년 보호 정책
+              </span>
+            </div>
           </div>
+
         </div>
 
-        <div className="mt-8 border-t border-white/10 pt-6 text-xs text-white/40">
-          © 2026 UNNEWS. All rights reserved.
+        <div className="mt-8 border-t border-neutral-200 pt-6 text-sm text-neutral-500">
+          © University Alliance News. All rights reserved.
         </div>
+
       </div>
     </footer>
   );
