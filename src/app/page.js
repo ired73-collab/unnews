@@ -451,35 +451,11 @@ function getSmartImageSuggestions(category, title, body) {
 function BrandLogo() {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-white shadow-[0_8px_22px_rgba(77,187,255,0.22)] ring-1 ring-[#4dbbff]/25">
-        <svg
-          width="34"
-          height="34"
-          viewBox="0 0 64 64"
-          fill="none"
-          aria-hidden="true"
-          className="text-[#4dbbff]"
-        >
-          <path
-            d="M8 14L20 8L32 14L44 8L56 14V47L44 55L32 49L20 55L8 47V14Z"
-            fill="currentColor"
-          />
-          <path
-            d="M18 21V39L27 34V20L32 17L37 20V34L46 39V21"
-            stroke="white"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M27 34L32 37L37 34"
-            stroke="white"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+      <img
+        src="/unnews_logo.png"
+        alt="UNNEWS"
+        className="h-12 w-12 object-contain"
+      />
 
       <div className="text-[21px] font-black tracking-[-0.06em] text-neutral-900">
         대학연합신문
