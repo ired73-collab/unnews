@@ -504,33 +504,33 @@ function ShortcutAdminIcon() {
 
 function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-neutral-200 bg-white">
+    <footer className="mt-16 bg-black text-white">
       <div className="mx-auto max-w-[1440px] px-6 py-10 md:px-8">
 
         <div className="flex flex-col gap-8 md:flex-row md:justify-between">
 
           <div>
-            <div className="text-xl font-bold text-neutral-900">
+            <div className="text-xl font-bold">
               대학연합신문
             </div>
 
-            <div className="mt-3 text-sm text-neutral-600">
+            <div className="mt-3 text-sm text-white/60">
               사업자번호 : 504-81-47108
             </div>
 
-            <div className="text-sm text-neutral-600">
-              주소 : 대구 남구 현충로 206 3층(대명동, 신화빌딩)
+            <div className="text-sm text-white/60">
+              주소 : 대구 남구 현충로 206 3층 (대명동, 신화빌딩)
             </div>
 
-            <div className="text-sm text-neutral-600">
+            <div className="text-sm text-white/60">
               전화 : 053-765-4765
             </div>
 
-            <div className="text-sm text-neutral-600">
+            <div className="text-sm text-white/60">
               팩스 : 053-767-4766
             </div>
 
-            <div className="text-sm text-neutral-600">
+            <div className="text-sm text-white/60">
               이메일 : unnews@daum.net
             </div>
           </div>
@@ -541,39 +541,41 @@ function SiteFooter() {
               href="https://www.instagram.com/withcomm_official/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-neutral-600 hover:text-blue-600"
+              className="text-sm text-white/60 hover:text-white"
             >
               [인스타그램]
             </a>
 
-            <div className="flex flex-wrap gap-3 text-sm">
-              <span className="cursor-pointer text-red-500 hover:text-red-600">
+            <div className="flex flex-wrap gap-3 text-sm text-white/70">
+
+              <span className="cursor-pointer text-red-400 hover:text-red-300">
                 개인정보처리방침
               </span>
 
               <span>|</span>
 
-              <span className="cursor-pointer hover:text-blue-600">
+              <span className="cursor-pointer hover:text-white">
                 이용약관
               </span>
 
               <span>|</span>
 
-              <span className="cursor-pointer hover:text-blue-600">
+              <span className="cursor-pointer hover:text-white">
                 저작권 정책
               </span>
 
               <span>|</span>
 
-              <span className="cursor-pointer hover:text-blue-600">
+              <span className="cursor-pointer hover:text-white">
                 청소년 보호 정책
               </span>
+
             </div>
           </div>
 
         </div>
 
-        <div className="mt-8 border-t border-neutral-200 pt-6 text-sm text-neutral-500">
+        <div className="mt-8 border-t border-white/10 pt-6 text-sm text-white/40">
           © University Alliance News. All rights reserved.
         </div>
 
