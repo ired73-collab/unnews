@@ -538,13 +538,18 @@ function SiteFooter() {
           <div className="flex flex-col items-start gap-4 md:items-end">
 
             <a
-              href="https://www.instagram.com/withcomm_official/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-white/60 hover:text-white"
-            >
-              [인스타그램]
-            </a>
+  href="https://www.instagram.com/withcomm_official/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center justify-center opacity-80 transition hover:opacity-100"
+  aria-label="인스타그램"
+>
+  <img
+    src="/instagram_w.png"
+    alt="인스타그램"
+    className="h-7 w-7 object-contain"
+  />
+</a>
 
             <div className="flex flex-wrap gap-3 text-sm text-white/70">
 
