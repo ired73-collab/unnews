@@ -1399,28 +1399,40 @@ const addLinkBlock = () => {
   };
 
   const handleOpenPost = async (post) => {
-    setSelectedPost(post);
-    setPage("post");
+  setSelectedPost(post);
+  setPage("post");
 
-    if (!post?.id || typeof post.id === "number") return;
+  if (!post?.id) return;
 
-    const nextViews = (post.views || 0) + 1;
+  const nextViews = (post.views || 0) + 1;
 
-    setDrafts((prev) =>
-      prev.map((item) => (item.id === post.id ? { ...item, views: nextViews } : item))
-    );
-    setSelectedPost((prev) =>
-      prev?.id === post.id ? { ...prev, views: nextViews } : prev
-    );
+  setDrafts((prev) =>
+    prev.map((item) =>
+      item.id === post.id ? { ...item, views: nextViews } : item
+    )
+  );
 
-    try {
-      await updateDoc(doc(db, "posts", post.id), {
-        views: nextViews,
-      });
-    } catch (error) {
-      console.error("Firestore view count error:", error);
-    }
-  };
+  setSelectedPost((prev) =>
+    prev?.id === post.id ? { ...prev, views: nextViews } : prev
+  );
+
+  try {
+    const { error } = await supabase
+      .from("posts")
+      .update({ views: nextViews })
+      .eq("id", post.id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("Supabase view count error:", error);
+  }
+};
+
+const getCommentsArray = (post) => {
+  return Array.isArray(post?.comments)
+    ? post.comments
+    : [];
+};
 
 const handleLikePost = async (post, event) => {
   event.stopPropagation();
@@ -1463,6 +1475,61 @@ const handleLikePost = async (post, event) => {
   }
 };
   
+const handleAddComment = async () => {
+  if (!selectedPost?.id) {
+    alert("글 정보를 찾을 수 없습니다.");
+    return;
+  }
+
+  if (!commentName.trim() || !commentText.trim()) {
+    alert("이름과 댓글 내용을 입력해주세요.");
+    return;
+  }
+
+  const newComment = {
+    id: Date.now(),
+    name: commentName.trim(),
+    text: commentText.trim(),
+    createdAt: new Date().toISOString(),
+  };
+
+  const currentComments = getCommentsArray(selectedPost);
+  const nextComments = [...currentComments, newComment];
+
+  try {
+    setIsSavingComment(true);
+
+    const { error } = await supabase
+      .from("posts")
+      .update({
+        comments: nextComments.length,
+      })
+      .eq("id", selectedPost.id);
+
+    if (error) throw error;
+
+    setSelectedPost((prev) =>
+      prev ? { ...prev, comments: nextComments } : prev
+    );
+
+    setDrafts((prev) =>
+      prev.map((post) =>
+        post.id === selectedPost.id
+          ? { ...post, comments: nextComments }
+          : post
+      )
+    );
+
+    setCommentName("");
+    setCommentText("");
+  } catch (error) {
+    console.error("Supabase comment save error:", error);
+    alert("댓글 저장에 실패했습니다.");
+  } finally {
+    setIsSavingComment(false);
+  }
+};
+
   const handleDeletePost = async (postId) => {
     if (!postId || typeof postId === "number") {
       alert("기본 예시 글은 삭제할 수 없습니다. Firestore에 저장된 글만 삭제됩니다.");
