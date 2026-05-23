@@ -57,22 +57,30 @@ export default function Header({
           </nav>
 
           <div className="hidden items-center gap-2 md:flex">
-            <img
-              src="/talk.png"
-              alt="카카오톡"
-              className="h-9 w-9 rounded-[10px] object-cover"
-            />
-            <img
-              src="/blog.png"
-              alt="네이버 블로그"
-              className="h-9 w-9 rounded-[10px] object-cover"
-            />
-            <img
-              src="/instagram.png"
-              alt="인스타그램"
-              className="h-9 w-9 rounded-[10px] object-cover"
-            />
-          </div>
+  <a
+    href="네이버TV_URL_https://tv.naver.com/withmagazine"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      src="/naver_tv.png"
+      alt="네이버TV"
+      className="h-9 w-9 rounded-[10px] object-cover"
+    />
+  </a>
+
+  <a
+    href="https://www.instagram.com/withcomm_official/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      src="/instagram.png"
+      alt="인스타그램"
+      className="h-9 w-9 rounded-[10px] object-cover"
+    />
+  </a>
+</div>
         </div>
       </div>
     </header>
