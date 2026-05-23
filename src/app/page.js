@@ -439,13 +439,90 @@ function getSuggestionTopic(category, text = "") {
 }
 
 function getSmartImageSuggestions(category, title, body) {
-  const topic = getSuggestionTopic(category, `${title} ${body}`);
-  const urls = suggestImages(`${category} ${title}`, body);
+  const fullText = `${category || ""} ${title || ""} ${body || ""}`.toLowerCase();
 
-  return urls.slice(0, 4).map((url, index) => ({
-    id: `${topic.key}-${index}`,
+  let topicKey = "campus";
+  let topicLabel = "대학·캠퍼스";
+
+  if (
+    fullText.includes("ai") ||
+    fullText.includes("인공지능") ||
+    fullText.includes("챗gpt") ||
+    fullText.includes("디지털") ||
+    fullText.includes("기술") ||
+    fullText.includes("데이터")
+  ) {
+    topicKey = "ai";
+    topicLabel = "AI·기술";
+  } else if (
+    fullText.includes("취업") ||
+    fullText.includes("채용") ||
+    fullText.includes("면접") ||
+    fullText.includes("자소서") ||
+    fullText.includes("포트폴리오") ||
+    fullText.includes("커리어")
+  ) {
+    topicKey = "career";
+    topicLabel = "취업·커리어";
+  } else if (
+    fullText.includes("공모전") ||
+    fullText.includes("대외활동") ||
+    fullText.includes("창업") ||
+    fullText.includes("아이디어") ||
+    fullText.includes("프로젝트")
+  ) {
+    topicKey = "activity";
+    topicLabel = "공모전·대외활동";
+  } else if (
+    fullText.includes("의료") ||
+    fullText.includes("의대") ||
+    fullText.includes("병원") ||
+    fullText.includes("보건") ||
+    fullText.includes("건강")
+  ) {
+    topicKey = "medical";
+    topicLabel = "의료·보건";
+  } else if (
+    fullText.includes("연애") ||
+    fullText.includes("관계") ||
+    fullText.includes("데이트") ||
+    fullText.includes("커플")
+  ) {
+    topicKey = "relationship";
+    topicLabel = "연애·관계";
+  } else if (
+    fullText.includes("문화") ||
+    fullText.includes("공연") ||
+    fullText.includes("전시") ||
+    fullText.includes("영화") ||
+    fullText.includes("축제")
+  ) {
+    topicKey = "culture";
+    topicLabel = "문화·콘텐츠";
+  } else if (
+    fullText.includes("지역") ||
+    fullText.includes("사회") ||
+    fullText.includes("정책") ||
+    fullText.includes("청년")
+  ) {
+    topicKey = "society";
+    topicLabel = "사회·지역";
+  } else if (
+    fullText.includes("생활") ||
+    fullText.includes("루틴") ||
+    fullText.includes("일상") ||
+    fullText.includes("습관")
+  ) {
+    topicKey = "lifestyle";
+    topicLabel = "대학생 라이프";
+  }
+
+  const pool = IMAGE_SUGGESTION_POOLS[topicKey] || IMAGE_SUGGESTION_POOLS.campus;
+
+  return pool.slice(0, 4).map((url, index) => ({
+    id: `${topicKey}-${index}`,
     url,
-    label: topic.label,
+    label: topicLabel,
   }));
 }
 
@@ -817,21 +894,41 @@ const visiblePosts = useMemo(() => {
 
   useEffect(() => {
     const loadPosts = async () => {
-      try {
-        setIsLoadingPosts(true);
-        const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(postsQuery);
-        const savedPosts = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setDrafts(savedPosts);
-      } catch (error) {
-        console.error("Firestore load error:", error);
-      } finally {
-        setIsLoadingPosts(false);
-      }
-    };
+  try {
+    setIsLoadingPosts(true);
+
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const savedPosts = (data || []).map((post) => ({
+      id: post.id,
+      title: post.title,
+      body: post.body || "",
+      contentBlocks: post.content_blocks || [],
+      summary: post.summary || "",
+      category1: post.category1 || "뉴스",
+      category2: post.category2 || "교육",
+      category: post.category || post.category2 || "교육",
+      readTime: post.read_time || "1분 읽기",
+      image: post.image || "",
+      views: post.views || 0,
+      likes: post.likes || 0,
+      comments: [],
+      createdAt: post.created_at,
+      updatedAt: post.updated_at,
+    }));
+
+    setDrafts(savedPosts);
+  } catch (error) {
+    console.error("Supabase load error:", error);
+  } finally {
+    setIsLoadingPosts(false);
+  }
+};
 
     loadPosts();
   }, []);
@@ -1328,19 +1425,20 @@ const addLinkBlock = () => {
 const handleLikePost = async (post, event) => {
   event.stopPropagation();
 
-  if (!post?.id || typeof post.id === "number") return;
+  if (!post?.id) return;
 
   const storageKey = "unnews_liked_posts";
   const likedPosts = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  const postId = String(post.id);
 
-  if (likedPosts.includes(post.id)) {
+  if (likedPosts.includes(postId)) {
     alert("이미 좋아요를 누른 글입니다.");
     return;
   }
 
   const nextLikes = (post.likes || 0) + 1;
 
-  localStorage.setItem(storageKey, JSON.stringify([...likedPosts, post.id]));
+  localStorage.setItem(storageKey, JSON.stringify([...likedPosts, postId]));
 
   setDrafts((prev) =>
     prev.map((item) =>
@@ -1348,65 +1446,20 @@ const handleLikePost = async (post, event) => {
     )
   );
 
-  if (selectedPost?.id === post.id) {
-    setSelectedPost((prev) =>
-      prev ? { ...prev, likes: nextLikes } : prev
-    );
-  }
+  setSelectedPost((prev) =>
+    prev?.id === post.id ? { ...prev, likes: nextLikes } : prev
+  );
 
   try {
-    await updateDoc(doc(db, "posts", post.id), {
-      likes: nextLikes,
-    });
+    const { error } = await supabase
+      .from("posts")
+      .update({ likes: nextLikes })
+      .eq("id", post.id);
+
+    if (error) throw error;
   } catch (error) {
-    console.error("Firestore like count error:", error);
-  }
-};
-
-const handleAddComment = async () => {
-  if (!selectedPost?.id || typeof selectedPost.id === "number") {
-    alert("Firestore에 저장된 글에만 댓글을 작성할 수 있습니다.");
-    return;
-  }
-
-  if (!commentName.trim() || !commentText.trim()) {
-    alert("이름과 댓글 내용을 입력해주세요.");
-    return;
-  }
-
-  const newComment = {
-    id: Date.now(),
-    name: commentName.trim(),
-    text: commentText.trim(),
-    createdAt: new Date().toISOString(),
-  };
-
-  const nextComments = [...(selectedPost.comments || []), newComment];
-
-  try {
-    setIsSavingComment(true);
-
-    await updateDoc(doc(db, "posts", selectedPost.id), {
-      comments: nextComments,
-    });
-
-    setSelectedPost((prev) =>
-      prev ? { ...prev, comments: nextComments } : prev
-    );
-
-    setDrafts((prev) =>
-      prev.map((post) =>
-        post.id === selectedPost.id ? { ...post, comments: nextComments } : post
-      )
-    );
-
-    setCommentName("");
-    setCommentText("");
-  } catch (error) {
-    console.error("Firestore comment save error:", error);
-    alert("댓글 저장에 실패했습니다.");
-  } finally {
-    setIsSavingComment(false);
+    console.error("Supabase like error:", error);
+    alert("좋아요 저장에 실패했습니다.");
   }
 };
   
