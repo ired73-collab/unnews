@@ -58,7 +58,7 @@ export default function Header({
 
           <div className="hidden items-center gap-2 md:flex">
   <a
-    href="네이버TV_URL_https://tv.naver.com/withmagazine"
+    href="https://tv.naver.com/withmagazine"
     target="_blank"
     rel="noopener noreferrer"
   >
