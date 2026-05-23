@@ -2716,35 +2716,36 @@ const handleAddComment = async () => {
                 </div>
 
                 <div>
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-600">
-                        본문 블록 편집
-                      </label>
-                      <p className="mt-1 text-xs text-neutral-400">
-                        텍스트와 이미지를 원하는 순서로 추가할 수 있습니다.
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap gap-2">
-  <button type="button" onClick={addTextBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
-    + 텍스트
-  </button>
-  <button type="button" onClick={addHeadingBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
-    + 소제목
-  </button>
-  <button type="button" onClick={addQuoteBlock} className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
-    + 인용문
-  </button>
-  <button type="button" onClick={addHighlightBlock} className="rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
-    + 강조박스
-  </button>
-  <button type="button" onClick={addLinkBlock} className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100">
-    + 링크버튼
-  </button>
-  <button type="button" onClick={addImageBlock} className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white">
-    + 이미지
-  </button>
-</div>
+                  <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+  <div>
+    <h3 className="text-sm font-bold text-neutral-800">
+      본문 블록 편집
+    </h3>
+    <p className="mt-1 text-xs leading-5 text-neutral-400">
+      텍스트와 이미지를 원하는 순서로 추가할 수 있습니다.
+    </p>
+  </div>
+
+  <div className="flex flex-wrap gap-2">
+    <button type="button" onClick={addTextBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
+      + 텍스트
+    </button>
+    <button type="button" onClick={addHeadingBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
+      + 소제목
+    </button>
+    <button type="button" onClick={addQuoteBlock} className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+      + 인용문
+    </button>
+    <button type="button" onClick={addHighlightBlock} className="rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
+      + 강조박스
+    </button>
+    <button type="button" onClick={addLinkBlock} className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100">
+      + 링크버튼
+    </button>
+    <button type="button" onClick={addImageBlock} className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white">
+      + 이미지
+    </button>
+  </div>
 </div>
 
 <div className="space-y-3">
