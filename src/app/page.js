@@ -1,5 +1,6 @@
 "use client";
 
+import { supabase } from "../lib/supabase";
 import Header from "../components/Header";
 import { useEffect, useMemo, useState } from "react";
 import { db, auth } from "../lib/firebase";
@@ -1164,54 +1165,107 @@ const addLinkBlock = () => {
     };
 
     try {
-      setIsSavingPost(true);
+  setIsSavingPost(true);
 
-      if (editingId) {
-        const updatedPostData = {
-          ...postData,
-          updatedAt: serverTimestamp(),
-        };
+  if (editingId) {
+    const { data, error } = await supabase
+      .from("posts")
+      .update({
+        title: postData.title,
+        body: postData.body,
+        content_blocks: postData.contentBlocks,
+        summary: postData.summary,
+        category1: postData.category1,
+        category2: postData.category2,
+        category: postData.category,
+        read_time: postData.readTime,
+        image: postData.image,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", editingId)
+      .select()
+      .single();
 
-        await updateDoc(doc(db, "posts", editingId), updatedPostData);
+    if (error) throw error;
 
-        const localUpdatedPost = {
-          id: editingId,
-          ...postData,
-          updatedAt: new Date().toISOString(),
-        };
+    const localUpdatedPost = {
+      id: data.id,
+      title: data.title,
+      body: data.body,
+      contentBlocks: data.content_blocks || [],
+      summary: data.summary,
+      category1: data.category1,
+      category2: data.category2,
+      category: data.category,
+      readTime: data.read_time || "1분 읽기",
+      image: data.image,
+      views: data.views || 0,
+      likes: data.likes || 0,
+      comments: [],
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
 
-        setDrafts((prev) =>
-          prev.map((post) => (post.id === editingId ? localUpdatedPost : post))
-        );
-        setSelectedPost(localUpdatedPost);
-        resetForm();
-        setPage("post");
-        return;
-      }
+    setDrafts((prev) =>
+      prev.map((post) => (post.id === editingId ? localUpdatedPost : post))
+    );
 
-      const newPostData = {
-        ...postData,
-        createdAt: serverTimestamp(),
-      };
+    setSelectedPost(localUpdatedPost);
+    resetForm();
+    setPage("post");
+    return;
+  }
 
-      const docRef = await addDoc(collection(db, "posts"), newPostData);
-      const newPost = {
-        id: docRef.id,
-        ...postData,
-        createdAt: new Date().toISOString(),
-      };
+  const { data, error } = await supabase
+    .from("posts")
+    .insert({
+      title: postData.title,
+      body: postData.body,
+      content_blocks: postData.contentBlocks,
+      summary: postData.summary,
+      category1: postData.category1,
+      category2: postData.category2,
+      category: postData.category,
+      read_time: postData.readTime,
+      image: postData.image,
+      views: 0,
+      likes: 0,
+      comments: 0,
+    })
+    .select()
+    .single();
 
-      setDrafts((prev) => [newPost, ...prev]);
-      resetForm();
-      setSelectedPost(newPost);
-      setPage("post");
-    } catch (error) {
-      console.error("Firestore save/update error:", error);
-      alert("글 저장에 실패했습니다. Firestore 보안 규칙과 Firebase 설정을 확인해주세요.");
-    } finally {
-      setIsSavingPost(false);
-    }
+  if (error) throw error;
+
+  const newPost = {
+    id: data.id,
+    title: data.title,
+    body: data.body,
+    contentBlocks: data.content_blocks || [],
+    summary: data.summary,
+    category1: data.category1,
+    category2: data.category2,
+    category: data.category,
+    readTime: data.read_time || "1분 읽기",
+    image: data.image,
+    views: data.views || 0,
+    likes: data.likes || 0,
+    comments: [],
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
   };
+
+  setDrafts((prev) => [newPost, ...prev]);
+  resetForm();
+  setSelectedPost(newPost);
+  setPage("post");
+} catch (error) {
+  console.error("Supabase save/update error:", error);
+  alert("글 저장에 실패했습니다. Supabase 테이블 컬럼과 API Key를 확인해주세요.");
+} finally {
+  setIsSavingPost(false);
+}
+};
 
   const handleEditPost = (post) => {
     if (!post || typeof post.id === "number") {
