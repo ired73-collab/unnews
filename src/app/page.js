@@ -2725,32 +2725,29 @@ const handleAddComment = async () => {
                         텍스트와 이미지를 원하는 순서로 추가할 수 있습니다.
                       </p>
                     </div>
-                    <div className="flex shrink-0 gap-2">
-                      <button
-                        type="button"
-                        onClick={addTextBlock}
-                        className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
-                      >
-                        + 텍스트
-                      </button>
-                      <button
-                        type="button"
-                        onClick={addImageBlock}
-                        className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white"
-                      >
-                          + 소제목
-                     </button>
-                     <button
-                       type="button"
-                       onClick={addImageBlock}
-                       className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white"
-                      >
-                        + 이미지
-                      </button>
-                    </div>
-                  </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+  <button type="button" onClick={addTextBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
+    + 텍스트
+  </button>
+  <button type="button" onClick={addHeadingBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
+    + 소제목
+  </button>
+  <button type="button" onClick={addQuoteBlock} className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+    + 인용문
+  </button>
+  <button type="button" onClick={addHighlightBlock} className="rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
+    + 강조박스
+  </button>
+  <button type="button" onClick={addLinkBlock} className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100">
+    + 링크버튼
+  </button>
+  <button type="button" onClick={addImageBlock} className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white">
+    + 이미지
+  </button>
+</div>
+</div>
 
-                  <div className="space-y-3">
+<div className="space-y-3">
                     {contentBlocks.map((block, index) => (
                       <div
                         key={block.id}
@@ -2758,8 +2755,20 @@ const handleAddComment = async () => {
                       >
                         <div className="mb-3 flex items-center justify-between gap-3">
                           <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-500">
-                            {index + 1}. {block.type === "heading" ? "소제목" : block.type === "text" ? "텍스트" : "이미지"}
-                          </span>
+  {`${index + 1}. ${
+    block.type === "text"
+      ? "텍스트"
+      : block.type === "heading"
+        ? "소제목"
+        : block.type === "quote"
+          ? "인용문"
+          : block.type === "highlight"
+            ? "강조박스"
+            : block.type === "link"
+              ? "링크버튼"
+              : "이미지"
+  }`}
+</span>
                           <div className="flex gap-1">
                             <button
                               type="button"
@@ -2954,8 +2963,8 @@ const handleAddComment = async () => {
                           삭제
                         </button>
                       </div>
-                    </button>
-                                      ))}
+                                        </button>
+                  ))}
                 </div>
               </div>
             </div>
