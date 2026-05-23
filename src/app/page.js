@@ -523,16 +523,10 @@ function SiteFooter() {
             </div>
 
             <div className="text-sm text-white/60">
-              전화 : 053-765-4765
-            </div>
-
-            <div className="text-sm text-white/60">
-              팩스 : 053-767-4766
-            </div>
-
-            <div className="text-sm text-white/60">
-              이메일 : unnews@daum.net
-            </div>
+  전화 : 053-765-4765 &nbsp;&nbsp;|&nbsp;&nbsp;
+  팩스 : 053-767-4766 &nbsp;&nbsp;|&nbsp;&nbsp;
+  이메일 : unnews@daum.net
+</div>
           </div>
 
           <div className="flex flex-col items-start gap-4 md:items-end">
@@ -553,7 +547,7 @@ function SiteFooter() {
 
             <div className="flex flex-wrap gap-3 text-sm text-white/70">
 
-              <span className="cursor-pointer text-red-400 hover:text-red-300">
+              <span className="cursor-pointer text-[#4DBBFF] hover:text-[#73CCFF]">
                 개인정보처리방침
               </span>
 
@@ -581,7 +575,7 @@ function SiteFooter() {
         </div>
 
         <div className="mt-8 border-t border-white/10 pt-6 text-sm text-white/40">
-          © University Alliance News. All rights reserved.
+          © 대학연합신문 (UNNEWS). All rights reserved.
         </div>
 
       </div>
