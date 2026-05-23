@@ -1924,29 +1924,76 @@ const handleAddComment = async () => {
                 {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
                   <div className="space-y-6">
                     {selectedPost.contentBlocks.map((block, index) => {
-                      if (block.type === "image") {
-                        return (
-                          <figure key={index} className="overflow-hidden rounded-[24px] bg-neutral-50">
-                            <img
-                              src={block.url}
-                              alt={block.caption || selectedPost.title}
-                              className="max-h-[520px] w-full object-cover"
-                            />
-                            {block.caption && (
-                              <figcaption className="px-4 py-3 text-xs text-neutral-500">
-                                {block.caption}
-                              </figcaption>
-                            )}
-                          </figure>
-                        );
-                      }
+  if (block.type === "image") {
+    return (
+      <figure key={index} className="overflow-hidden rounded-[24px] bg-neutral-50">
+        <img
+          src={block.url}
+          alt={block.caption || selectedPost.title}
+          className="max-h-[520px] w-full object-cover"
+        />
+        {block.caption && (
+          <figcaption className="px-4 py-3 text-xs text-neutral-500">
+            {block.caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
 
-                      return (
-                        <p key={index} className="whitespace-pre-line">
-                          {block.value}
-                        </p>
-                      );
-                    })}
+  if (block.type === "heading") {
+    return (
+      <h2
+        key={index}
+        className="mt-10 text-2xl font-black leading-tight tracking-[-0.04em] text-neutral-950"
+      >
+        {block.value}
+      </h2>
+    );
+  }
+
+  if (block.type === "quote") {
+    return (
+      <blockquote
+        key={index}
+        className="rounded-[22px] border-l-4 border-[#4DBBFF] bg-blue-50 px-5 py-4 text-[17px] font-medium leading-8 text-blue-900"
+      >
+        “{block.value}”
+      </blockquote>
+    );
+  }
+
+  if (block.type === "highlight") {
+    return (
+      <div
+        key={index}
+        className="rounded-[22px] border border-amber-100 bg-amber-50 px-5 py-4 text-[16px] font-semibold leading-8 text-amber-900"
+      >
+        {block.value}
+      </div>
+    );
+  }
+
+  if (block.type === "link") {
+    return (
+      <a
+        key={index}
+        href={block.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex w-fit items-center rounded-full bg-neutral-950 px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-neutral-800"
+      >
+        {block.text || "링크 바로가기"} →
+      </a>
+    );
+  }
+
+  return (
+    <p key={index} className="whitespace-pre-line">
+      {block.value}
+    </p>
+  );
+})}
                   </div>
                 ) : (
                   <p className="whitespace-pre-line">{selectedPost.body}</p>
