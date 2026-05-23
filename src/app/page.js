@@ -943,25 +943,46 @@ const visiblePosts = useMemo(() => {
   };
 
   const addTextBlock = () => {
-    setContentBlocks((prev) => [
-      ...prev,
-      { id: Date.now() + Math.random(), type: "text", value: "" },
-    ]);
-  };
+  setContentBlocks((prev) => [
+    ...prev,
+    { id: Date.now() + Math.random(), type: "text", value: "" },
+  ]);
+};
 
-  const addHeadingBlock = () => {
+const addHeadingBlock = () => {
   setContentBlocks((prev) => [
     ...prev,
     { id: Date.now() + Math.random(), type: "heading", value: "" },
   ]);
 };
-  
-  const addImageBlock = () => {
-    setContentBlocks((prev) => [
-      ...prev,
-      { id: Date.now() + Math.random(), type: "image", url: "", caption: "" },
-    ]);
-  };
+
+const addImageBlock = () => {
+  setContentBlocks((prev) => [
+    ...prev,
+    { id: Date.now() + Math.random(), type: "image", url: "", caption: "" },
+  ]);
+};
+
+const addQuoteBlock = () => {
+  setContentBlocks((prev) => [
+    ...prev,
+    { id: Date.now() + Math.random(), type: "quote", value: "" },
+  ]);
+};
+
+const addHighlightBlock = () => {
+  setContentBlocks((prev) => [
+    ...prev,
+    { id: Date.now() + Math.random(), type: "highlight", value: "" },
+  ]);
+};
+
+const addLinkBlock = () => {
+  setContentBlocks((prev) => [
+    ...prev,
+    { id: Date.now() + Math.random(), type: "link", text: "", url: "" },
+  ]);
+};
 
   const updateBlock = (blockId, patch) => {
     setContentBlocks((prev) =>
@@ -1048,14 +1069,16 @@ const visiblePosts = useMemo(() => {
   };
 
   const getPlainBodyFromBlocks = (blocks) => {
-    const text = blocks
-      .filter((block) => block.type === "text")
-      .map((block) => block.value || "")
-      .join("\n\n")
-      .trim();
+  const text = blocks
+    .filter((block) =>
+      ["text", "heading", "quote", "highlight"].includes(block.type)
+    )
+    .map((block) => block.value || "")
+    .join("\n\n")
+    .trim();
 
-    return text || form.body.trim();
-  };
+  return text || form.body.trim();
+};
 
   const getCleanContentBlocks = () => {
     return contentBlocks
