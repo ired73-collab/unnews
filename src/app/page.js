@@ -656,8 +656,8 @@ const adminPieData = [
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [contentBlocks, setContentBlocks] = useState([
-    { id: Date.now(), type: "text", value: "" },
-  ]);
+  { id: "block-1", type: "text", value: "" },
+]);
   const [uploadingBlockId, setUploadingBlockId] = useState(null);
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [isSuggestingImages, setIsSuggestingImages] = useState(false);
@@ -1132,7 +1132,7 @@ const addLinkBlock = () => {
     });
     setSummary("");
     setEditingId(null);
-    setContentBlocks([{ id: Date.now(), type: "text", value: "" }]);
+    setContentBlocks([{ id: "block-1", type: "text", value: "" }]);
     setSuggestedImages([]);
     setSuggestionLabel("");
     setAutoImageReady(false);
