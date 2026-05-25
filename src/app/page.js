@@ -745,10 +745,12 @@ const adminPieData = [
   const [isSavingComment, setIsSavingComment] = useState(false);
 
   const allPosts = useMemo(() => {
-    // 실제 서비스에서는 Firestore에 저장된 글만 노출합니다.
-    // Firestore 글이 하나도 없을 때만 기본 예시 글을 보여줍니다.
-    return drafts.length > 0 ? drafts : POSTS;
-  }, [drafts]);
+  if (isLoadingPosts) return [];
+
+  return drafts.length > 0
+    ? drafts
+    : POSTS;
+}, [drafts, isLoadingPosts]);
 
 const visiblePosts = useMemo(() => {
   const keyword = searchKeyword.trim().toLowerCase();
@@ -829,7 +831,10 @@ const visiblePosts = useMemo(() => {
 
   const featured = popularPosts;
   const latest = allPosts.slice(0, 8);
-  const currentHero = heroPosts[heroIndex] || POSTS[0];
+  const currentHero =
+  heroPosts[heroIndex] ||
+  allPosts[0] ||
+  POSTS[0];
 
   const adminStats = useMemo(() => {
   const posts = drafts || [];
@@ -917,12 +922,17 @@ const visiblePosts = useMemo(() => {
       image: post.image || "",
       views: post.views || 0,
       likes: post.likes || 0,
-      comments: [],
+      comments: Array.isArray(post.comments)
+  ? post.comments
+  : [],
       createdAt: post.created_at,
       updatedAt: post.updated_at,
     }));
 
     setDrafts(savedPosts);
+
+    console.log("SUPABASE POSTS", savedPosts);
+    
   } catch (error) {
     console.error("Supabase load error:", error);
   } finally {
@@ -2177,7 +2187,7 @@ const handleAddComment = async () => {
               <div className="mt-10 border-t border-black/5 pt-7">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-[1.35rem] font-black tracking-[-0.04em]">
-                    댓글 {selectedPost.comments?.length || 0}
+                    댓글 {getCommentsArray(selectedPost).length}
                   </h2>
                 </div>
 
@@ -2209,12 +2219,12 @@ const handleAddComment = async () => {
                 </div>
 
                 <div className="mt-5 space-y-3">
-                  {(selectedPost.comments || []).length === 0 ? (
+                  {getCommentsArray(selectedPost).length === 0 ? (
                     <div className="rounded-[18px] bg-neutral-50 px-4 py-5 text-sm text-neutral-400">
                       아직 댓글이 없습니다.
                     </div>
                   ) : (
-                    [...(selectedPost.comments || [])].reverse().map((comment) => (
+                    [...getCommentsArray(selectedPost)].reverse().map((comment) => (
                       <div
                         key={comment.id}
                         className="rounded-[18px] border border-black/5 bg-white px-4 py-4"
