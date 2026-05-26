@@ -3,23 +3,12 @@
 import { supabase } from "../lib/supabase";
 import Header from "../components/Header";
 import { useEffect, useMemo, useState } from "react";
-import { db, auth } from "../lib/firebase";
+import { auth } from "../lib/firebase";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
 
 import {
   BarChart,
@@ -747,9 +736,7 @@ const adminPieData = [
   const allPosts = useMemo(() => {
   if (isLoadingPosts) return [];
 
-  return drafts.length > 0
-    ? drafts
-    : POSTS;
+  return drafts;
 }, [drafts, isLoadingPosts]);
 
 const visiblePosts = useMemo(() => {
@@ -932,7 +919,7 @@ const visiblePosts = useMemo(() => {
     setDrafts(savedPosts);
 
     console.log("SUPABASE POSTS", savedPosts);
-    
+
   } catch (error) {
     console.error("Supabase load error:", error);
   } finally {
@@ -1308,7 +1295,9 @@ const addLinkBlock = () => {
       image: data.image,
       views: data.views || 0,
       likes: data.likes || 0,
-      comments: [],
+      comments: Array.isArray(data.comments)
+  ? data.comments
+  : [],
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };
@@ -1337,7 +1326,7 @@ const addLinkBlock = () => {
       image: postData.image,
       views: 0,
       likes: 0,
-      comments: 0,
+      comments: [],
     })
     .select()
     .single();
@@ -1357,8 +1346,10 @@ const addLinkBlock = () => {
     image: data.image,
     views: data.views || 0,
     likes: data.likes || 0,
-    comments: [],
-    createdAt: data.created_at,
+    comments: Array.isArray(data.comments)
+  ? data.comments
+  : [],
+createdAt: data.created_at,
     updatedAt: data.updated_at,
   };
 
@@ -1375,38 +1366,56 @@ const addLinkBlock = () => {
 };
 
   const handleEditPost = (post) => {
-    if (!post || typeof post.id === "number") {
-      alert("기본 예시 글은 수정할 수 없습니다. Firestore에 저장된 글만 수정됩니다.");
-      return;
-    }
+  if (!post?.id) {
+    alert("수정할 글 정보를 찾을 수 없습니다.");
+    return;
+  }
 
-    setEditingId(post.id);
-    setForm({
-      title: post.title || "",
-      category1: getCategory1(post),
-      category2: getCategory2(post),
-      category: getCategory2(post),
-      body: post.body || "",
-      image: post.image || "",
-      imageFileName: "",
-      uploadedImage: post.image || "",
-      useAutoImage: false,
-    });
-    setSummary(post.summary || fallbackSummary(post.body || ""));
-    setContentBlocks(
-      Array.isArray(post.contentBlocks) && post.contentBlocks.length > 0
-        ? post.contentBlocks.map((block, index) => ({
-            id: Date.now() + index,
-            type: block.type,
-            value: block.value || "",
-            url: block.url || "",
-            caption: block.caption || "",
-          }))
-        : [{ id: Date.now(), type: "text", value: post.body || "" }]
-    );
-    setPage("admin");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  setEditingId(post.id);
+
+  setForm({
+    title: post.title || "",
+    category1: getCategory1(post),
+    category2: getCategory2(post),
+    category: getCategory2(post),
+    body: post.body || "",
+    image: post.image || "",
+    imageFileName: "",
+    uploadedImage: post.image || "",
+    useAutoImage: false,
+  });
+
+  setSummary(
+    post.summary || fallbackSummary(post.body || "")
+  );
+
+  setContentBlocks(
+    Array.isArray(post.contentBlocks) &&
+    post.contentBlocks.length > 0
+      ? post.contentBlocks.map((block, index) => ({
+          id: `edit-${Date.now()}-${index}`,
+          type: block.type || "text",
+          value: block.value || "",
+          url: block.url || "",
+          caption: block.caption || "",
+          text: block.text || "",
+        }))
+      : [
+          {
+            id: "edit-block-1",
+            type: "text",
+            value: post.body || "",
+          },
+        ]
+  );
+
+  setPage("admin");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
 
   const handleOpenPost = async (post) => {
   setSelectedPost(post);
@@ -1510,11 +1519,11 @@ const handleAddComment = async () => {
     setIsSavingComment(true);
 
     const { error } = await supabase
-      .from("posts")
-      .update({
-        comments: nextComments.length,
-      })
-      .eq("id", selectedPost.id);
+  .from("posts")
+  .update({
+    comments: nextComments,
+  })
+  .eq("id", selectedPost.id);
 
     if (error) throw error;
 
@@ -1541,25 +1550,34 @@ const handleAddComment = async () => {
 };
 
   const handleDeletePost = async (postId) => {
-    if (!postId || typeof postId === "number") {
-      alert("기본 예시 글은 삭제할 수 없습니다. Firestore에 저장된 글만 삭제됩니다.");
-      return;
-    }
+  if (!postId) {
+    alert("삭제할 글 정보를 찾을 수 없습니다.");
+    return;
+  }
 
-    if (!confirm("정말 이 글을 삭제할까요?")) return;
+  if (!confirm("정말 이 글을 삭제할까요?")) return;
 
-    try {
-      await deleteDoc(doc(db, "posts", postId));
-      setDrafts((prev) => prev.filter((post) => post.id !== postId));
-      if (selectedPost?.id === postId) {
-        setSelectedPost(POSTS[0]);
-        setPage("home");
-      }
-    } catch (error) {
-      console.error("Firestore delete error:", error);
-      alert("글 삭제에 실패했습니다. Firestore 보안 규칙을 확인해주세요.");
+  try {
+    const { error } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", postId);
+
+    if (error) throw error;
+
+    setDrafts((prev) =>
+      prev.filter((post) => post.id !== postId)
+    );
+
+    if (selectedPost?.id === postId) {
+      setSelectedPost(null);
+      setPage("home");
     }
-  };
+  } catch (error) {
+    console.error("Supabase delete error:", error);
+    alert("글 삭제에 실패했습니다.");
+  }
+};
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -2074,7 +2092,7 @@ const handleAddComment = async () => {
   </button>
 </div>
 
-              {isAdmin && typeof selectedPost.id !== "number" && (
+              {isAdmin && selectedPost?.id && (
                 <div className="mb-4 flex gap-2">
                   <button
                     type="button"
@@ -3159,7 +3177,7 @@ const handleAddComment = async () => {
                     {isSavingPost
                       ? editingId
                         ? "수정 저장 중..."
-                        : "Firestore에 저장 중..."
+                        : "Supabase에 저장 중..."
                       : editingId
                         ? "수정 저장하기"
                         : "글 등록 미리보기"}
