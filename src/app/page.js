@@ -284,6 +284,33 @@ const IMAGE_SUGGESTION_POOLS = {
     "https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=1200&q=80",
     "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
   ],
+  education: [
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80",
+],
+
+student: [
+  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+],
+
+project: [
+  "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
+],
+
+research: [
+  "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1518152006812-edab29b069ac?auto=format&fit=crop&w=1200&q=80",
+],
   drinking: [
     "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
     "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1200&q=80",
@@ -430,89 +457,137 @@ function getSuggestionTopic(category, text = "") {
 function getSmartImageSuggestions(category, title, body) {
   const fullText = `${category || ""} ${title || ""} ${body || ""}`.toLowerCase();
 
-  let topicKey = "campus";
-  let topicLabel = "대학·캠퍼스";
+  const topicRules = [
+    {
+      key: "ai",
+      label: "AI·기술",
+      words: ["ai", "인공지능", "챗gpt", "chatgpt", "생성형", "디지털", "기술", "데이터", "자동화"],
+    },
+    {
+      key: "education",
+      label: "교육·학습",
+      words: ["교육", "학습", "수업", "강의", "교과목", "교육과정", "역량", "학습환경"],
+    },
+    {
+      key: "student",
+      label: "학생·대학생",
+      words: ["학생", "대학생", "청년", "팀플", "과제", "포트폴리오", "취업"],
+    },
+    {
+      key: "campus",
+      label: "대학·캠퍼스",
+      words: ["대학", "캠퍼스", "학과", "학사", "교수", "학교"],
+    },
+    {
+      key: "project",
+      label: "프로젝트·창업",
+      words: ["프로젝트", "창업", "아이디어", "검증", "팀", "협업", "공모전", "대외활동"],
+    },
+    {
+      key: "research",
+      label: "연구·데이터",
+      words: ["연구", "데이터", "분석", "실험", "논문", "랩", "연구실"],
+    },
+    {
+      key: "career",
+      label: "취업·커리어",
+      words: ["취업", "채용", "면접", "자소서", "스펙", "커리어", "인턴"],
+    },
+    {
+      key: "medical",
+      label: "의료·보건",
+      words: ["의료", "의대", "의학", "병원", "보건", "건강", "간호"],
+    },
+    {
+      key: "culture",
+      label: "문화·콘텐츠",
+      words: ["문화", "콘텐츠", "공연", "전시", "영화", "축제"],
+    },
+    {
+      key: "society",
+      label: "사회·지역",
+      words: ["지역", "사회", "정책", "도시", "지자체"],
+    },
+    {
+      key: "lifestyle",
+      label: "대학생 라이프",
+      words: ["생활", "루틴", "일상", "습관", "라이프"],
+    },
+  ];
 
-  if (
-    fullText.includes("ai") ||
-    fullText.includes("인공지능") ||
-    fullText.includes("챗gpt") ||
-    fullText.includes("디지털") ||
-    fullText.includes("기술") ||
-    fullText.includes("데이터")
-  ) {
-    topicKey = "ai";
-    topicLabel = "AI·기술";
-  } else if (
-    fullText.includes("취업") ||
-    fullText.includes("채용") ||
-    fullText.includes("면접") ||
-    fullText.includes("자소서") ||
-    fullText.includes("포트폴리오") ||
-    fullText.includes("커리어")
-  ) {
-    topicKey = "career";
-    topicLabel = "취업·커리어";
-  } else if (
-    fullText.includes("공모전") ||
-    fullText.includes("대외활동") ||
-    fullText.includes("창업") ||
-    fullText.includes("아이디어") ||
-    fullText.includes("프로젝트")
-  ) {
-    topicKey = "activity";
-    topicLabel = "공모전·대외활동";
-  } else if (
-    fullText.includes("의료") ||
-    fullText.includes("의대") ||
-    fullText.includes("병원") ||
-    fullText.includes("보건") ||
-    fullText.includes("건강")
-  ) {
-    topicKey = "medical";
-    topicLabel = "의료·보건";
-  } else if (
-    fullText.includes("연애") ||
-    fullText.includes("관계") ||
-    fullText.includes("데이트") ||
-    fullText.includes("커플")
-  ) {
-    topicKey = "relationship";
-    topicLabel = "연애·관계";
-  } else if (
-    fullText.includes("문화") ||
-    fullText.includes("공연") ||
-    fullText.includes("전시") ||
-    fullText.includes("영화") ||
-    fullText.includes("축제")
-  ) {
-    topicKey = "culture";
-    topicLabel = "문화·콘텐츠";
-  } else if (
-    fullText.includes("지역") ||
-    fullText.includes("사회") ||
-    fullText.includes("정책") ||
-    fullText.includes("청년")
-  ) {
-    topicKey = "society";
-    topicLabel = "사회·지역";
-  } else if (
-    fullText.includes("생활") ||
-    fullText.includes("루틴") ||
-    fullText.includes("일상") ||
-    fullText.includes("습관")
-  ) {
-    topicKey = "lifestyle";
-    topicLabel = "대학생 라이프";
+  const scoredTopics = topicRules
+    .map((topic) => {
+      const score = topic.words.reduce((total, word) => {
+        const count = fullText.split(word).length - 1;
+        const titleBonus = `${title || ""}`.toLowerCase().includes(word) ? 2 : 0;
+        const categoryBonus = `${category || ""}`.toLowerCase().includes(word) ? 1 : 0;
+
+        return total + count + titleBonus + categoryBonus;
+      }, 0);
+
+      return {
+        ...topic,
+        score,
+      };
+    })
+    .filter((topic) => topic.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const primaryTopic = scoredTopics[0] || {
+    key: "campus",
+    label: "대학·캠퍼스",
+    score: 1,
+  };
+
+  const blendedTopics = [
+    primaryTopic,
+    ...scoredTopics.filter((topic) => topic.key !== primaryTopic.key),
+  ];
+
+  const fallbackTopics = ["campus", "education", "student", "lifestyle"]
+    .map((key) => topicRules.find((topic) => topic.key === key))
+    .filter(Boolean)
+    .filter((topic) => !blendedTopics.some((item) => item.key === topic.key));
+
+  const finalTopics = [...blendedTopics, ...fallbackTopics].slice(0, 4);
+
+  const picked = [];
+  const usedUrls = new Set();
+
+  finalTopics.forEach((topic, topicIndex) => {
+    const pool = IMAGE_SUGGESTION_POOLS[topic.key] || IMAGE_SUGGESTION_POOLS.campus || [];
+    const url = pool.find((item) => !usedUrls.has(item));
+
+    if (url) {
+      usedUrls.add(url);
+      picked.push({
+        id: `${topic.key}-${topicIndex}`,
+        url,
+        label: topic.label,
+      });
+    }
+  });
+
+  if (picked.length < 4) {
+    Object.entries(IMAGE_SUGGESTION_POOLS).forEach(([key, pool]) => {
+      if (picked.length >= 4) return;
+
+      const url = pool.find((item) => !usedUrls.has(item));
+
+      if (url) {
+        usedUrls.add(url);
+        const topic = topicRules.find((item) => item.key === key);
+
+        picked.push({
+          id: `${key}-${picked.length}`,
+          url,
+          label: topic?.label || "추천 이미지",
+        });
+      }
+    });
   }
 
-  const pool = IMAGE_SUGGESTION_POOLS[topicKey] || IMAGE_SUGGESTION_POOLS.campus;
-
-  return pool.slice(0, 4).map((url, index) => ({
-    id: `${topicKey}-${index}`,
-    url,
-    label: topicLabel,
-  }));
+  return picked.slice(0, 4);
 }
 
 function BrandLogo() {
