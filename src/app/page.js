@@ -279,11 +279,11 @@ const IMAGE_SUGGESTION_POOLS = {
     "https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1200&q=80",
   ],
   ai: [
-    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
-  ],
+  "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1526378722484-bd91ca387e72?auto=format&fit=crop&w=1200&q=80",
+],
   education: [
   "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80",
@@ -1223,10 +1223,20 @@ const addLinkBlock = () => {
   };
 
   const getAutoRecommendedImage = () => {
-    const plainBody = getPlainBodyFromBlocks(contentBlocks);
-    const suggestions = getSmartImageSuggestions(form.category2, form.title, plainBody);
-    return suggestions?.[0]?.url || getAutoImage(form.category2, `${form.title} ${plainBody}`);
-  };
+  const plainBody = getPlainBodyFromBlocks(contentBlocks);
+  const suggestions = getSmartImageSuggestions(form.category2, form.title, plainBody);
+
+  const validSuggestion = suggestions.find(
+    (item) =>
+      item?.url &&
+      item.url.startsWith("https://images.unsplash.com/")
+  );
+
+  return (
+    validSuggestion?.url ||
+    getAutoImage(form.category2, `${form.title} ${plainBody}`)
+  );
+};
 
   const applySuggestedImage = (url) => {
     setForm((prev) => ({
@@ -1313,11 +1323,11 @@ const addLinkBlock = () => {
 
     if (!form.title.trim() || !plainBody || isSavingPost) return;
 
-    const resolvedImage = form.uploadedImage
-      ? form.uploadedImage
-      : form.image.trim()
-        ? form.image.trim()
-        : getAutoRecommendedImage();
+    const resolvedImage =
+  form.uploadedImage ||
+  form.image.trim() ||
+  getAutoRecommendedImage() ||
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
 
     const resolvedSummary = summary.trim() || fallbackSummary(plainBody);
 
@@ -1709,6 +1719,10 @@ const handleAddComment = async () => {
                 src={currentHero.image}
                 alt={currentHero.title}
                 className="block h-[520px] w-full object-cover transition duration-700"
+                onError={(e) => {
+    e.currentTarget.src =
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+  }}
               />
               <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.56),rgba(0,0,0,0.18),transparent)]" />
 
