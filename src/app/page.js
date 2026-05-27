@@ -1834,7 +1834,14 @@ const handleAddComment = async () => {
                   </button>
 
                   <button
-                    onClick={() => setPage("admin")}
+                    onClick={() => {
+  if (!isAdmin) {
+    setPage("admin");
+    return;
+  }
+
+  setPage("admin");
+}}
                     className="flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-2xl border border-black/5 bg-neutral-50/90 px-4 py-4 text-center transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md active:scale-95"
                   >
                     <IconTile>
