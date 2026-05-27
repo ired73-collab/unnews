@@ -295,7 +295,7 @@ student: [
   "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
 ],
 
 project: [
@@ -1867,6 +1867,10 @@ const handleAddComment = async () => {
             src={post.image}
             alt={post.title}
             className="h-[260px] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+            onError={(e) => {
+  e.currentTarget.src =
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+}}
           />
 
           <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-neutral-900 backdrop-blur">
@@ -1938,6 +1942,10 @@ const handleAddComment = async () => {
                     src={post.image}
                     alt={post.title}
                     className="h-24 w-24 rounded-[18px] object-cover md:h-28 md:w-28"
+                    onError={(e) => {
+  e.currentTarget.src =
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+}}
                   />
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center gap-2">
@@ -2058,6 +2066,10 @@ const handleAddComment = async () => {
                 src={post.image}
                 alt={post.title}
                 className="h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                onError={(e) => {
+  e.currentTarget.src =
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+}}
               />
             </div>
             <div className="mt-4 flex items-center justify-between gap-3">
@@ -2104,6 +2116,10 @@ const handleAddComment = async () => {
               src={post.image}
               alt={post.title}
               className="h-24 w-24 rounded-[18px] object-cover md:h-28 md:w-28"
+              onError={(e) => {
+  e.currentTarget.src =
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+}}
             />
             <div className="min-w-0 flex-1">
               <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-500">
@@ -2137,10 +2153,14 @@ const handleAddComment = async () => {
 
           <div className="overflow-hidden rounded-[30px] border border-white/60 bg-white/80 shadow-[0_24px_70px_rgba(0,0,0,0.08)] backdrop-blur">
             <img
-              src={selectedPost.image}
-              alt={selectedPost.title}
-              className="h-[320px] w-full object-cover"
-            />
+  src={selectedPost.image}
+  alt={selectedPost.title}
+  className="h-[420px] w-full object-cover"
+  onError={(e) => {
+    e.currentTarget.src =
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+  }}
+/>
 
             <div className="p-7 md:p-9">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -2614,6 +2634,10 @@ const handleAddComment = async () => {
               src={post.image}
               alt={post.title}
               className="h-12 w-16 rounded-[12px] object-cover"
+              onError={(e) => {
+  e.currentTarget.src =
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+}}
             />
 
             <div className="min-w-0">
@@ -3024,10 +3048,14 @@ const handleAddComment = async () => {
                             }`}
                           >
                             <img
-                              src={item.url}
-                              alt={item.label}
-                              className="h-28 w-full object-cover"
-                            />
+  src={item.url}
+  alt={item.label}
+  className="h-28 w-full object-cover"
+  onError={(e) => {
+    e.currentTarget.src =
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+  }}
+/>
                             <div className="px-3 py-2 text-xs font-medium text-neutral-600">
                               이 이미지 사용
                             </div>
@@ -3051,10 +3079,13 @@ const handleAddComment = async () => {
                   </div>
                   <div className="overflow-hidden rounded-[18px] bg-white">
                     <img
-                      src={previewImage}
-                      alt="미리보기 이미지"
-                      className="h-48 w-full object-cover"
-                    />
+  src={previewImage}
+  alt="미리보기"
+  onError={(e) => {
+    e.currentTarget.src =
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+  }}
+/>
                   </div>
                 </div>
 
@@ -3309,6 +3340,10 @@ const handleAddComment = async () => {
                           src={post.image}
                           alt={post.title}
                           className="h-24 w-full object-cover"
+                          onError={(e) => {
+  e.currentTarget.src =
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+}}
                         />
                       </div>
                       <strong>{post.title}</strong>
