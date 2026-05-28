@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import { supabase } from "../lib/supabase";
 import Header from "../components/Header";
 import { useEffect, useMemo, useState } from "react";
@@ -746,6 +747,13 @@ export default function Page() {
   const [activeSubCategory, setActiveSubCategory] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedPost, setSelectedPost] = useState(POSTS[0]);
+  const [seoTitle, setSeoTitle] = useState("UNNEWS");
+const [seoDescription, setSeoDescription] = useState(
+  "대학생을 위한 뉴스·트렌드 플랫폼"
+);
+const [seoImage, setSeoImage] = useState(
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
+);
   const [drafts, setDrafts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [isSavingPost, setIsSavingPost] = useState(false);
@@ -1048,6 +1056,24 @@ const visiblePosts = useMemo(() => {
     }
   }
 }, [allPosts, isLoadingPosts]);
+
+useEffect(() => {
+  if (!selectedPost) return;
+
+  setSeoTitle(
+    `${selectedPost.title} | UNNEWS`
+  );
+
+  setSeoDescription(
+    selectedPost.summary ||
+      fallbackSummary(selectedPost.body || "")
+  );
+
+  setSeoImage(
+    selectedPost.image ||
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
+  );
+}, [selectedPost]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -1812,6 +1838,17 @@ const handleAddComment = async () => {
   };
 
   return (
+  <>
+    <Head>
+      <title>{seoTitle}</title>
+
+      <meta name="description" content={seoDescription} />
+      <meta property="og:title" content={seoTitle} />
+      <meta property="og:description" content={seoDescription} />
+      <meta property="og:image" content={seoImage} />
+      <meta property="og:type" content="article" />
+    </Head>
+
     <div
       className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f7f5_45%,_#f3f2ef_100%)] text-neutral-900"
       style={{ fontFamily: "Pretendard, Inter, system-ui, sans-serif" }}
@@ -3517,6 +3554,7 @@ const handleAddComment = async () => {
 )}
 
       <SiteFooter />
-    </div>
-  );
+</div>
+</>
+);
 }
