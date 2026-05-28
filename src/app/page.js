@@ -1067,6 +1067,7 @@ const visiblePosts = useMemo(() => {
 
     const savedPosts = (data || []).map((post) => ({
       id: post.id,
+      slug: post.slug || "",
       title: post.title,
       body: post.body || "",
       contentBlocks: post.content_blocks || [],
@@ -1427,7 +1428,6 @@ const addLinkBlock = () => {
 
     const postData = {
   slug: createSlug(form.title),
-
   title: form.title.trim(),
       body: plainBody,
       contentBlocks: cleanBlocks.length > 0 ? cleanBlocks : [{ type: "text", value: plainBody }],
@@ -1446,6 +1446,7 @@ const addLinkBlock = () => {
     const { data, error } = await supabase
       .from("posts")
       .update({
+        slug: postData.slug,
         title: postData.title,
         body: postData.body,
         content_blocks: postData.contentBlocks,
@@ -1465,6 +1466,7 @@ const addLinkBlock = () => {
 
     const localUpdatedPost = {
       id: data.id,
+      slug: data.slug || "",
       title: data.title,
       body: data.body,
       contentBlocks: data.content_blocks || [],
@@ -1496,6 +1498,7 @@ const addLinkBlock = () => {
   const { data, error } = await supabase
     .from("posts")
     .insert({
+      slug: postData.slug,
       title: postData.title,
       body: postData.body,
       content_blocks: postData.contentBlocks,
@@ -1516,6 +1519,7 @@ const addLinkBlock = () => {
 
   const newPost = {
     id: data.id,
+    slug: data.slug || "",
     title: data.title,
     body: data.body,
     contentBlocks: data.content_blocks || [],
