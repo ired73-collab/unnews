@@ -1049,11 +1049,6 @@ const visiblePosts = useMemo(() => {
   }
 }, [allPosts, isLoadingPosts]);
 
-    if (params.get("admin") === "1" || path === "/admin") {
-      setPage("admin");
-    }
-  }, []);
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAdmin(Boolean(user));
