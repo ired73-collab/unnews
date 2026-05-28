@@ -1021,23 +1021,33 @@ const visiblePosts = useMemo(() => {
 }, [selectedPost]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return;
+  if (isLoadingPosts) return;
 
-    const params = new URLSearchParams(window.location.search);
-    const path = window.location.pathname;
+  const params = new URLSearchParams(window.location.search);
+  const path = window.location.pathname;
 
-    if (path.startsWith("/news/")) {
-  const slug = path.replace("/news/", "");
-
-  const matchedPost = allPosts.find(
-    (post) => post.slug === slug || String(post.id) === slug
-  );
-
-  if (matchedPost) {
-    setSelectedPost(matchedPost);
-    setPage("article");
+  if (params.get("admin") === "1" || path === "/admin") {
+    setPage("admin");
+    return;
   }
-}
+
+  if (path.startsWith("/news/")) {
+    const slug = decodeURIComponent(path.replace("/news/", ""));
+
+    const matchedPost = allPosts.find(
+      (post) =>
+        post.slug === slug ||
+        String(post.id) === slug ||
+        createSlug(post.title || "") === slug
+    );
+
+    if (matchedPost) {
+      setSelectedPost(matchedPost);
+      setPage("post");
+    }
+  }
+}, [allPosts, isLoadingPosts]);
 
     if (params.get("admin") === "1" || path === "/admin") {
       setPage("admin");
@@ -1067,7 +1077,7 @@ const visiblePosts = useMemo(() => {
 
     const savedPosts = (data || []).map((post) => ({
       id: post.id,
-      slug: post.slug || "",
+      slug: post.slug || createSlug(post.title || `post-${post.id}`),
       title: post.title,
       body: post.body || "",
       contentBlocks: post.content_blocks || [],
@@ -1466,7 +1476,7 @@ const addLinkBlock = () => {
 
     const localUpdatedPost = {
       id: data.id,
-      slug: data.slug || "",
+      slug: data.slug || postData.slug || createSlug(data.title || ""),
       title: data.title,
       body: data.body,
       contentBlocks: data.content_blocks || [],
@@ -1519,7 +1529,7 @@ const addLinkBlock = () => {
 
   const newPost = {
     id: data.id,
-    slug: data.slug || "",
+    slug: data.slug || postData.slug || createSlug(data.title || ""),
     title: data.title,
     body: data.body,
     contentBlocks: data.content_blocks || [],
