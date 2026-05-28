@@ -145,6 +145,15 @@ function fallbackSummary(text) {
   return clip(compact, 160);
 }
 
+function createSlug(text = "") {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 80);
+}
+
 function getAutoImage(category, text = "") {
   const keyword = `${category} ${text}`.toLowerCase();
 
@@ -939,11 +948,96 @@ const visiblePosts = useMemo(() => {
       ? form.image.trim()
       : suggestedImages?.[0]?.url || getAutoImage(form.category2, `${form.title} ${form.body}`);
 
+      useEffect(() => {
+  if (typeof document === "undefined") return;
+
+  const title = selectedPost?.title
+    ? `${selectedPost.title} | 대학연합신문`
+    : "대학연합신문";
+
+  const description =
+    selectedPost?.summary ||
+    "대학생을 위한 뉴스, 교육, AI, 취업, 공모전, 창업 정보를 제공하는 대학연합신문";
+
+  const image =
+    selectedPost?.image ||
+    "https://unnews.vercel.app/unnews_logo.png";
+
+  document.title = title;
+
+  const setMeta = (selector, attr, value) => {
+    let tag = document.querySelector(selector);
+
+    if (!tag) {
+      tag = document.createElement("meta");
+
+      if (selector.includes("property=")) {
+        tag.setAttribute(
+          "property",
+          selector.match(/property="(.+?)"/)?.[1]
+        );
+      } else {
+        tag.setAttribute(
+          "name",
+          selector.match(/name="(.+?)"/)?.[1]
+        );
+      }
+
+      document.head.appendChild(tag);
+    }
+
+    tag.setAttribute(attr, value);
+  };
+
+  setMeta(
+    'meta[name="description"]',
+    "content",
+    description
+  );
+
+  setMeta(
+    'meta[property="og:title"]',
+    "content",
+    title
+  );
+
+  setMeta(
+    'meta[property="og:description"]',
+    "content",
+    description
+  );
+
+  setMeta(
+    'meta[property="og:image"]',
+    "content",
+    image
+  );
+
+  setMeta(
+    'meta[property="og:url"]',
+    "content",
+    window.location.href
+  );
+}, [selectedPost]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const params = new URLSearchParams(window.location.search);
     const path = window.location.pathname;
+
+    if (path.startsWith("/news/")) {
+  const slug = path.replace("/news/", "");
+
+  const matchedPost = allPosts.find(
+    (post) => post.slug === slug || String(post.id) === slug
+  );
+
+  if (matchedPost) {
+    setSelectedPost(matchedPost);
+    setPage("article");
+  }
+}
 
     if (params.get("admin") === "1" || path === "/admin") {
       setPage("admin");
@@ -1332,7 +1426,9 @@ const addLinkBlock = () => {
     const resolvedSummary = summary.trim() || fallbackSummary(plainBody);
 
     const postData = {
-      title: form.title.trim(),
+  slug: createSlug(form.title),
+
+  title: form.title.trim(),
       body: plainBody,
       contentBlocks: cleanBlocks.length > 0 ? cleanBlocks : [{ type: "text", value: plainBody }],
       summary: resolvedSummary,
@@ -1504,7 +1600,14 @@ createdAt: data.created_at,
 
   const handleOpenPost = async (post) => {
   setSelectedPost(post);
-  setPage("post");
+
+window.history.pushState(
+  {},
+  "",
+  `/news/${post.slug || post.id}`
+);
+
+setPage("post");
 
   if (!post?.id) return;
 
