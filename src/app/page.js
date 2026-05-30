@@ -1984,7 +1984,7 @@ const handleAddComment = async () => {
   <div className="relative">
     <p className="text-sm font-semibold text-white/90">대학연합신문</p>
 
-    <h2 className="mt-1 text-[2rem] font-black leading-none tracking-[-0.05em]">">
+    <h2 className="mt-1 text-[2rem] font-black leading-none tracking-[-0.05em]">
       UNNEWS
     </h2>
 
