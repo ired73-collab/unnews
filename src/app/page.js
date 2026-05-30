@@ -1977,25 +1977,32 @@ const handleAddComment = async () => {
             </div>
 
             <div className="grid gap-4">
-              <div className="rounded-[24px] border border-white/60 bg-white/78 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.05)] backdrop-blur">
-                <p className="text-xs font-medium text-neutral-500">브랜드</p>
-                <h2 className="mt-1 text-[1.65rem] font-semibold tracking-[-0.04em]">
-                  UNNEWS
-                </h2>
-                <p className="mt-3 text-[14px] leading-6 text-neutral-700">
-                  대학연합신문은 대학생에게 필요한 정보를 빠르게 선별하고 정리하는 큐레이션 기반 디지털 미디어입니다. 실제 대학생의 트렌드·커리어·AI·라이프를 짧고 현실적인 문장으로 담아내는 매거진형 플랫폼입니다.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {["unnews.kr", "부드러운 매거진형", "이미지 우선형"].map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-600"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#6D5DFB] via-[#6EA8FF] to-[#7EE7F2] p-6 text-white shadow-[0_22px_60px_rgba(80,120,255,0.28)]">
+  <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/20 blur-2xl" />
+  <div className="absolute -bottom-16 left-8 h-44 w-44 rounded-full bg-sky-200/30 blur-3xl" />
+
+  <div className="relative">
+    <p className="text-sm font-semibold text-white/80">대학연합신문</p>
+
+    <h2 className="mt-2 text-[2rem] font-black tracking-[-0.05em]">
+      UNNEWS
+    </h2>
+
+    <p className="mt-5 text-[15px] leading-7 text-white/92">
+      대학연합신문은 대학생에게 필요한 정보를 빠르게 선별하고 정리하는
+      큐레이션 기반 디지털 미디어입니다. 실제 대학생의 트렌드·커리어·AI·라이프를
+      짧고 현실적인 문장으로 담아내는 매거진형 플랫폼입니다.
+    </p>
+
+    <button
+      type="button"
+      onClick={() => setPage("about")}
+      className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#3150D4] shadow-[0_12px_30px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:bg-white/95"
+    >
+      바로가기 →
+    </button>
+  </div>
+</div>
 
               <div className="rounded-[24px] border border-white/60 bg-white/78 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.05)] backdrop-blur">
                 <p className="text-xs font-medium text-neutral-500">바로 보기</p>
