@@ -1636,17 +1636,27 @@ createdAt: data.created_at,
   const handleOpenPost = async (post) => {
   setSelectedPost(post);
 
-window.history.pushState(
-  {},
-  "",
-  `/news/${post.slug || post.id}`
-);
+  window.history.pushState(
+    {},
+    "",
+    `/news/${post.slug || post.id}`
+  );
 
-setPage("post");
+  setPage("post");
 
   if (!post?.id) return;
 
+  const viewedKey = "unnews_viewed_posts";
+  const viewedPosts = JSON.parse(localStorage.getItem(viewedKey) || "[]");
+  const postId = String(post.id);
+
+  if (viewedPosts.includes(postId)) {
+    return;
+  }
+
   const nextViews = (post.views || 0) + 1;
+
+  localStorage.setItem(viewedKey, JSON.stringify([...viewedPosts, postId]));
 
   setDrafts((prev) =>
     prev.map((item) =>
