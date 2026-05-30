@@ -841,13 +841,35 @@ const visiblePosts = useMemo(() => {
     const matchSub =
       activeSubCategory === "전체" || getCategory2(post) === activeSubCategory;
 
-    const text = [
-      post.title,
-      post.summary,
-      post.body,
-      getCategory1(post),
-      getCategory2(post),
-    ]
+    const commentText = Array.isArray(post.comments)
+  ? post.comments
+      .map((comment) => `${comment.name || ""} ${comment.text || ""}`)
+      .join(" ")
+  : "";
+
+const blockText = Array.isArray(post.contentBlocks)
+  ? post.contentBlocks
+      .map((block) =>
+        [
+          block.value || "",
+          block.text || "",
+          block.caption || "",
+          block.url || "",
+        ].join(" ")
+      )
+      .join(" ")
+  : "";
+
+const text = [
+  post.title,
+  post.summary,
+  post.body,
+  blockText,
+  commentText,
+  getCategory1(post),
+  getCategory2(post),
+]
+
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
