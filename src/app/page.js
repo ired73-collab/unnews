@@ -1802,43 +1802,32 @@ const handleAddComment = async () => {
   }
 };
 
-const ADMIN_EMAILS = ["ired73@gmail.com"];
-
   const handleAdminLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  setAdminError("");
+
+  if (!adminEmail.trim() || !adminPassword.trim()) {
+    setAdminError("이메일과 비밀번호를 모두 입력해주세요.");
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      adminEmail.trim(),
+      adminPassword
+    );
+
+    setIsAdmin(true);
+    setAdminEmail("");
+    setAdminPassword("");
     setAdminError("");
-
-    if (!adminEmail.trim() || !adminPassword.trim()) {
-      setAdminError("이메일과 비밀번호를 모두 입력해주세요.");
-      return;
-    }
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-  auth,
-  adminEmail.trim(),
-  adminPassword
-);
-
-const userEmail = userCredential.user?.email || "";
-
-if (!ADMIN_EMAILS.includes(userEmail)) {
-  await signOut(auth);
-  setIsAdmin(false);
-  setAdminError("관리자 권한이 없는 계정입니다.");
-  return;
-}
-
-setIsAdmin(true);
-setAdminEmail("");
-setAdminPassword("");
-setAdminError("");
-setPage("admin");
-    } catch (error) {
-      console.error("Firebase Auth login error:", error);
-      setAdminError("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.");
-    }
-  };
+    setPage("admin");
+  } catch (error) {
+    console.error("Firebase Auth login error:", error);
+    setAdminError("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.");
+  }
+};
 
   const handleAdminLogout = async () => {
     try {
