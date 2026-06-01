@@ -1900,7 +1900,7 @@ const handleAddComment = async () => {
 
       {page === "home" && (
         <main className="mx-auto max-w-[1440px] px-5 py-8 md:px-8 md:py-10">
-          <section className="mb-6 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+          <section className="mb-4 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
             <div className="relative overflow-hidden rounded-[32px] border border-white/50 bg-white/70 shadow-[0_24px_70px_rgba(0,0,0,0.08)] backdrop-blur">
               <img
                 src={currentHero.image}
@@ -2069,7 +2069,7 @@ const handleAddComment = async () => {
     </button>
   </div>
 
-  <div className="grid gap-6 md:grid-cols-3">
+  <div className="grid gap-5 md:grid-cols-3">
     {featured.slice(0, 3).map((post, index) => (
       <button
         type="button"
@@ -2081,7 +2081,7 @@ const handleAddComment = async () => {
           <img
             src={post.image}
             alt={post.title}
-            className="h-[260px] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+            className="h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
             onError={(e) => {
   e.currentTarget.src =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
@@ -2099,7 +2099,7 @@ const handleAddComment = async () => {
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3">
           <h3 className="line-clamp-2 text-[1.15rem] font-black leading-7 tracking-[-0.04em] text-neutral-900">
             {post.title}
           </h3>
