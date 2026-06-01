@@ -1900,7 +1900,7 @@ const handleAddComment = async () => {
 
       {page === "home" && (
         <main className="mx-auto max-w-[1440px] px-5 py-8 md:px-8 md:py-10">
-          <section className="mb-10 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+          <section className="mb-6 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
             <div className="relative overflow-hidden rounded-[32px] border border-white/50 bg-white/70 shadow-[0_24px_70px_rgba(0,0,0,0.08)] backdrop-blur">
               <img
                 src={currentHero.image}
@@ -2258,7 +2258,7 @@ const handleAddComment = async () => {
       </div>
     )}
 
-    <section className="mb-10 mt-8">
+    <section className="mb-10">
       <div className="mb-4 flex items-end justify-between">
         <div>
           <p className="text-sm font-medium text-[#4dbbff]">Popular</p>
