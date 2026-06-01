@@ -1905,7 +1905,7 @@ const handleAddComment = async () => {
               <img
                 src={currentHero.image}
                 alt={currentHero.title}
-                className="block h-[460px] w-full object-cover transition duration-700"
+                className="block h-[440px] w-full object-cover transition duration-700"
                 onError={(e) => {
     e.currentTarget.src =
       "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
