@@ -1977,7 +1977,7 @@ const handleAddComment = async () => {
             </div>
 
             <div className="grid gap-4">
-              <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#6D5DFB] via-[#6EA8FF] to-[#7EE7F2] p-6 text-white shadow-[0_14px_34px_rgba(80,120,255,0.16)]">
+              <div className="relative flex min-h-[296px] flex-col justify-center overflow-hidden rounded-[28px] bg-gradient-to-br from-[#6D5DFB] via-[#6EA8FF] to-[#7EE7F2] p-6 text-white shadow-[0_14px_34px_rgba(80,120,255,0.16)]">
   <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/20 blur-2xl" />
   <div className="absolute -bottom-16 left-8 h-44 w-44 rounded-full bg-sky-200/30 blur-3xl" />
 
