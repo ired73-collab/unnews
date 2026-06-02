@@ -2048,8 +2048,8 @@ const handleAddComment = async () => {
             </div>
           </section>
 
-         <section className="mb-12">
-  <div className="mb-5 flex items-end justify-between">
+         <section className="mb-8">
+  <div className="mb-3 flex items-end justify-between">
     <div>
       <p className="text-sm font-semibold text-[#4dbbff]">Popular</p>
       <h2 className="text-[2rem] font-black tracking-[-0.05em]">
