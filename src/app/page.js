@@ -2184,6 +2184,113 @@ const handleAddComment = async () => {
         </main>
       )}
 
+      {page === "about" && (
+  <main className="mx-auto max-w-[1440px] px-5 py-10 md:px-8">
+    <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] text-white shadow-[0_24px_70px_rgba(80,120,255,0.18)]">
+      <div className="grid gap-8 p-8 md:grid-cols-[1.05fr_0.95fr] md:p-12">
+        <div className="flex flex-col justify-center">
+          <p className="text-sm font-bold text-white/80">ABOUT UNNEWS</p>
+          <h1 className="mt-3 text-[3rem] font-black leading-[1.05] tracking-[-0.06em] md:text-[4.5rem]">
+            대학생의 오늘을 읽고,
+            <br />
+            내일의 선택을 연결합니다.
+          </h1>
+          <p className="mt-6 max-w-2xl text-[16px] leading-7 text-white/90">
+            대학연합신문은 대학생에게 필요한 뉴스, 커리어, AI, 라이프, 지역 정보를
+            빠르게 선별하고 쉽게 전달하는 디지털 미디어 플랫폼입니다.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setPage("category")}
+              className="rounded-full bg-white px-5 py-3 text-sm font-bold text-[#3150D4] shadow-sm"
+            >
+              콘텐츠 둘러보기 →
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage("home")}
+              className="rounded-full border border-white/40 px-5 py-3 text-sm font-bold text-white"
+            >
+              메인으로
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-[28px] bg-white/15 p-3 backdrop-blur">
+          <img
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+            alt="대학생 미디어 플랫폼"
+            className="h-[420px] w-full rounded-[22px] object-cover"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section className="mt-12 grid gap-5 md:grid-cols-3">
+      {[
+        {
+          title: "대학연합신문 소개",
+          text: "대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를 선별하고 정리하는 큐레이션 기반 디지털 미디어입니다.",
+        },
+        {
+          title: "비전",
+          text: "대학생이 더 나은 선택을 할 수 있도록 교육, 커리어, 지역, 트렌드 정보를 연결하는 신뢰도 높은 플랫폼으로 성장합니다.",
+        },
+        {
+          title: "핵심가치",
+          text: "빠른 정보, 쉬운 문장, 실용적 관점, 이미지 중심 전달을 바탕으로 대학생에게 읽히는 콘텐츠를 만듭니다.",
+        },
+      ].map((item) => (
+        <div
+          key={item.title}
+          className="rounded-[28px] border border-black/5 bg-white p-7 shadow-[0_18px_44px_rgba(0,0,0,0.05)]"
+        >
+          <h2 className="text-xl font-black tracking-[-0.04em] text-neutral-900">
+            {item.title}
+          </h2>
+          <p className="mt-4 text-[15px] leading-7 text-neutral-600">
+            {item.text}
+          </p>
+        </div>
+      ))}
+    </section>
+
+    <section className="mt-8 grid gap-5 md:grid-cols-2">
+      <div className="rounded-[28px] bg-neutral-950 p-8 text-white">
+        <p className="text-sm font-bold text-[#72E3F1]">PARTICIPATION</p>
+        <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
+          참여안내
+        </h2>
+        <p className="mt-5 text-[15px] leading-7 text-white/70">
+          대학생 기자단, 서포터즈, 캠퍼스 리포터, 콘텐츠 제보 등 다양한 방식으로
+          대학연합신문과 함께할 수 있습니다. 실제 대학생의 시선으로 캠퍼스와 사회를
+          연결하는 콘텐츠를 만들어갑니다.
+        </p>
+      </div>
+
+      <div className="rounded-[28px] border border-black/5 bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)]">
+        <p className="text-sm font-bold text-[#4dbbff]">CONTACT</p>
+        <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
+          제휴문의
+        </h2>
+        <p className="mt-5 text-[15px] leading-7 text-neutral-600">
+          대학, 기관, 기업, 브랜드와의 콘텐츠 제휴 및 홍보 협업을 진행합니다.
+          대학생 대상 캠페인, 서포터즈 모집, 공모전 홍보, 지역 청년 프로젝트를
+          함께 기획할 수 있습니다.
+        </p>
+
+        <div className="mt-6 rounded-2xl bg-neutral-50 p-5 text-sm font-semibold text-neutral-700">
+          이메일: unnews@daum.net
+          <br />
+          전화: 053-765-4765
+        </div>
+      </div>
+    </section>
+  </main>
+)}
+
 {page === "category" && (
   <main className="mx-auto max-w-[1440px] px-5 py-8 md:px-8 md:py-10">
     <div className="mb-6">
