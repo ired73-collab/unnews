@@ -2048,8 +2048,29 @@ const handleAddComment = async () => {
             </div>
           </section>
 
-         <section className="mb-8">
-  <div className="grid gap-5 md:grid-cols-3 md:items-start">
+         <section className="mb-12 mt-8">
+  <div className="mb-5 flex items-end justify-between">
+    <div>
+      <p className="text-sm font-semibold text-[#4dbbff]">Popular</p>
+      <h2 className="text-[2rem] font-black tracking-[-0.05em]">
+        인기 콘텐츠
+      </h2>
+    </div>
+
+    <button
+      type="button"
+      onClick={() => {
+        setActiveCategory("전체");
+        setActiveSubCategory("전체");
+        setPage("category");
+      }}
+      className="hidden rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 md:block"
+    >
+      전체 보기 →
+    </button>
+  </div>
+
+  <div className="grid gap-5 md:grid-cols-3">
     {featured.slice(0, 3).map((post, index) => (
       <button
         type="button"
@@ -2057,17 +2078,6 @@ const handleAddComment = async () => {
         onClick={() => handleOpenPost(post)}
         className="group text-left"
       >
-        {index === 0 && (
-          <div className="mb-3 flex items-end justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[#4dbbff]">Popular</p>
-              <h2 className="text-[2rem] font-black tracking-[-0.05em]">
-                인기 콘텐츠
-              </h2>
-            </div>
-          </div>
-        )}
-
         <div className="relative overflow-hidden rounded-[26px] bg-neutral-100 shadow-[0_18px_44px_rgba(0,0,0,0.08)]">
           <img
             src={post.image}
@@ -2112,20 +2122,6 @@ const handleAddComment = async () => {
         </div>
       </button>
     ))}
-  </div>
-
-  <div className="mt-4 flex justify-end">
-    <button
-      type="button"
-      onClick={() => {
-        setActiveCategory("전체");
-        setActiveSubCategory("전체");
-        setPage("category");
-      }}
-      className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
-    >
-      전체 보기 →
-    </button>
   </div>
 </section>
 
