@@ -2088,9 +2088,9 @@ const handleAddComment = async () => {
 }}
           />
 
-          <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-neutral-900 backdrop-blur">
-            TOP {index + 1}
-          </div>
+          <div className="absolute left-4 top-4 rounded-full bg-neutral-950 px-3.5 py-1.5 text-xs font-extrabold text-white shadow-[0_8px_20px_rgba(0,0,0,0.18)]">
+  TOP {index + 1}
+</div>
 
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-4">
             <span className="rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
