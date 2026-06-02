@@ -1913,22 +1913,22 @@ const handleAddComment = async () => {
               />
               <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.56),rgba(0,0,0,0.18),transparent)]" />
 
-              <div className="absolute inset-x-0 bottom-0 p-8 text-white md:p-10">
+              <div className="absolute inset-x-0 bottom-0 p-8 pb-10 text-white md:p-10 md:pb-12">
                 <span className="inline-flex rounded-full border border-white/35 bg-black/25 px-3 py-1.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
   {getCategory2(currentHero)}
 </span>
 
-                <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] md:text-[3.7rem] line-clamp-2 break-keep">
+                <h1 className="mt-5 max-w-2xl text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white md:text-[3.35rem] line-clamp-2 break-keep">
                   {currentHero.title}
                 </h1>
 
-                <p className="mt-4 max-w-xl text-sm leading-6 text-white/90 md:text-[15px] md:leading-7">
+                <p className="mt-5 max-w-xl text-sm leading-6 text-white/90 md:text-[15px] md:leading-7">
                   {clip(currentHero.body, 130)}
                 </p>
 
                 <button
                   onClick={() => handleOpenPost(currentHero)}
-                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
                 >
                   지금 읽기 →
                 </button>
