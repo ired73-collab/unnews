@@ -2075,7 +2075,7 @@ const handleAddComment = async () => {
         type="button"
         key={post.id}
         onClick={() => handleOpenPost(post)}
-        className="group text-left"
+        className="group text-left transition-all duration-300 hover:-translate-y-1"
       >
         <div className="relative overflow-hidden rounded-[26px] bg-neutral-100 shadow-[0_18px_44px_rgba(0,0,0,0.08)]">
           <img
@@ -2276,7 +2276,7 @@ const handleAddComment = async () => {
             onClick={() => handleOpenPost(post)}
             className="group text-left"
           >
-            <div className="overflow-hidden rounded-[22px] bg-neutral-100 shadow-[0_16px_42px_rgba(0,0,0,0.06)]">
+            <div className="overflow-hidden rounded-[22px] bg-neutral-100 shadow-[0_16px_42px_rgba(0,0,0,0.06)] transition-shadow duration-300 group-hover:shadow-[0_22px_54px_rgba(0,0,0,0.12)]">
               <img
                 src={post.image}
                 alt={post.title}
