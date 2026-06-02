@@ -2186,153 +2186,142 @@ const handleAddComment = async () => {
 
       {page === "about" && (
   <main className="mx-auto max-w-[1440px] px-5 py-10 md:px-8">
-    <section className="relative overflow-hidden rounded-[36px]">
+    <section className="relative overflow-hidden rounded-[36px] text-white shadow-[0_24px_70px_rgba(0,0,0,0.14)]">
+      <img
+        src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
+        alt="대학생 미디어 플랫폼"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/60" />
 
-  <img
-    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
-    alt=""
-    className="absolute inset-0 h-full w-full object-cover"
-  />
+      <div className="relative p-10 md:p-14">
+        <p className="text-sm font-bold text-white/85">ABOUT UNNEWS</p>
 
-  <div className="absolute inset-0 bg-black/60" />
+        <h1 className="mt-2 max-w-3xl text-[2.8rem] font-black leading-[1.05] tracking-[-0.06em] text-white md:text-[4rem]">
+          대학생의 오늘을 읽고,
+          <br />
+          내일의 선택을 연결합니다.
+        </h1>
 
-  <div className="relative p-10 md:p-14">
-        <div className="flex flex-col justify-center">
-          <p className="text-sm font-bold text-white/80">ABOUT UNNEWS</p>
-          <h1 className="mt-2 text-[2.8rem] font-black text-white leading-[1.05] tracking-[-0.06em] md:text-[4rem]">
-            대학생의 오늘을 읽고,
-            <br />
-            내일의 선택을 연결합니다.
-          </h1>
-          <p className="mt-6 max-w-2xl text-[16px] leading-7 text-white/90">
-            대학연합신문은 대학생에게 필요한 뉴스, 커리어, AI, 라이프, 지역 정보를
-            빠르게 선별하고 쉽게 전달하는 디지털 미디어 플랫폼입니다.
-          </p>
+        <p className="mt-6 max-w-2xl text-[16px] leading-7 text-white/90">
+          대학연합신문은 대학생에게 필요한 뉴스, 커리어, AI, 라이프, 지역 정보를
+          빠르게 선별하고 쉽게 전달하는 디지털 미디어 플랫폼입니다.
+        </p>
 
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => setPage("category")}
-              className="rounded-full bg-black px-5 py-3 text-sm font-bold text-white hover:bg-neutral-800 transition"
-            >
-              콘텐츠 둘러보기 →
-            </button>
-            
-          </div>
-        </div>
-
+        <button
+          type="button"
+          onClick={() => setPage("category")}
+          className="mt-6 rounded-full bg-black px-5 py-3 text-sm font-bold text-white transition hover:bg-neutral-800"
+        >
+          콘텐츠 둘러보기 →
+        </button>
       </div>
     </section>
 
     <section className="mt-14 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)] md:p-10">
-  <p className="text-sm font-bold text-[#4dbbff]">ABOUT</p>
-  <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
-    대학연합신문 소개
-  </h2>
+      <p className="text-sm font-bold text-[#4dbbff]">ABOUT</p>
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
+        대학연합신문 소개
+      </h2>
 
-  <div className="mt-6 grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
-    <p className="text-[1.45rem] font-black leading-9 tracking-[-0.05em] text-neutral-900">
-      대학생에게 필요한 정보를
-      <br />
-      가장 현실적인 언어로 전달합니다.
-    </p>
+      <div className="mt-6 grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
+        <p className="text-[1.45rem] font-black leading-9 tracking-[-0.05em] text-neutral-900">
+          대학생에게 필요한 정보를
+          <br />
+          가장 현실적인 언어로 전달합니다.
+        </p>
 
-    <div className="space-y-4 text-[15px] leading-7 text-neutral-600">
-      <p>
-        대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를 선별하고
-        정리하는 큐레이션 기반 디지털 미디어입니다.
-      </p>
-      <p>
-        단순히 뉴스를 전달하는 것을 넘어, 대학생이 실제로 고민하는 진로, 취업,
-        AI 활용, 캠퍼스 라이프, 지역사회 이슈를 짧고 명확한 문장으로 풀어냅니다.
-      </p>
-      <p>
-        빠르게 변화하는 대학 생활 속에서 학생들이 더 나은 선택을 할 수 있도록
-        필요한 정보와 관점을 연결하는 것을 목표로 합니다.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section className="mt-8 rounded-[32px] bg-neutral-950 p-8 text-white md:p-10">
-  <p className="text-sm font-bold text-[#72E3F1]">VISION</p>
-  <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
-    비전
-  </h2>
-  <p className="mt-4 max-w-3xl text-[15px] leading-7 text-white/70">
-    대학생이 더 나은 선택을 할 수 있도록 교육, 커리어, 지역, 트렌드 정보를 연결하는
-    신뢰도 높은 플랫폼으로 성장합니다.
-  </p>
-
-  <div className="mt-8 grid gap-4 md:grid-cols-3">
-    {[
-      {
-        num: "01",
-        title: "정보를 선별합니다",
-        text: "대학생에게 필요한 뉴스와 기회를 빠르게 골라냅니다.",
-      },
-      {
-        num: "02",
-        title: "쉽게 전달합니다",
-        text: "복잡한 이슈도 짧고 현실적인 문장으로 정리합니다.",
-      },
-      {
-        num: "03",
-        title: "선택을 연결합니다",
-        text: "진로, 커리어, 라이프, 지역 정보를 다음 행동으로 연결합니다.",
-      },
-    ].map((item) => (
-      <div
-        key={item.num}
-        className="rounded-[24px] border border-white/10 bg-white/8 p-6 backdrop-blur"
-      >
-        <div className="text-4xl font-black text-[#72E3F1]">
-          {item.num}
+        <div className="space-y-4 text-[15px] leading-7 text-neutral-600">
+          <p>
+            대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를 선별하고
+            정리하는 큐레이션 기반 디지털 미디어입니다.
+          </p>
+          <p>
+            단순히 뉴스를 전달하는 것을 넘어, 대학생이 실제로 고민하는 진로, 취업,
+            AI 활용, 캠퍼스 라이프, 지역사회 이슈를 짧고 명확한 문장으로 풀어냅니다.
+          </p>
+          <p>
+            빠르게 변화하는 대학 생활 속에서 학생들이 더 나은 선택을 할 수 있도록
+            필요한 정보와 관점을 연결하는 것을 목표로 합니다.
+          </p>
         </div>
-        <h3 className="mt-5 text-xl font-black tracking-[-0.04em]">
-          {item.title}
-        </h3>
-        <p className="mt-3 text-sm leading-6 text-white/65">
-          {item.text}
-        </p>
       </div>
-    ))}
-  </div>
-</section>
+    </section>
 
-<section className="mt-8 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)] md:p-10">
-  <p className="text-sm font-bold text-[#4dbbff]">CORE VALUE</p>
-  <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
-    핵심가치
-  </h2>
-  <p className="mt-4 max-w-3xl text-[15px] leading-7 text-neutral-600">
-    빠른 정보, 쉬운 문장, 실용적 관점, 이미지 중심 전달을 바탕으로 대학생에게 읽히는
-    콘텐츠를 만듭니다.
-  </p>
+    <section className="mt-8 rounded-[32px] bg-neutral-950 p-8 text-white md:p-10">
+      <p className="text-sm font-bold text-[#72E3F1]">VISION</p>
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">비전</h2>
+      <p className="mt-4 max-w-3xl text-[15px] leading-7 text-white/70">
+        대학생이 더 나은 선택을 할 수 있도록 교육, 커리어, 지역, 트렌드 정보를
+        연결하는 신뢰도 높은 플랫폼으로 성장합니다.
+      </p>
 
-  <div className="mt-8 grid gap-4 md:grid-cols-4">
-    {[
-      { icon: "⚡", title: "빠른 정보", text: "필요한 정보를 빠르게 전달" },
-      { icon: "✍️", title: "쉬운 문장", text: "읽기 쉬운 언어로 정리" },
-      { icon: "🎯", title: "실용적 관점", text: "선택에 도움 되는 정보" },
-      { icon: "🖼️", title: "이미지 중심", text: "직관적인 콘텐츠 경험" },
-    ].map((item) => (
-      <div
-        key={item.title}
-        className="rounded-[24px] border border-black/5 bg-neutral-50 p-6"
-      >
-        <div className="text-3xl">{item.icon}</div>
-        <h3 className="mt-4 text-lg font-black tracking-[-0.04em] text-neutral-900">
-          {item.title}
-        </h3>
-        <p className="mt-2 text-sm leading-6 text-neutral-500">
-          {item.text}
-        </p>
+      <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="rounded-[24px] border border-white/10 bg-white/10 p-6">
+          <div className="text-4xl font-black text-[#72E3F1]">01</div>
+          <h3 className="mt-5 text-xl font-black">정보를 선별합니다</h3>
+          <p className="mt-3 text-sm leading-6 text-white/65">
+            대학생에게 필요한 뉴스와 기회를 빠르게 골라냅니다.
+          </p>
+        </div>
+
+        <div className="rounded-[24px] border border-white/10 bg-white/10 p-6">
+          <div className="text-4xl font-black text-[#72E3F1]">02</div>
+          <h3 className="mt-5 text-xl font-black">쉽게 전달합니다</h3>
+          <p className="mt-3 text-sm leading-6 text-white/65">
+            복잡한 이슈도 짧고 현실적인 문장으로 정리합니다.
+          </p>
+        </div>
+
+        <div className="rounded-[24px] border border-white/10 bg-white/10 p-6">
+          <div className="text-4xl font-black text-[#72E3F1]">03</div>
+          <h3 className="mt-5 text-xl font-black">선택을 연결합니다</h3>
+          <p className="mt-3 text-sm leading-6 text-white/65">
+            진로, 커리어, 라이프, 지역 정보를 다음 행동으로 연결합니다.
+          </p>
+        </div>
       </div>
-    ))}
-  </div>
-</section>
-      <div className="rounded-[28px] bg-neutral-950 p-8 text-white">
+    </section>
+
+    <section className="mt-8 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)] md:p-10">
+      <p className="text-sm font-bold text-[#4dbbff]">CORE VALUE</p>
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
+        핵심가치
+      </h2>
+      <p className="mt-4 max-w-3xl text-[15px] leading-7 text-neutral-600">
+        빠른 정보, 쉬운 문장, 실용적 관점, 이미지 중심 전달을 바탕으로 대학생에게
+        읽히는 콘텐츠를 만듭니다.
+      </p>
+
+      <div className="mt-8 grid gap-4 md:grid-cols-4">
+        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
+          <div className="text-3xl">⚡</div>
+          <h3 className="mt-4 text-lg font-black">빠른 정보</h3>
+          <p className="mt-2 text-sm leading-6 text-neutral-500">필요한 정보를 빠르게 전달</p>
+        </div>
+
+        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
+          <div className="text-3xl">✍️</div>
+          <h3 className="mt-4 text-lg font-black">쉬운 문장</h3>
+          <p className="mt-2 text-sm leading-6 text-neutral-500">읽기 쉬운 언어로 정리</p>
+        </div>
+
+        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
+          <div className="text-3xl">🎯</div>
+          <h3 className="mt-4 text-lg font-black">실용적 관점</h3>
+          <p className="mt-2 text-sm leading-6 text-neutral-500">선택에 도움 되는 정보</p>
+        </div>
+
+        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
+          <div className="text-3xl">🖼️</div>
+          <h3 className="mt-4 text-lg font-black">이미지 중심</h3>
+          <p className="mt-2 text-sm leading-6 text-neutral-500">직관적인 콘텐츠 경험</p>
+        </div>
+      </div>
+    </section>
+
+    <section className="mt-8 grid gap-5 md:grid-cols-2">
+      <div className="rounded-[28px] bg-neutral-950 p-7 text-white">
         <p className="text-sm font-bold text-[#72E3F1]">PARTICIPATION</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
           참여안내
@@ -2344,18 +2333,18 @@ const handleAddComment = async () => {
         </p>
       </div>
 
-      <div className="rounded-[28px] border border-black/5 bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)]">
-        <p className="text-sm font-bold text-[#4dbbff]">CONTACT</p>
+      <div className="rounded-[28px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] p-7 text-white shadow-[0_18px_44px_rgba(80,120,255,0.18)]">
+        <p className="text-sm font-bold text-white/80">CONTACT</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
           제휴문의
         </h2>
-        <p className="mt-5 text-[15px] leading-7 text-neutral-600">
+        <p className="mt-5 text-[15px] leading-7 text-white/85">
           대학, 기관, 기업, 브랜드와의 콘텐츠 제휴 및 홍보 협업을 진행합니다.
           대학생 대상 캠페인, 서포터즈 모집, 공모전 홍보, 지역 청년 프로젝트를
           함께 기획할 수 있습니다.
         </p>
 
-        <div className="mt-6 rounded-2xl bg-neutral-50 p-5 text-sm font-semibold text-neutral-700">
+        <div className="mt-6 rounded-2xl bg-white/20 p-5 text-sm font-semibold text-white backdrop-blur">
           이메일: unnews@daum.net
           <br />
           전화: 053-765-4765
