@@ -2076,7 +2076,7 @@ const handleAddComment = async () => {
         type="button"
         key={post.id}
         onClick={() => handleOpenPost(post)}
-        className="group text-left"
+        className="group flex h-full flex-col text-left"
       >
         <div className="relative overflow-hidden rounded-[26px] bg-neutral-100 shadow-[0_18px_44px_rgba(0,0,0,0.08)]">
           <img
@@ -2101,15 +2101,15 @@ const handleAddComment = async () => {
         </div>
 
         <div className="mt-3">
-          <h3 className="line-clamp-2 text-[1.15rem] font-black leading-7 tracking-[-0.04em] text-neutral-900">
+          <h3 className="min-h-[56px] line-clamp-2 text-[1.15rem] font-black leading-7 tracking-[-0.04em] text-neutral-900">
             {post.title}
           </h3>
 
-          <p className="mt-2 line-clamp-2 text-[14px] leading-6 text-neutral-500">
+          <p className="mt-2 min-h-[48px] line-clamp-2 text-[14px] leading-6 text-neutral-500">
             {post.summary || post.body}
           </p>
 
-          <div className="mt-3 flex items-center justify-between text-xs font-medium text-neutral-400">
+          <div className="mt-auto flex items-center justify-between pt-3 text-xs font-medium text-neutral-400">
             <span>조회 {post.views || 0}</span>
             <button
               type="button"
