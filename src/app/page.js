@@ -1901,80 +1901,78 @@ const handleAddComment = async () => {
       {page === "home" && (
         <main className="mx-auto max-w-[1440px] px-5 py-8 md:px-8 md:py-10">
           <section className="mb-2 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-            <div className="relative overflow-hidden rounded-[32px] border border-white/50 bg-white/70 shadow-[0_24px_70px_rgba(0,0,0,0.08)] backdrop-blur">
-              <img
-                src={currentHero.image}
-                alt={currentHero.title}
-                className="block h-[440px] w-full object-cover transition duration-700"
-                onError={(e) => {
-    e.currentTarget.src =
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
-  }}
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.56),rgba(0,0,0,0.18),transparent)]" />
+            <div className="relative h-[520px] overflow-hidden rounded-[32px] border border-white/50 bg-neutral-100 shadow-[0_24px_70px_rgba(0,0,0,0.08)]">
+  <img
+    src={currentHero.image}
+    alt={currentHero.title}
+    className="absolute inset-0 h-full w-full object-cover"
+    onError={(e) => {
+      e.currentTarget.src =
+        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+    }}
+  />
 
-              <div className="absolute inset-x-0 bottom-0 p-8 pb-10 text-white md:p-10 md:pb-12">
-                <span className="inline-flex rounded-full border border-white/35 bg-black/25 px-3 py-1.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
-  {getCategory2(currentHero)}
-</span>
+  <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.62),rgba(0,0,0,0.24),rgba(0,0,0,0.10))]" />
 
-                <h1 className="mt-5 max-w-2xl text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white md:text-[3.35rem] line-clamp-2 break-keep">
-                  {currentHero.title}
-                </h1>
+  <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
+    <span className="inline-flex rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
+      {getCategory2(currentHero)}
+    </span>
 
-                <p className="mt-5 max-w-xl text-sm leading-6 text-white/90 md:text-[15px] md:leading-7">
-                  {clip(currentHero.body, 130)}
-                </p>
+    <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white md:text-[3.7rem] line-clamp-2 break-keep">
+      {currentHero.title}
+    </h1>
 
-                <button
-                  onClick={() => handleOpenPost(currentHero)}
-                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
-                >
-                  지금 읽기 →
-                </button>
+    <p className="mt-4 max-w-xl text-sm leading-6 text-white/90 md:text-[15px] md:leading-7">
+      {clip(currentHero.body, 130)}
+    </p>
 
-                <div className="mt-6 flex items-center gap-3">
-                  {heroPosts.map((post, index) => (
-                    <button
-                      key={post.id}
-                      onClick={() => setHeroIndex(index)}
-                      className={`h-2.5 rounded-full transition-all ${
-                        heroIndex === index ? "w-10 bg-white" : "w-2.5 bg-white/45"
-                      }`}
-                      aria-label={`${index + 1}번 히어로 보기`}
-                    />
-                  ))}
-                </div>
+    <button
+      onClick={() => handleOpenPost(currentHero)}
+      className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
+    >
+      지금 읽기 →
+    </button>
 
-                <div className="mt-7 hidden grid-cols-3 gap-3 md:grid">
-                  {heroPosts.map((post, index) => (
-                    <button
-                      key={post.id}
-                      onClick={() => {
-                        setHeroIndex(index);
-                        handleOpenPost(post);
-                      }}
-                      className={`group rounded-[22px] border px-5 py-4 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
-                        heroIndex === index
-                          ? "border-white/45 bg-white/18"
-                          : "border-white/25 bg-white/10 hover:border-white/35 hover:bg-white/16"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-xs font-semibold text-white/75">
-                          {getCategory2(post)}
-                        </span>
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/60 opacity-0 transition group-hover:opacity-100" />
-                      </div>
+    <div className="mt-6 flex items-center gap-3">
+      {heroPosts.map((post, index) => (
+        <button
+          key={post.id}
+          onClick={() => setHeroIndex(index)}
+          className={`h-2.5 rounded-full transition-all ${
+            heroIndex === index ? "w-10 bg-white" : "w-2.5 bg-white/45"
+          }`}
+          aria-label={`${index + 1}번 히어로 보기`}
+        />
+      ))}
+    </div>
 
-                      <div className="mt-2 line-clamp-1 text-[15px] font-semibold leading-6 tracking-[-0.03em]">
-                        {post.title}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+    <div className="mt-7 hidden grid-cols-3 gap-3 md:grid">
+      {heroPosts.map((post, index) => (
+        <button
+          key={post.id}
+          onClick={() => {
+            setHeroIndex(index);
+            handleOpenPost(post);
+          }}
+          className={`group rounded-[22px] border px-5 py-4 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
+            heroIndex === index
+              ? "border-white/45 bg-white/18"
+              : "border-white/25 bg-white/10 hover:border-white/35 hover:bg-white/16"
+          }`}
+        >
+          <div className="text-xs font-semibold text-white/75">
+            {getCategory2(post)}
+          </div>
+
+          <div className="mt-2 line-clamp-1 text-[15px] font-semibold leading-6 tracking-[-0.03em]">
+            {post.title}
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
 
             <div className="grid gap-3">
               <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#6D5DFB] via-[#6EA8FF] to-[#7EE7F2] p-6 text-white shadow-[0_14px_34px_rgba(80,120,255,0.16)]">
