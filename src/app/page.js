@@ -2081,7 +2081,7 @@ const handleAddComment = async () => {
           <img
             src={post.image}
             alt={post.title}
-            className="h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+            className="h-[220px] w-full object-cover"
             onError={(e) => {
   e.currentTarget.src =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
