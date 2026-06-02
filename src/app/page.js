@@ -2075,7 +2075,7 @@ const handleAddComment = async () => {
         type="button"
         key={post.id}
         onClick={() => handleOpenPost(post)}
-        className="group text-left transition-all duration-300 hover:-translate-y-1"
+        className="group text-left"
       >
         <div className="relative overflow-hidden rounded-[26px] bg-neutral-100 shadow-[0_18px_44px_rgba(0,0,0,0.08)]">
           <img
@@ -2276,11 +2276,11 @@ const handleAddComment = async () => {
             onClick={() => handleOpenPost(post)}
             className="group text-left"
           >
-            <div className="overflow-hidden rounded-[22px] bg-neutral-100 shadow-[0_16px_42px_rgba(0,0,0,0.06)] transition-shadow duration-300 group-hover:shadow-[0_22px_54px_rgba(0,0,0,0.12)]">
+            <div className="overflow-hidden rounded-[22px] bg-neutral-100 shadow-[0_16px_42px_rgba(0,0,0,0.06)]">
               <img
                 src={post.image}
                 alt={post.title}
-                className="h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                className="h-[220px] w-full object-cover"
                 onError={(e) => {
   e.currentTarget.src =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
