@@ -2049,27 +2049,7 @@ const handleAddComment = async () => {
           </section>
 
          <section className="mb-8">
-  <div className="mb-3 flex items-end justify-between">
-    <div>
-      <p className="text-sm font-semibold text-[#4dbbff]">Popular</p>
-      <h2 className="text-[2rem] font-black tracking-[-0.05em]">
-        인기 콘텐츠
-      </h2>
-    </div>
-    <button
-      type="button"
-      onClick={() => {
-        setActiveCategory("전체");
-        setActiveSubCategory("전체");
-        setPage("category");
-      }}
-      className="hidden rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 md:block"
-    >
-      전체 보기 →
-    </button>
-  </div>
-
-  <div className="grid gap-5 md:grid-cols-3">
+  <div className="grid gap-5 md:grid-cols-3 md:items-start">
     {featured.slice(0, 3).map((post, index) => (
       <button
         type="button"
@@ -2077,20 +2057,31 @@ const handleAddComment = async () => {
         onClick={() => handleOpenPost(post)}
         className="group text-left"
       >
+        {index === 0 && (
+          <div className="mb-3 flex items-end justify-between">
+            <div>
+              <p className="text-sm font-semibold text-[#4dbbff]">Popular</p>
+              <h2 className="text-[2rem] font-black tracking-[-0.05em]">
+                인기 콘텐츠
+              </h2>
+            </div>
+          </div>
+        )}
+
         <div className="relative overflow-hidden rounded-[26px] bg-neutral-100 shadow-[0_18px_44px_rgba(0,0,0,0.08)]">
           <img
             src={post.image}
             alt={post.title}
             className="h-[220px] w-full object-cover"
             onError={(e) => {
-  e.currentTarget.src =
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
-}}
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+            }}
           />
 
           <div className="absolute left-4 top-4 rounded-full bg-neutral-950 px-3.5 py-1.5 text-xs font-extrabold text-white shadow-[0_8px_20px_rgba(0,0,0,0.18)]">
-  TOP {index + 1}
-</div>
+            TOP {index + 1}
+          </div>
 
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-4">
             <span className="rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
@@ -2111,16 +2102,30 @@ const handleAddComment = async () => {
           <div className="mt-3 flex items-center justify-between text-xs font-medium text-neutral-400">
             <span>조회 {post.views || 0}</span>
             <button
-  type="button"
-  onClick={(event) => handleLikePost(post, event)}
-  className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-600 shadow-sm transition hover:bg-neutral-950 hover:text-white"
->
-  ♡ {post.likes || 0}
-</button>
+              type="button"
+              onClick={(event) => handleLikePost(post, event)}
+              className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-600 shadow-sm transition hover:bg-neutral-950 hover:text-white"
+            >
+              ♡ {post.likes || 0}
+            </button>
           </div>
         </div>
       </button>
     ))}
+  </div>
+
+  <div className="mt-4 flex justify-end">
+    <button
+      type="button"
+      onClick={() => {
+        setActiveCategory("전체");
+        setActiveSubCategory("전체");
+        setPage("category");
+      }}
+      className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+    >
+      전체 보기 →
+    </button>
   </div>
 </section>
 
