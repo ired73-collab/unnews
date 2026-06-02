@@ -2186,11 +2186,21 @@ const handleAddComment = async () => {
 
       {page === "about" && (
   <main className="mx-auto max-w-[1440px] px-5 py-10 md:px-8">
-    <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] text-white shadow-[0_24px_70px_rgba(80,120,255,0.18)]">
-      <div className="grid gap-8 p-8 md:grid-cols-[1.05fr_0.95fr] md:p-12">
+    <section className="relative overflow-hidden rounded-[36px]">
+
+  <img
+    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
+    alt=""
+    className="absolute inset-0 h-full w-full object-cover"
+  />
+
+  <div className="absolute inset-0 bg-black/45" />
+
+  <div className="relative p-10 md:p-14">
         <div className="flex flex-col justify-center">
           <p className="text-sm font-bold text-white/80">ABOUT UNNEWS</p>
-          <h1 className="mt-3 text-[3rem] font-black leading-[1.05] tracking-[-0.06em] md:text-[4.5rem]">
+          <h1 className="mt-2 text-[2.8rem] font-black leading-[1.05]
+tracking-[-0.06em] md:text-[4rem]">
             대학생의 오늘을 읽고,
             <br />
             내일의 선택을 연결합니다.
@@ -2200,7 +2210,7 @@ const handleAddComment = async () => {
             빠르게 선별하고 쉽게 전달하는 디지털 미디어 플랫폼입니다.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-6">
             <button
               type="button"
               onClick={() => setPage("category")}
@@ -2208,23 +2218,10 @@ const handleAddComment = async () => {
             >
               콘텐츠 둘러보기 →
             </button>
-            <button
-              type="button"
-              onClick={() => setPage("home")}
-              className="rounded-full border border-white/40 px-5 py-3 text-sm font-bold text-white"
-            >
-              메인으로
-            </button>
+            
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[28px] bg-white/15 p-3 backdrop-blur">
-          <img
-            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
-            alt="대학생 미디어 플랫폼"
-            className="h-[420px] w-full rounded-[22px] object-cover"
-          />
-        </div>
       </div>
     </section>
 
