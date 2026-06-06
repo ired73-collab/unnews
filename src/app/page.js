@@ -1914,25 +1914,25 @@ const handleAddComment = async () => {
 
   <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.62),rgba(0,0,0,0.24),rgba(0,0,0,0.10))]" />
 
-  <div className="absolute inset-0 flex flex-col justify-center p-10 pb-36 text-white md:p-12 md:pb-40">
+  <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
     <span className="inline-flex rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
       {getCategory2(currentHero)}
     </span>
 
-    <h1 className="mt-6 max-w-xl text-3xl md:text-[3.2rem] font-semibold leading-[1.1] line-clamp-2">
+    <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white md:text-[3.2rem] line-clamp-2 break-keep">
   {currentHero.title}
 </h1>
 
-    <p className="mt-4 max-w-lg text-sm leading-6 text-white/90 md:text-[15px] line-clamp-2">
+    <p className="mt-3 max-w-lg text-sm leading-6 text-white/90 md:text-[15px] md:leading-6 line-clamp-2">
   {clip(currentHero.body, 70)}
 </p>
 
     <button
-      onClick={() => handleOpenPost(currentHero)}
-      className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
-    >
-      지금 읽기 →
-    </button>
+  onClick={() => handleOpenPost(currentHero)}
+  className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-neutral-900 backdrop-blur transition hover:bg-white"
+>
+  지금 읽기 →
+</button>
 
     <div className="mt-6 flex items-center gap-3">
       {heroPosts.map((post, index) => (
