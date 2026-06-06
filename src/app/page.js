@@ -1914,18 +1914,18 @@ const handleAddComment = async () => {
 
   <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.62),rgba(0,0,0,0.24),rgba(0,0,0,0.10))]" />
 
-  <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
+  <div className="absolute inset-0 flex flex-col justify-center p-10 pb-36 text-white md:p-12 md:pb-40">
     <span className="inline-flex rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
       {getCategory2(currentHero)}
     </span>
 
-    <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white md:text-[3.7rem] line-clamp-2 break-keep">
-      {currentHero.title}
-    </h1>
+    <h1 className="mt-6 max-w-xl text-3xl md:text-[3.2rem] font-semibold leading-[1.1] line-clamp-2">
+  {currentHero.title}
+</h1>
 
-    <p className="mt-4 max-w-xl text-sm leading-6 text-white/90 md:text-[15px] md:leading-7">
-      {clip(currentHero.body, 130)}
-    </p>
+    <p className="mt-4 max-w-lg text-sm leading-6 text-white/90 md:text-[15px] line-clamp-2">
+  {clip(currentHero.body, 70)}
+</p>
 
     <button
       onClick={() => handleOpenPost(currentHero)}
@@ -1955,15 +1955,22 @@ const handleAddComment = async () => {
             setHeroIndex(index);
             handleOpenPost(post);
           }}
-          className={`group rounded-[22px] border px-5 py-4 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
+          className={`group rounded-[22px] border px-5 py-3 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
             heroIndex === index
               ? "border-white/45 bg-white/18"
               : "border-white/25 bg-white/10 hover:border-white/35 hover:bg-white/16"
           }`}
         >
-          <div className="text-xs font-semibold text-white/75">
-            {getCategory2(post)}
-          </div>
+          <div className="flex items-center justify-between">
+  <span className="text-xs font-semibold text-white/75">
+    {getCategory2(post)}
+  </span>
+
+  {heroIndex === index && (
+    <span className="h-1.5 w-1.5 rounded-full bg-white" />
+  )}
+</div>
+
 
           <div className="mt-2 line-clamp-1 text-[15px] font-semibold leading-6 tracking-[-0.03em]">
             {post.title}
