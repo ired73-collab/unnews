@@ -2197,7 +2197,7 @@ const handleAddComment = async () => {
         alt="대학생 미디어 플랫폼"
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-black/10" />
 
       <div className="relative p-10 md:p-14">
         <p className="text-sm font-bold text-white/85">ABOUT UNNEWS</p>
@@ -2224,36 +2224,37 @@ const handleAddComment = async () => {
     </section>
 
     <section className="mt-14 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)] md:p-10">
-      <p className="text-sm font-bold text-[#4dbbff]">ABOUT</p>
-      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
-        대학연합신문 소개
-      </h2>
+  <p className="text-sm font-bold text-[#4dbbff]">ABOUT</p>
+  <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
+    대학연합신문 소개
+  </h2>
 
-      <div className="mt-6 grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
-        <p className="text-[1.45rem] font-black leading-9 tracking-[-0.05em] text-neutral-900">
-          대학생에게 필요한 정보를
-          <br />
-          가장 현실적인 언어로 전달합니다.
-        </p>
+  <div className="mt-7 grid gap-8 md:grid-cols-[0.85fr_1.15fr]">
+    <p className="text-[1.6rem] font-black leading-10 tracking-[-0.05em] text-neutral-900">
+      대학생의 시선으로 보고,
+      <br />
+      현실적인 언어로 전달합니다.
+    </p>
 
-        <div className="space-y-4 text-[15px] leading-7 text-neutral-600">
-          <p>
-            대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를 선별하고
-            정리하는 큐레이션 기반 디지털 미디어입니다.
-          </p>
-          <p>
-            단순히 뉴스를 전달하는 것을 넘어, 대학생이 실제로 고민하는 진로, 취업,
-            AI 활용, 캠퍼스 라이프, 지역사회 이슈를 짧고 명확한 문장으로 풀어냅니다.
-          </p>
-          <p>
-            빠르게 변화하는 대학 생활 속에서 학생들이 더 나은 선택을 할 수 있도록
-            필요한 정보와 관점을 연결하는 것을 목표로 합니다.
-          </p>
-        </div>
-      </div>
-    </section>
+    <div className="space-y-5 text-[17px] leading-8 text-neutral-600">
+      <p>
+        대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를 선별하고
+        정리하는 큐레이션 기반 디지털 미디어입니다.
+      </p>
+      <p>
+        단순히 뉴스를 전달하는 것을 넘어, 대학생이 실제로 고민하는 진로, 취업,
+        공모전, AI 활용, 캠퍼스 라이프, 지역사회 이슈를 짧고 명확한 문장으로
+        풀어냅니다.
+      </p>
+      <p>
+        빠르게 변화하는 대학 생활 속에서 학생들이 더 나은 선택을 할 수 있도록
+        필요한 정보와 관점을 연결하는 것을 목표로 합니다.
+      </p>
+    </div>
+  </div>
+</section>
 
-    <section className="mt-8 rounded-[32px] bg-neutral-950 p-8 text-white md:p-10">
+    <section className="mt-8 rounded-[32px] bg-gradient-to-br from-[#0F172A] via-[#15345C] to-[#2563EB] p-8 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-10">
       <p className="text-sm font-bold text-[#72E3F1]">VISION</p>
       <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">비전</h2>
       <p className="mt-4 max-w-3xl text-[15px] leading-7 text-white/70">
@@ -2262,7 +2263,7 @@ const handleAddComment = async () => {
       </p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <div className="rounded-[24px] border border-white/10 bg-white/10 p-6">
+        <div className="rounded-[24px] border border-white/10 bg-white/8 backdrop-blur p-6">
           <div className="text-4xl font-black text-[#72E3F1]">01</div>
           <h3 className="mt-5 text-xl font-black">정보를 선별합니다</h3>
           <p className="mt-3 text-sm leading-6 text-white/65">
@@ -2270,7 +2271,7 @@ const handleAddComment = async () => {
           </p>
         </div>
 
-        <div className="rounded-[24px] border border-white/10 bg-white/10 p-6">
+        <div className="rounded-[24px] border border-white/10 bg-white/8 backdrop-blur p-6">
           <div className="text-4xl font-black text-[#72E3F1]">02</div>
           <h3 className="mt-5 text-xl font-black">쉽게 전달합니다</h3>
           <p className="mt-3 text-sm leading-6 text-white/65">
@@ -2278,7 +2279,7 @@ const handleAddComment = async () => {
           </p>
         </div>
 
-        <div className="rounded-[24px] border border-white/10 bg-white/10 p-6">
+        <div className="rounded-[24px] border border-white/10 bg-white/8 backdrop-blur p-6">
           <div className="text-4xl font-black text-[#72E3F1]">03</div>
           <h3 className="mt-5 text-xl font-black">선택을 연결합니다</h3>
           <p className="mt-3 text-sm leading-6 text-white/65">
@@ -2300,25 +2301,33 @@ const handleAddComment = async () => {
 
       <div className="mt-8 grid gap-4 md:grid-cols-4">
         <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="text-3xl">⚡</div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
+  ⚡
+</div>
           <h3 className="mt-4 text-lg font-black">빠른 정보</h3>
           <p className="mt-2 text-sm leading-6 text-neutral-500">필요한 정보를 빠르게 전달</p>
         </div>
 
         <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="text-3xl">✍️</div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
+  ✍️
+</div>
           <h3 className="mt-4 text-lg font-black">쉬운 문장</h3>
           <p className="mt-2 text-sm leading-6 text-neutral-500">읽기 쉬운 언어로 정리</p>
         </div>
 
         <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="text-3xl">🎯</div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
+  🎯
+</div>
           <h3 className="mt-4 text-lg font-black">실용적 관점</h3>
           <p className="mt-2 text-sm leading-6 text-neutral-500">선택에 도움 되는 정보</p>
         </div>
 
         <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="text-3xl">🖼️</div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
+  🖼️
+</div>
           <h3 className="mt-4 text-lg font-black">이미지 중심</h3>
           <p className="mt-2 text-sm leading-6 text-neutral-500">직관적인 콘텐츠 경험</p>
         </div>
@@ -2326,24 +2335,24 @@ const handleAddComment = async () => {
     </section>
 
     <section className="mt-8 grid gap-5 md:grid-cols-2">
-      <div className="rounded-[28px] bg-neutral-950 p-7 text-white">
+      <div className="rounded-[28px] bg-neutral-950 p-6 text-white">
         <p className="text-sm font-bold text-[#72E3F1]">PARTICIPATION</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
           참여안내
         </h2>
-        <p className="mt-5 text-[15px] leading-7 text-white/70">
+        <p className="mt-5 text-[15px] leading-6 text-white/70">
           대학생 기자단, 서포터즈, 캠퍼스 리포터, 콘텐츠 제보 등 다양한 방식으로
           대학연합신문과 함께할 수 있습니다. 실제 대학생의 시선으로 캠퍼스와 사회를
           연결하는 콘텐츠를 만들어갑니다.
         </p>
       </div>
 
-      <div className="rounded-[28px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] p-7 text-white shadow-[0_18px_44px_rgba(80,120,255,0.18)]">
+      <div className="rounded-[28px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] p-6 text-white shadow-[0_18px_44px_rgba(80,120,255,0.18)]">
         <p className="text-sm font-bold text-white/80">CONTACT</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
           제휴문의
         </h2>
-        <p className="mt-5 text-[15px] leading-7 text-white/85">
+        <p className="mt-5 text-[15px] leading-6 text-white/85">
           대학, 기관, 기업, 브랜드와의 콘텐츠 제휴 및 홍보 협업을 진행합니다.
           대학생 대상 캠페인, 서포터즈 모집, 공모전 홍보, 지역 청년 프로젝트를
           함께 기획할 수 있습니다.
