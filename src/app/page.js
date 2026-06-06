@@ -1914,12 +1914,12 @@ const handleAddComment = async () => {
 
   <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.62),rgba(0,0,0,0.24),rgba(0,0,0,0.10))]" />
 
-  <div className="absolute inset-x-0 bottom-5 p-7 text-white md:bottom-12 md:p-9">
-    <span className="inline-flex rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
+  <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
+    <span className="mt-2 inline-flex rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
       {getCategory2(currentHero)}
     </span>
 
-    <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white md:text-[3.2rem] line-clamp-2 break-keep">
+    <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white md:text-[2.8rem] line-clamp-2 break-keep">
   {currentHero.title}
 </h1>
 
