@@ -2233,7 +2233,7 @@ const handleAddComment = async () => {
   ))}
 </div>
 
-    <section className="mt-14 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
+    <section className="mt-12 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
   <p className="text-sm font-bold text-[#4dbbff]">ABOUT UNNEWS</p>
 
   <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
@@ -2248,7 +2248,7 @@ const handleAddComment = async () => {
         내일의 선택을 연결합니다.
       </p>
 
-      <div className="mt-8 grid grid-cols-3 gap-3">
+      <div className="mt-7 grid grid-cols-3 gap-3">
         {[
           { num: "4+", label: "주요 카테고리" },
           { num: "300+", label: "콘텐츠" },
@@ -2256,7 +2256,7 @@ const handleAddComment = async () => {
         ].map((item) => (
           <div
             key={item.label}
-            className="rounded-2xl bg-[#eef6ff] px-4 py-5 text-center"
+            className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white px-4 py-5 text-center shadow-sm"
           >
             <div className="text-2xl font-black text-[#2563eb]">
               {item.num}
@@ -2271,19 +2271,19 @@ const handleAddComment = async () => {
 
     <div className="space-y-5 text-[17px] leading-8 text-neutral-600">
       <p>
-        대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를
-        선별하고 정리하는 정보 큐레이션 미디어입니다.
-      </p>
+  대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를
+  선별하고 정리하는 정보 큐레이션 미디어입니다.
+</p>
 
-      <p>
-        뉴스 전달을 넘어 커리어, AI, 트렌드, 라이프, 지역 정보를 실질적인
-        선택에 도움이 되는 콘텐츠로 재구성합니다.
-      </p>
+<p>
+  뉴스 전달을 넘어 커리어, AI, 트렌드, 라이프, 지역 정보를 실질적인
+  선택에 도움이 되는 콘텐츠로 재구성합니다.
+</p>
 
-      <p>
-        빠르게 소비되고 잊히는 정보가 아니라, 대학생의 행동과 성장으로 이어지는
-        콘텐츠를 지향합니다.
-      </p>
+<p>
+  빠르게 소비되고 잊히는 정보가 아니라, 대학생의 행동과 성장으로 이어지는
+  콘텐츠를 지향합니다.
+</p>
     </div>
   </div>
 </section>
