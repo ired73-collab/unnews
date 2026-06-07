@@ -2376,7 +2376,7 @@ const handleAddComment = async () => {
     <section className="mt-8 grid gap-5 md:grid-cols-2">
   <div className="relative min-h-[280px] overflow-hidden rounded-[32px] text-white">
     <img
-      src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+      src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
       alt=""
       className="absolute inset-0 h-full w-full object-cover"
     />
@@ -2403,11 +2403,11 @@ const handleAddComment = async () => {
 
   <div className="relative min-h-[280px] overflow-hidden rounded-[32px] text-white">
     <img
-      src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+      src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
       alt=""
       className="absolute inset-0 h-full w-full object-cover"
     />
-    <div className="absolute inset-0 bg-gradient-to-br from-[#2563eb]/85 to-[#4dbbff]/75" />
+    <div className="absolute inset-0 bg-black/60" />
 
     <div className="relative z-10 p-8">
       <p className="text-sm font-bold text-white/80">CONTACT</p>
