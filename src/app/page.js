@@ -2339,36 +2339,36 @@ const handleAddComment = async () => {
       </p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-4">
-        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
-  ⚡
+        <div className="group rounded-[24px] border border-neutral-200 bg-white p-7 transition-all duration-300 hover:-translate-y-2 hover:border-[#4dbbff] hover:shadow-[0_20px_40px_rgba(77,187,255,0.15)]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#eef6ff] to-white text-[2rem] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_10px_30px_rgba(77,187,255,0.25)]">
+  <span className="text-[#2563eb]">↯</span>
 </div>
-          <h3 className="mt-4 text-lg font-black">빠른 정보</h3>
-          <p className="mt-2 text-sm leading-6 text-neutral-500">필요한 정보를 빠르게 전달</p>
+          <h3 className="mt-4 text-lg font-black transition-colors duration-300 group-hover:text-[#2563eb]">신속한 큐레이션</h3>
+          <p className="mt-3 text-[15px] leading-7 text-neutral-600">대학생에게 필요한 정보를 빠르게 선별합니다.</p>
         </div>
 
-        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
-  ✍️
+        <div className="group rounded-[24px] border border-neutral-200 bg-white p-7 transition-all duration-300 hover:-translate-y-2 hover:border-[#4dbbff] hover:shadow-[0_20px_40px_rgba(77,187,255,0.15)]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#eef6ff] to-white text-[2rem] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_10px_30px_rgba(77,187,255,0.25)]">
+  <span className="text-[#2563eb]">✎</span>
 </div>
-          <h3 className="mt-4 text-lg font-black">쉬운 문장</h3>
-          <p className="mt-2 text-sm leading-6 text-neutral-500">읽기 쉬운 언어로 정리</p>
+          <h3 className="mt-4 text-lg font-black transition-colors duration-300 group-hover:text-[#2563eb]">읽기 쉬운 콘텐츠</h3>
+          <p className="mt-3 text-[15px] leading-7 text-neutral-600">복잡한 이슈도 쉽게 이해할 수 있도록 전달합니다.</p>
         </div>
 
-        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
-  🎯
+        <div className="group rounded-[24px] border border-neutral-200 bg-white p-7 transition-all duration-300 hover:-translate-y-2 hover:border-[#4dbbff] hover:shadow-[0_20px_40px_rgba(77,187,255,0.15)]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#eef6ff] to-white text-[2rem] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_10px_30px_rgba(77,187,255,0.25)]">
+  <span className="text-[#2563eb]">◎</span>
 </div>
-          <h3 className="mt-4 text-lg font-black">실용적 관점</h3>
-          <p className="mt-2 text-sm leading-6 text-neutral-500">선택에 도움 되는 정보</p>
+          <h3 className="mt-4 text-lg font-black transition-colors duration-300 group-hover:text-[#2563eb]">실질적 도움</h3>
+          <p className="mt-3 text-[15px] leading-7 text-neutral-600">진로와 성장에 도움이 되는 정보를 제공합니다.</p>
         </div>
 
-        <div className="rounded-[24px] border border-black/5 bg-neutral-50 p-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4dbbff]/10 text-4xl">
-  🖼️
+        <div className="group rounded-[24px] border border-neutral-200 bg-white p-7 transition-all duration-300 hover:-translate-y-2 hover:border-[#4dbbff] hover:shadow-[0_20px_40px_rgba(77,187,255,0.15)]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#eef6ff] to-white text-[2rem] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_10px_30px_rgba(77,187,255,0.25)]">
+  <span className="text-[#2563eb]">▧</span>
 </div>
-          <h3 className="mt-4 text-lg font-black">이미지 중심</h3>
-          <p className="mt-2 text-sm leading-6 text-neutral-500">직관적인 콘텐츠 경험</p>
+          <h3 className="mt-4 text-lg font-black transition-colors duration-300 group-hover:text-[#2563eb]">직관적 경험</h3>
+          <p className="mt-3 text-[15px] leading-7 text-neutral-600">이미지와 시각 요소로 이해를 돕습니다.</p>
         </div>
       </div>
     </section>
