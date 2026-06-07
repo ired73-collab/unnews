@@ -2374,72 +2374,59 @@ const handleAddComment = async () => {
     </section>
 
     <section className="mt-8 grid gap-5 md:grid-cols-2">
-      <section
-  className="
-  relative
-  overflow-hidden
-  rounded-[32px]
-  min-h-[280px]
-  text-white
-  "
->
-  <img
-  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
-  alt=""
-  className="absolute inset-0 h-full w-full object-cover"
-/>
+  <div className="relative min-h-[280px] overflow-hidden rounded-[32px] text-white">
+    <img
+      src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+      alt=""
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+    <div className="absolute inset-0 bg-black/60" />
 
-<div className="absolute inset-0 bg-black/60" />
+    <div className="relative z-10 p-8">
+      <p className="text-sm font-bold text-[#72E3F1]">PARTICIPATION</p>
+      <h2 className="mt-3 text-[2rem] font-black text-white">
+        참여안내
+      </h2>
+      <p className="mt-4 text-[15px] leading-7 text-white/85">
+        대학생 기자단, 서포터즈, 캠퍼스 리포터, 콘텐츠 제보 등 다양한 방식으로
+        대학연합신문과 함께할 수 있습니다. 실제 대학생의 시선으로 캠퍼스와 사회를
+        연결하는 콘텐츠를 만들어갑니다.
+      </p>
+      <button
+        type="button"
+        className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-bold text-black transition hover:scale-105"
+      >
+        참여하기 →
+      </button>
+    </div>
+  </div>
 
-        <div className="relative z-10 p-8">
+  <div className="relative min-h-[280px] overflow-hidden rounded-[32px] text-white">
+    <img
+      src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+      alt=""
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+    <div className="absolute inset-0 bg-gradient-to-br from-[#2563eb]/85 to-[#4dbbff]/75" />
 
-  <p className="text-sm font-bold text-[#72E3F1]">
-    PARTICIPATION
-  </p>
-
-  <h2 className="mt-3 text-[2rem] font-black text-white">
-    참여안내
-  </h2>
-        <p className="mt-5 text-[15px] leading-6 text-white/70">
-          대학생 기자단, 서포터즈, 캠퍼스 리포터, 콘텐츠 제보 등 다양한 방식으로
-          대학연합신문과 함께할 수 있습니다. 실제 대학생의 시선으로 캠퍼스와 사회를
-          연결하는 콘텐츠를 만들어갑니다.
-        </p>
-        <button
-  className="
-  mt-6
-  rounded-full
-  bg-white
-  px-5 py-3
-  text-sm
-  font-bold
-  text-black
-  transition
-  hover:scale-105
-  "
->
-  참여하기 →
-</button>
+    <div className="relative z-10 p-8">
+      <p className="text-sm font-bold text-white/80">CONTACT</p>
+      <h2 className="mt-3 text-[2rem] font-black text-white">
+        제휴문의
+      </h2>
+      <p className="mt-4 text-[15px] leading-7 text-white/90">
+        대학, 기관, 기업, 브랜드와의 콘텐츠 제휴 및 홍보 협업을 진행합니다.
+        대학생 대상 캠페인, 서포터즈 모집, 공모전 홍보, 지역 청년 프로젝트를
+        함께 기획할 수 있습니다.
+      </p>
+      <div className="mt-5 rounded-2xl bg-white/20 p-4 text-sm font-semibold text-white backdrop-blur">
+        이메일: unnews@daum.net
+        <br />
+        전화: 053-765-4765
       </div>
-
-      <div className="rounded-[28px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] p-6 text-white shadow-[0_18px_44px_rgba(80,120,255,0.18)]">
-        <p className="text-sm font-bold text-white/80">CONTACT</p>
-        <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
-          제휴문의
-        </h2>
-        <p className="mt-5 text-[15px] leading-6 text-white/85">
-          대학, 기관, 기업, 브랜드와의 콘텐츠 제휴 및 홍보 협업을 진행합니다.
-          대학생 대상 캠페인, 서포터즈 모집, 공모전 홍보, 지역 청년 프로젝트를
-          함께 기획할 수 있습니다.
-        </p>
-
-        <div className="mt-6 rounded-2xl bg-white/20 p-5 text-sm font-semibold text-white backdrop-blur">
-          이메일: unnews@daum.net
-          <br />
-          전화: 053-765-4765
-        </div>
-      </div>
-    </section>
+    </div>
+  </div>
+</section>
   </main>
 )}
 
