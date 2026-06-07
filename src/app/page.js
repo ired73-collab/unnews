@@ -2374,16 +2374,52 @@ const handleAddComment = async () => {
     </section>
 
     <section className="mt-8 grid gap-5 md:grid-cols-2">
-      <div className="rounded-[28px] bg-neutral-950 p-6 text-white">
-        <p className="text-sm font-bold text-[#72E3F1]">PARTICIPATION</p>
-        <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">
-          참여안내
-        </h2>
+      <section
+  className="
+  relative
+  overflow-hidden
+  rounded-[32px]
+  min-h-[280px]
+  text-white
+  "
+>
+  <img
+  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+  alt=""
+  className="absolute inset-0 h-full w-full object-cover"
+/>
+
+<div className="absolute inset-0 bg-black/60" />
+
+        <div className="relative z-10 p-8">
+
+  <p className="text-sm font-bold text-[#72E3F1]">
+    PARTICIPATION
+  </p>
+
+  <h2 className="mt-3 text-[2rem] font-black text-white">
+    참여안내
+  </h2>
         <p className="mt-5 text-[15px] leading-6 text-white/70">
           대학생 기자단, 서포터즈, 캠퍼스 리포터, 콘텐츠 제보 등 다양한 방식으로
           대학연합신문과 함께할 수 있습니다. 실제 대학생의 시선으로 캠퍼스와 사회를
           연결하는 콘텐츠를 만들어갑니다.
         </p>
+        <button
+  className="
+  mt-6
+  rounded-full
+  bg-white
+  px-5 py-3
+  text-sm
+  font-bold
+  text-black
+  transition
+  hover:scale-105
+  "
+>
+  참여하기 →
+</button>
       </div>
 
       <div className="rounded-[28px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] p-6 text-white shadow-[0_18px_44px_rgba(80,120,255,0.18)]">
