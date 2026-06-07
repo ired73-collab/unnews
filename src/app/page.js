@@ -2116,13 +2116,12 @@ const handleAddComment = async () => {
 
           <div className="mt-auto flex items-center justify-between pt-3 text-xs font-medium text-neutral-400">
             <span>조회 {post.views || 0}</span>
-            <button
-              type="button"
+            <span
               onClick={(event) => handleLikePost(post, event)}
               className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-600 shadow-sm transition hover:bg-neutral-950 hover:text-white"
             >
               ♡ {post.likes || 0}
-            </button>
+            </span>
           </div>
         </div>
       </button>
@@ -2223,32 +2222,67 @@ const handleAddComment = async () => {
       </div>
     </section>
 
-    <section className="mt-14 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.05)] md:p-10">
-  <p className="text-sm font-bold text-[#4dbbff]">ABOUT</p>
+    <div className="mt-8 flex flex-wrap gap-3">
+  {["NEWS", "CAREER", "AI", "LIFE", "TREND"].map((item) => (
+    <span
+      key={item}
+      className="rounded-full bg-[#eef6ff] px-4 py-2 text-sm font-bold text-[#2563eb]"
+    >
+      {item}
+    </span>
+  ))}
+</div>
+
+    <section className="mt-14 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
+  <p className="text-sm font-bold text-[#4dbbff]">ABOUT UNNEWS</p>
+
   <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
     대학연합신문 소개
   </h2>
 
-  <div className="mt-7 grid gap-8 md:grid-cols-[0.85fr_1.15fr]">
-    <p className="text-[1.6rem] font-black leading-10 tracking-[-0.05em] text-neutral-900">
-      대학생의 시선으로 보고,
-      <br />
-      현실적인 언어로 전달합니다.
-    </p>
+  <div className="mt-8 grid gap-10 md:grid-cols-[0.85fr_1.15fr]">
+    <div>
+      <p className="text-[1.65rem] font-black leading-10 tracking-[-0.05em] text-neutral-900">
+        대학생의 오늘을 읽고,
+        <br />
+        내일의 선택을 연결합니다.
+      </p>
+
+      <div className="mt-8 grid grid-cols-3 gap-3">
+        {[
+          { num: "4+", label: "주요 카테고리" },
+          { num: "300+", label: "콘텐츠" },
+          { num: "10+", label: "대학 네트워크" },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="rounded-2xl bg-[#eef6ff] px-4 py-5 text-center"
+          >
+            <div className="text-2xl font-black text-[#2563eb]">
+              {item.num}
+            </div>
+            <div className="mt-1 text-xs font-bold text-neutral-500">
+              {item.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
 
     <div className="space-y-5 text-[17px] leading-8 text-neutral-600">
       <p>
-        대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를 선별하고
-        정리하는 큐레이션 기반 디지털 미디어입니다.
+        대학연합신문은 대학생의 관심사와 현실적인 필요를 중심으로 콘텐츠를
+        선별하고 정리하는 정보 큐레이션 미디어입니다.
       </p>
+
       <p>
-        단순히 뉴스를 전달하는 것을 넘어, 대학생이 실제로 고민하는 진로, 취업,
-        공모전, AI 활용, 캠퍼스 라이프, 지역사회 이슈를 짧고 명확한 문장으로
-        풀어냅니다.
+        뉴스 전달을 넘어 커리어, AI, 트렌드, 라이프, 지역 정보를 실질적인
+        선택에 도움이 되는 콘텐츠로 재구성합니다.
       </p>
+
       <p>
-        빠르게 변화하는 대학 생활 속에서 학생들이 더 나은 선택을 할 수 있도록
-        필요한 정보와 관점을 연결하는 것을 목표로 합니다.
+        빠르게 소비되고 잊히는 정보가 아니라, 대학생의 행동과 성장으로 이어지는
+        콘텐츠를 지향합니다.
       </p>
     </div>
   </div>
