@@ -2288,7 +2288,11 @@ const handleAddComment = async () => {
   </div>
 </section>
 
-    <section className="mt-8 rounded-[32px] bg-gradient-to-br from-[#0F172A] via-[#15345C] to-[#2563EB] p-8 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-10">
+    <section className="relative mt-8 overflow-hidden rounded-[32px] bg-gradient-to-br from-[#0F172A] via-[#15345C] to-[#2563EB] p-8 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-10">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-[360px] w-[360px] rounded-full bg-[#72E3F1]/20 blur-[110px]" />
+<div className="pointer-events-none absolute -right-24 -bottom-24 h-[360px] w-[360px] rounded-full bg-[#5B5CF6]/25 blur-[110px]" />
+
+<div className="relative">
       <p className="text-sm font-bold text-[#72E3F1]">VISION</p>
       <h2 className="mt-3 text-3xl font-black tracking-[-0.05em]">비전</h2>
       <p className="mt-4 max-w-3xl text-[15px] leading-7 text-white/70">
@@ -2297,7 +2301,7 @@ const handleAddComment = async () => {
       </p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <div className="rounded-[24px] border border-white/10 bg-white/8 backdrop-blur p-6">
+        <div className="rounded-[24px] border border-white/10 bg-white/8 p-6 backdrop-blur transition hover:-translate-y-1 hover:bg-white/12">
           <div className="text-4xl font-black text-[#72E3F1]">01</div>
           <h3 className="mt-5 text-xl font-black">정보를 선별합니다</h3>
           <p className="mt-3 text-sm leading-6 text-white/65">
@@ -2305,7 +2309,7 @@ const handleAddComment = async () => {
           </p>
         </div>
 
-        <div className="rounded-[24px] border border-white/10 bg-white/8 backdrop-blur p-6">
+        <div className="rounded-[24px] border border-white/10 bg-white/8 p-6 backdrop-blur transition hover:-translate-y-1 hover:bg-white/12">
           <div className="text-4xl font-black text-[#72E3F1]">02</div>
           <h3 className="mt-5 text-xl font-black">쉽게 전달합니다</h3>
           <p className="mt-3 text-sm leading-6 text-white/65">
@@ -2313,13 +2317,14 @@ const handleAddComment = async () => {
           </p>
         </div>
 
-        <div className="rounded-[24px] border border-white/10 bg-white/8 backdrop-blur p-6">
+        <div className="rounded-[24px] border border-white/10 bg-white/8 p-6 backdrop-blur transition hover:-translate-y-1 hover:bg-white/12">
           <div className="text-4xl font-black text-[#72E3F1]">03</div>
           <h3 className="mt-5 text-xl font-black">선택을 연결합니다</h3>
           <p className="mt-3 text-sm leading-6 text-white/65">
             진로, 커리어, 라이프, 지역 정보를 다음 행동으로 연결합니다.
           </p>
         </div>
+      </div>
       </div>
     </section>
 
