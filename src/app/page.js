@@ -2720,7 +2720,7 @@ const handleAddComment = async () => {
                 </p>
               </div>
 
-              <div className="mt-6 text-[15px] leading-8 text-neutral-700">
+              <div className="mt-10 text-[18px] leading-9 tracking-[-0.01em] text-neutral-700">
                 {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
                   <div className="space-y-6">
                     {selectedPost.contentBlocks.map((block, index) => {
@@ -2745,7 +2745,7 @@ const handleAddComment = async () => {
     return (
       <h2
         key={index}
-        className="mt-10 text-2xl font-black leading-tight tracking-[-0.04em] text-neutral-950"
+        className="mt-12 border-l-4 border-[#4dbbff] pl-4 text-2xl font-black leading-tight tracking-[-0.04em] text-neutral-950"
       >
         {block.value}
       </h2>
@@ -2756,7 +2756,7 @@ const handleAddComment = async () => {
     return (
       <blockquote
         key={index}
-        className="rounded-[22px] border-l-4 border-[#4DBBFF] bg-blue-50 px-5 py-4 text-[17px] font-medium leading-8 text-blue-900"
+        className="my-8 rounded-[24px] border-l-4 border-[#4DBBFF] bg-[#f8fbff] px-6 py-5 text-[18px] font-semibold leading-9 text-blue-900 shadow-[0_12px_30px_rgba(37,99,235,0.06)]"
       >
         “{block.value}”
       </blockquote>
