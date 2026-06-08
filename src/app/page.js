@@ -2800,6 +2800,53 @@ const handleAddComment = async () => {
                 )}
               </div>
 
+              <div className="mt-14 rounded-[28px] border border-black/5 bg-neutral-50 p-6">
+  <p className="text-xs font-black tracking-[0.15em] text-[#2563eb]">
+    REPORTER
+  </p>
+
+  <div className="mt-4 flex items-center gap-4">
+    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4dbbff] text-lg font-black text-white shadow-[0_10px_24px_rgba(77,187,255,0.25)]">
+      U
+    </div>
+
+    <div>
+      <h3 className="font-black text-neutral-950">
+        대학연합신문 편집부
+      </h3>
+
+      <p className="mt-1 text-sm leading-6 text-neutral-500">
+        대학생을 위한 뉴스·커리어·AI·라이프 콘텐츠를 제작합니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div className="mt-10 overflow-hidden rounded-[32px] bg-gradient-to-r from-[#2563eb] to-[#4dbbff] p-8 text-white shadow-[0_18px_44px_rgba(37,99,235,0.18)]">
+  <p className="text-sm font-bold text-white/80">
+    KEEP READING
+  </p>
+
+  <h3 className="mt-3 text-3xl font-black tracking-[-0.05em]">
+    더 많은 대학생 콘텐츠를 만나보세요.
+  </h3>
+
+  <p className="mt-4 text-[15px] leading-7 text-white/85">
+    뉴스, 커리어, AI, 라이프, 트렌드를 빠르게 전달합니다.
+  </p>
+
+  <button
+    type="button"
+    onClick={() => {
+      setActiveCategory("전체");
+      setPage("home");
+    }}
+    className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#2563eb] shadow-[0_10px_24px_rgba(255,255,255,0.25)] transition hover:scale-105"
+  >
+    뉴스 더 보기 →
+  </button>
+</div>
+
               <div className="mt-10 border-t border-black/5 pt-7">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-[1.35rem] font-black tracking-[-0.04em]">
