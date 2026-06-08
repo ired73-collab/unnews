@@ -2212,6 +2212,10 @@ const handleAddComment = async () => {
           빠르게 선별하고 쉽게 전달하는 디지털 미디어 플랫폼입니다.
         </p>
 
+        <p className="mt-3 text-sm font-semibold tracking-[0.2em] text-white/70">
+  NEWS · CAREER · AI · LIFE · TREND
+</p>
+
         <button
           type="button"
           onClick={() => setPage("category")}
@@ -2419,6 +2423,24 @@ const handleAddComment = async () => {
         대학생 대상 캠페인, 서포터즈 모집, 공모전 홍보, 지역 청년 프로젝트를
         함께 기획할 수 있습니다.
       </p>
+
+      <button
+  type="button"
+  className="
+  mt-6
+  rounded-full
+  bg-white
+  px-5 py-3
+  text-sm
+  font-bold
+  text-[#2563eb]
+  transition
+  hover:scale-105
+  "
+>
+  제휴 문의하기 →
+</button>
+
       <div className="mt-5 rounded-2xl bg-white/20 p-4 text-sm font-semibold text-white backdrop-blur">
         이메일: unnews@daum.net
         <br />
@@ -2427,6 +2449,39 @@ const handleAddComment = async () => {
     </div>
   </div>
 </section>
+
+<section className="mt-10 overflow-hidden rounded-[32px] bg-gradient-to-br from-[#5B5CF6] via-[#5DA8FF] to-[#72E3F1] p-8 text-white shadow-[0_20px_60px_rgba(80,120,255,0.18)] md:p-10">
+  <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+    <div>
+      <p className="text-sm font-bold text-white/80">UNNEWS</p>
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] md:text-4xl">
+        대학생의 오늘을 읽고,
+        <br />
+        내일의 선택을 연결합니다.
+      </h2>
+      <p className="mt-4 text-[15px] leading-7 text-white/85">
+        뉴스, 커리어, AI, 라이프, 트렌드를 대학생의 언어로 전합니다.
+      </p>
+    </div>
+
+    <div className="flex flex-wrap gap-4">
+      <button
+        type="button"
+        onClick={() => setPage("category")}
+        className="rounded-full bg-white px-5 py-3 text-sm font-bold text-[#2563eb] shadow-[0_10px_24px_rgba(255,255,255,0.25)] transition hover:scale-105"
+      >
+        뉴스 보러가기 →
+      </button>
+      <button
+        type="button"
+        className="rounded-full border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+      >
+        참여 신청하기 →
+      </button>
+    </div>
+  </div>
+</section>
+
   </main>
 )}
 
