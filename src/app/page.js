@@ -2424,23 +2424,6 @@ const handleAddComment = async () => {
         함께 기획할 수 있습니다.
       </p>
 
-      <button
-  type="button"
-  className="
-  mt-6
-  rounded-full
-  bg-white
-  px-5 py-3
-  text-sm
-  font-bold
-  text-[#2563eb]
-  transition
-  hover:scale-105
-  "
->
-  제휴 문의하기 →
-</button>
-
       <div className="mt-5 rounded-2xl bg-white/20 p-4 text-sm font-semibold text-white backdrop-blur">
         이메일: unnews@daum.net
         <br />
