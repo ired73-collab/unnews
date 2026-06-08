@@ -2640,16 +2640,17 @@ const handleAddComment = async () => {
 )}
 
       {page === "post" && selectedPost && (
-        <main className="mx-auto max-w-[980px] px-5 py-8 md:px-8 md:py-10">
+        <main className="mx-auto max-w-[860px] px-5 py-8 md:px-8 md:py-12">
           <button
-            onClick={() => {
-              setActiveCategory("전체");
-              setPage("home");
-            }}
-            className="mb-5 rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700"
-          >
-            ← 홈으로
-          </button>
+  type="button"
+  onClick={() => {
+    setActiveCategory("전체");
+    setPage("home");
+  }}
+  className="mb-6 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+>
+  ← 목록으로
+</button>
 
           <div className="overflow-hidden rounded-[30px] border border-white/60 bg-white/80 shadow-[0_24px_70px_rgba(0,0,0,0.08)] backdrop-blur">
             <img
