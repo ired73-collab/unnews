@@ -2664,17 +2664,17 @@ const handleAddComment = async () => {
 />
 
             <div className="p-7 md:p-9">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-  <div className="flex items-center gap-2">
-    <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-500">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+  <div className="flex flex-wrap items-center gap-2">
+    <span className="rounded-full bg-[#eef6ff] px-3 py-1.5 text-xs font-bold text-[#2563eb]">
       {getCategoryLabel(selectedPost)}
     </span>
 
-    <span className="text-xs text-neutral-400">
+    <span className="text-xs font-medium text-neutral-400">
       {selectedPost.readTime}
     </span>
 
-    <span className="text-xs text-neutral-400">
+    <span className="text-xs font-medium text-neutral-400">
       조회 {selectedPost.views || 0}
     </span>
   </div>
@@ -2707,13 +2707,15 @@ const handleAddComment = async () => {
                 </div>
               )}
 
-              <h1 className="text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.045em]">
-                {selectedPost.title}
-              </h1>
+              <h1 className="mt-2 text-[2.4rem] font-black leading-[1.18] tracking-[-0.05em] text-neutral-950 md:text-[3.2rem]">
+  {selectedPost.title}
+</h1>
 
-              <div className="mt-6 rounded-[22px] border border-black/5 bg-neutral-50/90 p-5">
-                <p className="text-sm font-semibold text-neutral-500">3줄 요약</p>
-                <p className="mt-2 whitespace-pre-line text-[15px] leading-7 text-neutral-700">
+              <div className="mt-8 rounded-[24px] border border-[#dbeafe] bg-[#f8fbff] p-6 shadow-[0_12px_30px_rgba(37,99,235,0.06)]">
+                <p className="text-xs font-black tracking-[0.16em] text-[#2563eb]">
+  ARTICLE SUMMARY
+</p>
+                <p className="mt-3 whitespace-pre-line text-[16px] leading-8 text-neutral-700">
                   {selectedPost.summary || fallbackSummary(selectedPost.body)}
                 </p>
               </div>
