@@ -654,7 +654,105 @@ function ShortcutAdminIcon() {
   );
 }
 
-function SiteFooter() {
+const POLICY_PAGES = {
+  privacy: {
+    label: "PRIVACY POLICY",
+    title: "개인정보처리방침",
+    desc: "대학연합신문은 이용자의 개인정보를 소중히 보호하며, 관련 법령에 따라 안전하게 관리합니다.",
+    sections: [
+      {
+        title: "1. 수집하는 개인정보 항목",
+        text: "대학연합신문은 문의, 제휴, 댓글 작성 등 서비스 이용 과정에서 이름, 이메일, 연락처, 작성 내용, 접속 기록 등 필요한 최소한의 정보를 수집할 수 있습니다.",
+      },
+      {
+        title: "2. 개인정보의 이용 목적",
+        text: "수집된 정보는 문의 응대, 서비스 운영, 콘텐츠 관리, 이용자 확인, 불법 이용 방지 및 서비스 품질 개선을 위해 사용됩니다.",
+      },
+      {
+        title: "3. 개인정보 보관 및 파기",
+        text: "개인정보는 수집 목적이 달성되면 지체 없이 파기하며, 관계 법령에 따라 보관이 필요한 경우 해당 기간 동안 안전하게 보관합니다.",
+      },
+      {
+        title: "4. 개인정보 보호 문의",
+        text: "개인정보 관련 문의는 unnews@daum.net 으로 접수할 수 있습니다.",
+      },
+    ],
+  },
+
+  terms: {
+    label: "TERMS OF USE",
+    title: "이용약관",
+    desc: "본 약관은 대학연합신문이 제공하는 콘텐츠와 서비스 이용에 관한 기본 사항을 정합니다.",
+    sections: [
+      {
+        title: "1. 목적",
+        text: "본 약관은 대학연합신문 웹사이트 이용과 관련하여 이용자와 대학연합신문 사이의 권리, 의무 및 책임사항을 정하는 것을 목적으로 합니다.",
+      },
+      {
+        title: "2. 서비스 이용",
+        text: "이용자는 대학연합신문이 제공하는 뉴스, 커뮤니티, 취업·공모전, 트렌드 콘텐츠를 자유롭게 열람할 수 있습니다.",
+      },
+      {
+        title: "3. 이용자의 의무",
+        text: "이용자는 타인의 권리를 침해하거나 서비스 운영을 방해하는 행위를 해서는 안 됩니다.",
+      },
+      {
+        title: "4. 서비스 변경 및 중단",
+        text: "대학연합신문은 운영상 필요한 경우 서비스의 일부 또는 전부를 변경하거나 중단할 수 있습니다.",
+      },
+    ],
+  },
+
+  copyright: {
+    label: "COPYRIGHT POLICY",
+    title: "저작권 정책",
+    desc: "대학연합신문의 콘텐츠는 저작권법의 보호를 받으며 무단 이용을 금합니다.",
+    sections: [
+      {
+        title: "1. 콘텐츠 저작권",
+        text: "대학연합신문에 게시된 기사, 이미지, 디자인, 로고 등 모든 콘텐츠의 권리는 대학연합신문 또는 정당한 권리자에게 있습니다.",
+      },
+      {
+        title: "2. 이용 제한",
+        text: "사전 허가 없이 콘텐츠를 복제, 배포, 전송, 수정, 재게시하거나 상업적으로 이용할 수 없습니다.",
+      },
+      {
+        title: "3. 인용 기준",
+        text: "보도, 비평, 교육 목적의 제한적 인용은 가능하나 출처를 명확히 표시해야 합니다.",
+      },
+      {
+        title: "4. 저작권 문의",
+        text: "콘텐츠 이용 및 제휴 문의는 unnews@daum.net 으로 연락해 주시기 바랍니다.",
+      },
+    ],
+  },
+
+  teen: {
+    label: "YOUTH PROTECTION POLICY",
+    title: "청소년보호정책",
+    desc: "대학연합신문은 청소년이 안전하게 이용할 수 있는 건강한 정보 환경을 지향합니다.",
+    sections: [
+      {
+        title: "1. 청소년 보호 원칙",
+        text: "대학연합신문은 청소년에게 유해한 정보가 제공되지 않도록 콘텐츠를 관리하고 점검합니다.",
+      },
+      {
+        title: "2. 콘텐츠 관리",
+        text: "폭력적, 선정적, 혐오적 표현 등 청소년에게 부적절한 콘텐츠가 게시되지 않도록 운영 기준을 적용합니다.",
+      },
+      {
+        title: "3. 이용자 신고",
+        text: "부적절한 콘텐츠나 댓글을 발견한 경우 이메일을 통해 신고할 수 있습니다.",
+      },
+      {
+        title: "4. 청소년 보호 문의",
+        text: "청소년 보호 관련 문의는 unnews@daum.net 으로 접수할 수 있습니다.",
+      },
+    ],
+  },
+};
+
+function SiteFooter({ openPolicy }) {
   return (
     <footer className="mt-16 bg-black text-white">
       <div className="mx-auto max-w-[1440px] px-6 py-10 md:px-8">
@@ -699,27 +797,43 @@ function SiteFooter() {
 
             <div className="flex flex-wrap gap-3 text-sm text-white/70">
 
-              <span className="cursor-pointer text-[#4DBBFF] hover:text-[#73CCFF]">
-                개인정보처리방침
-              </span>
+              <button
+  type="button"
+  onClick={() => openPolicy("privacy")}
+  className="text-[#4DBBFF] hover:text-[#73CCFF]"
+>
+  개인정보처리방침
+</button>
 
-              <span>|</span>
+<span>|</span>
 
-              <span className="cursor-pointer hover:text-white">
-                이용약관
-              </span>
+<button
+  type="button"
+  onClick={() => openPolicy("terms")}
+  className="hover:text-white"
+>
+  이용약관
+</button>
 
-              <span>|</span>
+<span>|</span>
 
-              <span className="cursor-pointer hover:text-white">
-                저작권 정책
-              </span>
+<button
+  type="button"
+  onClick={() => openPolicy("copyright")}
+  className="hover:text-white"
+>
+  저작권 정책
+</button>
 
-              <span>|</span>
+<span>|</span>
 
-              <span className="cursor-pointer hover:text-white">
-                청소년 보호 정책
-              </span>
+<button
+  type="button"
+  onClick={() => openPolicy("teen")}
+  className="hover:text-white"
+>
+  청소년 보호 정책
+</button>
 
             </div>
           </div>
@@ -737,6 +851,7 @@ function SiteFooter() {
 
 export default function Page() {
   const [page, setPage] = useState("home");
+  const [policyType, setPolicyType] = useState("privacy");
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState("dashboard");
   const [adminEmail, setAdminEmail] = useState("");
@@ -1089,6 +1204,19 @@ const text = [
     setPage("admin");
     return;
   }
+
+const policyPathMap = {
+  "/privacy": "privacy",
+  "/terms": "terms",
+  "/copyright": "copyright",
+  "/teen": "teen",
+};
+
+if (policyPathMap[path]) {
+  setPolicyType(policyPathMap[path]);
+  setPage("policy");
+  return;
+}
 
   if (path.startsWith("/news/")) {
     const slug = decodeURIComponent(path.replace("/news/", ""));
@@ -1676,6 +1804,25 @@ createdAt: data.created_at,
   );
 
   setPage("admin");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+const openPolicy = (type) => {
+  setPolicyType(type);
+  setPage("policy");
+
+  const pathMap = {
+    privacy: "/privacy",
+    terms: "/terms",
+    copyright: "/copyright",
+    teen: "/teen",
+  };
+
+  window.history.pushState({}, "", pathMap[type] || "/privacy");
 
   window.scrollTo({
     top: 0,
@@ -2493,6 +2640,51 @@ const handleAddComment = async () => {
   </div>
 </section>
 
+  </main>
+)}
+
+{page === "policy" && (
+  <main className="mx-auto max-w-[980px] px-5 py-10 md:px-8 md:py-14">
+    <button
+      type="button"
+      onClick={() => {
+        setPage("home");
+        window.history.pushState({}, "", "/");
+      }}
+      className="mb-6 rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    >
+      ← 홈으로
+    </button>
+
+    <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#2563eb] to-[#4dbbff] p-8 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-12">
+      <p className="text-sm font-bold text-white/75">
+        {POLICY_PAGES[policyType].label}
+      </p>
+      <h1 className="mt-4 text-[2.6rem] font-black tracking-[-0.06em] md:text-[4rem]">
+        {POLICY_PAGES[policyType].title}
+      </h1>
+      <p className="mt-5 max-w-2xl text-[16px] leading-7 text-white/85">
+        {POLICY_PAGES[policyType].desc}
+      </p>
+    </section>
+
+    <section className="mt-8 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
+      <div className="space-y-8">
+        {POLICY_PAGES[policyType].sections.map((section) => (
+          <div
+            key={section.title}
+            className="border-b border-black/5 pb-7 last:border-b-0 last:pb-0"
+          >
+            <h2 className="text-xl font-black tracking-[-0.04em] text-neutral-950">
+              {section.title}
+            </h2>
+            <p className="mt-3 text-[16px] leading-8 text-neutral-600">
+              {section.text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
   </main>
 )}
 
@@ -3961,7 +4153,7 @@ const handleAddComment = async () => {
   </main>
 )}
 
-      <SiteFooter />
+      <SiteFooter openPolicy={openPolicy} />
 </div>
 </>
 );
