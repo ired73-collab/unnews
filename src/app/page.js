@@ -760,6 +760,34 @@ const [seoImage, setSeoImage] = useState(
   const [editingId, setEditingId] = useState(null);
   const [heroIndex, setHeroIndex] = useState(0);
 
+  useEffect(() => {
+  const handlePopState = () => {
+  const path = window.location.pathname;
+
+  if (path === "/" || path === "") {
+    setPage("home");
+    setSelectedPost(null);
+    setActiveCategory("전체");
+    setActiveSubCategory("전체");
+    return;
+  }
+
+  if (path === "/admin") {
+    setPage("admin");
+    return;
+  }
+
+  setPage("home");
+  setSelectedPost(null);
+};
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, []);
+
   const adminChartData = [
   {
     name: "뉴스",
