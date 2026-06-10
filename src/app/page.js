@@ -2833,18 +2833,20 @@ const handleAddComment = async () => {
     <section className="mt-8 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
       <div className="space-y-8">
         {POLICY_PAGES[policyType].sections.map((section) => (
-          <div
-            key={section.title}
-            className="border-b border-black/5 pb-7 last:border-b-0 last:pb-0"
-          >
-            <h2 className="text-xl font-black tracking-[-0.04em] text-neutral-950">
-              {section.title}
-            </h2>
-            <p className="mt-3 text-[16px] leading-8 text-neutral-600">
-              {section.text}
-            </p>
-          </div>
-        ))}
+  <div
+    key={section.title}
+    className="border-b border-black/5 pb-7 last:border-b-0 last:pb-0"
+  >
+    <h2 className="text-xl font-black tracking-[-0.04em] text-neutral-950">
+      {section.title}
+    </h2>
+
+    <div className="mt-3 whitespace-pre-line text-[16px] leading-8 text-neutral-600">
+      {section.text}
+    </div>
+
+  </div>
+))}
       </div>
     </section>
   </main>
