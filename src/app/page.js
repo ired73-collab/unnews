@@ -3507,6 +3507,19 @@ const handleAddComment = async () => {
   >
     ♡ 좋아요 {selectedPost.likes || 0}
   </button>
+
+<button
+  type="button"
+  onClick={() => {
+    navigator.clipboard.writeText(window.location.href);
+    alert("기사 링크가 복사되었습니다.");
+  }}
+  className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-neutral-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+>
+  🔗
+  <span>공유하기</span>
+</button>
+
 </div>
 
               {isAdmin && selectedPost?.id && (
