@@ -1232,7 +1232,7 @@ const POLICY_PAGES = {
 
 [청소년보호책임자]
 
-- 성명 : 구미화
+- 성명 : 김영일
 - 소속 : 대학연합신문 편집국
 - 이메일 : unnews@daum.net`,
     },
@@ -3812,59 +3812,72 @@ const handleAddComment = async () => {
                   </h2>
                 </div>
 
-                <div className="rounded-[22px] bg-neutral-50 p-4">
-                  <div className="grid gap-3 md:grid-cols-[160px_1fr_auto]">
-                    <input
-                      value={commentName}
-                      onChange={(e) => setCommentName(e.target.value)}
-                      className="rounded-[16px] border border-black/10 bg-white px-4 py-3 text-sm outline-none"
-                      placeholder="이름"
-                    />
+                <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(0,0,0,0.03)]">
+  <div className="grid gap-3 md:grid-cols-[160px_1fr_auto]">
+    <input
+      value={commentName}
+      onChange={(e) => setCommentName(e.target.value)}
+      className="rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm outline-none transition focus:border-[#2563eb] focus:bg-white"
+      placeholder="이름"
+    />
 
-                    <input
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      className="rounded-[16px] border border-black/10 bg-white px-4 py-3 text-sm outline-none"
-                      placeholder="댓글을 입력하세요"
-                    />
+    <input
+      value={commentText}
+      onChange={(e) => setCommentText(e.target.value)}
+      className="rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm outline-none transition focus:border-[#2563eb] focus:bg-white"
+      placeholder="댓글을 입력하세요"
+    />
 
-                    <button
-                      type="button"
-                      onClick={handleAddComment}
-                      disabled={isSavingComment}
-                      className="rounded-full bg-neutral-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
-                    >
-                      {isSavingComment ? "저장 중..." : "등록"}
-                    </button>
-                  </div>
-                </div>
+    <button
+      type="button"
+      onClick={handleAddComment}
+      disabled={isSavingComment}
+      className="rounded-full bg-neutral-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-[#2563eb] disabled:opacity-50"
+    >
+      {isSavingComment ? "저장 중..." : "등록"}
+    </button>
+  </div>
 
-                <div className="mt-5 space-y-3">
-                  {getCommentsArray(selectedPost).length === 0 ? (
-                    <div className="rounded-[18px] bg-neutral-50 px-4 py-5 text-sm text-neutral-400">
-                      아직 댓글이 없습니다.
-                    </div>
-                  ) : (
-                    [...getCommentsArray(selectedPost)].reverse().map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="rounded-[18px] border border-black/5 bg-white px-4 py-4"
-                      >
-                        <div className="mb-1 flex items-center justify-between gap-3">
-                          <strong className="text-sm text-neutral-900">
-                            {comment.name}
-                          </strong>
-                          <span className="text-xs text-neutral-400">
-                            {new Date(comment.createdAt).toLocaleDateString("ko-KR")}
-                          </span>
-                        </div>
-                        <p className="text-sm leading-6 text-neutral-600">
-                          {comment.text}
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
+  <p className="mt-3 text-xs text-neutral-400">
+    건전한 댓글 문화를 위해 비방, 광고성 댓글은 삭제될 수 있습니다.
+  </p>
+</div>
+
+                <div className="mt-6 space-y-3">
+  {getCommentsArray(selectedPost).length === 0 ? (
+    <div className="rounded-[22px] border border-dashed border-slate-200 bg-slate-50 px-5 py-8 text-center text-sm text-neutral-400">
+      아직 댓글이 없습니다. 첫 댓글을 남겨보세요.
+    </div>
+  ) : (
+    [...getCommentsArray(selectedPost)].reverse().map((comment) => (
+      <div
+        key={comment.id}
+        className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-[0_10px_28px_rgba(0,0,0,0.03)]"
+      >
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef6ff] text-sm font-black text-[#2563eb]">
+              {comment.name?.slice(0, 1) || "U"}
+            </div>
+
+            <div>
+              <strong className="block text-sm font-black text-neutral-900">
+                {comment.name}
+              </strong>
+              <span className="text-xs text-neutral-400">
+                {new Date(comment.createdAt).toLocaleDateString("ko-KR")}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm leading-7 text-neutral-600">
+          {comment.text}
+        </p>
+      </div>
+    ))
+  )}
+</div>
               </div>
 
             </div>
