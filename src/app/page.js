@@ -3738,40 +3738,55 @@ const handleAddComment = async () => {
   </div>
 
   <div className="grid gap-4 md:grid-cols-3">
-    {(visiblePosts.length > 0 ? visiblePosts : drafts)
-      .filter((post) => String(post.id) !== String(selectedPost.id))
-      .filter((post) => getCategoryLabel(post) === getCategoryLabel(selectedPost))
-      .slice(0, 3)
-      .map((post) => (
-        <button
-          key={post.id}
-          type="button"
-          onClick={() => handleOpenPost(post)}
-          className="group overflow-hidden rounded-[24px] border border-black/5 bg-white text-left transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(0,0,0,0.08)]"
-        >
-          <img
-            src={post.image}
-            alt={post.title}
-            className="h-[140px] w-full object-cover transition duration-500 group-hover:scale-105"
-            onError={(e) => {
-              e.currentTarget.src =
-                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
-            }}
-          />
+    {(() => {
+  const posts = visiblePosts.length > 0 ? visiblePosts : drafts;
 
-          <div className="p-4">
-            <p className="text-xs font-bold text-[#2563eb]">
-              {getCategoryLabel(post)}
-            </p>
-            <h3 className="mt-2 line-clamp-2 text-[16px] font-black leading-6 text-neutral-950">
-              {post.title}
-            </h3>
-            <p className="mt-2 line-clamp-2 text-sm leading-6 text-neutral-500">
-              {post.summary || post.body}
-            </p>
-          </div>
-        </button>
-      ))}
+  const relatedPosts = posts
+    .filter((post) => String(post.id) !== String(selectedPost.id))
+    .filter(
+      (post) => getCategoryLabel(post) === getCategoryLabel(selectedPost)
+    );
+
+  const fallbackPosts = posts
+    .filter((post) => String(post.id) !== String(selectedPost.id))
+    .filter(
+      (post) =>
+        !relatedPosts.some(
+          (related) => String(related.id) === String(post.id)
+        )
+    );
+
+  return [...relatedPosts, ...fallbackPosts].slice(0, 3).map((post) => (
+    <button
+      key={post.id}
+      type="button"
+      onClick={() => handleOpenPost(post)}
+      className="group overflow-hidden rounded-[24px] border border-black/5 bg-white text-left transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(0,0,0,0.08)]"
+    >
+      <img
+        src={post.image}
+        alt={post.title}
+        className="h-[140px] w-full object-cover transition duration-500 group-hover:scale-105"
+        onError={(e) => {
+          e.currentTarget.src =
+            "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
+        }}
+      />
+
+      <div className="p-4">
+        <p className="text-xs font-bold text-[#2563eb]">
+          {getCategoryLabel(post)}
+        </p>
+        <h3 className="mt-2 line-clamp-2 text-[16px] font-black leading-6 text-neutral-950">
+          {post.title}
+        </h3>
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-neutral-500">
+          {post.summary || post.body}
+        </p>
+      </div>
+    </button>
+  ));
+})()}
   </div>
 </div>
 
