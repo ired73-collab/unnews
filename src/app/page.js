@@ -3664,51 +3664,115 @@ const handleAddComment = async () => {
   })()}
 </div>
 
-              <div className="mt-14 rounded-[28px] border border-black/5 bg-neutral-50 p-6">
-  <p className="text-xs font-black tracking-[0.15em] text-[#2563eb]">
-    REPORTER
+              <div className="mt-14 rounded-[32px] border border-slate-200 bg-white p-8">
+
+  <p className="text-xs font-black tracking-[0.2em] text-[#2563eb]">
+    EDITOR
   </p>
 
-  <div className="mt-4 flex items-center gap-4">
-    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4dbbff] text-lg font-black text-white shadow-[0_10px_24px_rgba(77,187,255,0.25)]">
+  <div className="mt-5 flex items-center gap-5">
+
+    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-xl font-black text-white">
       U
     </div>
 
     <div>
-      <h3 className="font-black text-neutral-950">
+      <h3 className="text-xl font-black text-neutral-950">
         대학연합신문 편집부
       </h3>
 
-      <p className="mt-1 text-sm leading-6 text-neutral-500">
-        대학생을 위한 뉴스·커리어·AI·라이프 콘텐츠를 제작합니다.
+      <p className="mt-1 text-sm text-neutral-500">
+        뉴스 · 커리어 · AI · 창업 · 라이프
       </p>
     </div>
+
   </div>
+
+  <div className="mt-6 grid gap-3 border-t border-slate-100 pt-6 md:grid-cols-2">
+
+    <div>
+      <p className="text-xs text-neutral-400">
+        작성 기사
+      </p>
+
+      <p className="font-bold">
+        248건
+      </p>
+    </div>
+
+    <div>
+      <p className="text-xs text-neutral-400">
+        Contact
+      </p>
+
+      <p className="font-bold">
+        unnews@daum.net
+      </p>
+    </div>
+
+  </div>
+
 </div>
 
-<div className="mt-10 overflow-hidden rounded-[32px] bg-gradient-to-r from-[#2563eb] to-[#4dbbff] p-8 text-white shadow-[0_18px_44px_rgba(37,99,235,0.18)]">
-  <p className="text-sm font-bold text-white/80">
-    KEEP READING
-  </p>
+<div className="mt-12">
+  <div className="mb-5 flex items-end justify-between">
+    <div>
+      <p className="text-xs font-black tracking-[0.2em] text-[#2563eb]">
+        RELATED ARTICLES
+      </p>
+      <h2 className="mt-2 text-2xl font-black tracking-[-0.05em] text-neutral-950">
+        함께 읽으면 좋은 기사
+      </h2>
+    </div>
 
-  <h3 className="mt-3 text-3xl font-black tracking-[-0.05em]">
-    더 많은 대학생 콘텐츠를 만나보세요.
-  </h3>
+    <button
+      type="button"
+      onClick={() => {
+        setActiveCategory("전체");
+        setPage("home");
+      }}
+      className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-neutral-700 transition hover:bg-neutral-50"
+    >
+      전체보기 →
+    </button>
+  </div>
 
-  <p className="mt-4 text-[15px] leading-7 text-white/85">
-    뉴스, 커리어, AI, 라이프, 트렌드를 빠르게 전달합니다.
-  </p>
+  <div className="grid gap-4 md:grid-cols-3">
+    {(visiblePosts.length > 0 ? visiblePosts : drafts)
+      .filter((post) => String(post.id) !== String(selectedPost.id))
+      .filter((post) => getCategoryLabel(post) === getCategoryLabel(selectedPost))
+      .slice(0, 3)
+      .map((post) => (
+        <button
+          key={post.id}
+          type="button"
+          onClick={() => handleOpenPost(post)}
+          className="group overflow-hidden rounded-[24px] border border-black/5 bg-white text-left transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(0,0,0,0.08)]"
+        >
+          <img
+            src={post.image}
+            alt={post.title}
+            className="h-[140px] w-full object-cover transition duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
+            }}
+          />
 
-  <button
-    type="button"
-    onClick={() => {
-      setActiveCategory("전체");
-      setPage("home");
-    }}
-    className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#2563eb] shadow-[0_10px_24px_rgba(255,255,255,0.25)] transition hover:scale-105"
-  >
-    뉴스 더 보기 →
-  </button>
+          <div className="p-4">
+            <p className="text-xs font-bold text-[#2563eb]">
+              {getCategoryLabel(post)}
+            </p>
+            <h3 className="mt-2 line-clamp-2 text-[16px] font-black leading-6 text-neutral-950">
+              {post.title}
+            </h3>
+            <p className="mt-2 line-clamp-2 text-sm leading-6 text-neutral-500">
+              {post.summary || post.body}
+            </p>
+          </div>
+        </button>
+      ))}
+  </div>
 </div>
 
               <div className="mt-10 border-t border-black/5 pt-7">
