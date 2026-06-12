@@ -3161,6 +3161,73 @@ const handleAddComment = async () => {
       </p>
     </section>
 
+    <div className="mb-8 flex flex-wrap gap-2">
+  <button
+    onClick={() => setPolicyType("privacy")}
+    className={`rounded-full px-4 py-2 text-sm font-bold ${
+      policyType === "privacy"
+        ? "bg-[#0759C8] text-white"
+        : "bg-white border border-slate-200"
+    }`}
+  >
+    개인정보처리방침
+  </button>
+
+  <button
+    onClick={() => setPolicyType("terms")}
+    className={`rounded-full px-4 py-2 text-sm font-bold ${
+      policyType === "terms"
+        ? "bg-[#0759C8] text-white"
+        : "bg-white border border-slate-200"
+    }`}
+  >
+    이용약관
+  </button>
+
+  <button
+    onClick={() => setPolicyType("copyright")}
+    className={`rounded-full px-4 py-2 text-sm font-bold ${
+      policyType === "copyright"
+        ? "bg-[#0759C8] text-white"
+        : "bg-white border border-slate-200"
+    }`}
+  >
+    저작권정책
+  </button>
+
+  <button
+    onClick={() => setPolicyType("teen")}
+    className={`rounded-full px-4 py-2 text-sm font-bold ${
+      policyType === "teen"
+        ? "bg-[#0759C8] text-white"
+        : "bg-white border border-slate-200"
+    }`}
+  >
+    청소년보호정책
+  </button>
+</div>
+
+{policyType === "privacy" && (
+  <div className="mb-8 rounded-3xl bg-slate-50 p-6">
+    <h3 className="mb-4 font-black">
+      목차
+    </h3>
+
+    <ul className="space-y-2 text-sm">
+      <li>0. 총칙</li>
+      <li>1. 수집하는 개인정보 항목 및 수집방법</li>
+      <li>2. 개인정보 보유 및 이용기간</li>
+      <li>3. 개인정보 파기 절차 및 방법</li>
+      <li>4. 수집한 개인정보의 위탁</li>
+      <li>5. 제3자에게 개인정보 제공</li>
+      <li>6. 이용자 및 법정대리인의 권리</li>
+      <li>7. 개인정보 자동수집 장치</li>
+      <li>8. 기타 개인정보 처리방침</li>
+      <li>9. 개인정보 보호책임자</li>
+    </ul>
+  </div>
+)}
+
     <section className="mt-8 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
       <div className="space-y-8">
         {POLICY_PAGES[policyType].sections.map((section) => (
@@ -3175,6 +3242,38 @@ const handleAddComment = async () => {
     <div className="mt-3 whitespace-pre-line text-[16px] leading-8 text-neutral-600">
       {section.text}
     </div>
+
+    <div className="overflow-hidden rounded-xl border border-slate-200">
+  <table className="w-full text-sm">
+    <thead className="bg-slate-100">
+      <tr>
+        <th className="p-3 text-left">보유항목</th>
+        <th className="p-3 text-left">보유기간</th>
+        <th className="p-3 text-left">법적근거</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr className="border-t">
+        <td className="p-3">계약 및 청약철회</td>
+        <td className="p-3">5년</td>
+        <td className="p-3">전자상거래법</td>
+      </tr>
+
+      <tr className="border-t">
+        <td className="p-3">대금결제 기록</td>
+        <td className="p-3">5년</td>
+        <td className="p-3">전자상거래법</td>
+      </tr>
+
+      <tr className="border-t">
+        <td className="p-3">접속 로그</td>
+        <td className="p-3">3개월</td>
+        <td className="p-3">통신비밀보호법</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
   </div>
 ))}
