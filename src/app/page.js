@@ -3149,18 +3149,6 @@ const handleAddComment = async () => {
       ← 홈으로
     </button>
 
-    <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#2563eb] to-[#4dbbff] p-8 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-12">
-      <p className="text-sm font-bold text-white/75">
-        {POLICY_PAGES[policyType].label}
-      </p>
-      <h1 className="mt-4 text-[2.6rem] font-black tracking-[-0.06em] md:text-[4rem]">
-        {POLICY_PAGES[policyType].title}
-      </h1>
-      <p className="mt-5 max-w-2xl text-[16px] leading-7 text-white/85">
-        {POLICY_PAGES[policyType].desc}
-      </p>
-    </section>
-
     <div className="mb-8 flex flex-wrap gap-2">
   <button
     onClick={() => setPolicyType("privacy")}
@@ -3206,6 +3194,18 @@ const handleAddComment = async () => {
     청소년보호정책
   </button>
 </div>
+
+    <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#2563eb] to-[#4dbbff] p-6 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-8">
+      <p className="text-sm font-bold text-white/75">
+        {POLICY_PAGES[policyType].label}
+      </p>
+      <h1 className="mt-3 text-[2.3rem] font-black tracking-[-0.05em] md:text-[3.2rem]">
+        {POLICY_PAGES[policyType].title}
+      </h1>
+      <p className="mt-3 max-w-2xl text-[15px] leading-7 text-white/85">
+        {POLICY_PAGES[policyType].desc}
+      </p>
+    </section>
 
 {policyType === "privacy" && (
   <div className="mb-8 rounded-3xl bg-slate-50 p-6">
