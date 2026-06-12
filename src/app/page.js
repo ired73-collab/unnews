@@ -3621,6 +3621,49 @@ const handleAddComment = async () => {
                 )}
               </div>
 
+              <div className="mt-14 grid gap-4 border-y border-black/5 py-6 md:grid-cols-2">
+  {(() => {
+    const posts = visiblePosts.length > 0 ? visiblePosts : drafts;
+    const currentIndex = posts.findIndex(
+      (post) => String(post.id) === String(selectedPost.id)
+    );
+
+    const prevPost = currentIndex > 0 ? posts[currentIndex - 1] : null;
+    const nextPost =
+      currentIndex >= 0 && currentIndex < posts.length - 1
+        ? posts[currentIndex + 1]
+        : null;
+
+    return (
+      <>
+        <button
+          type="button"
+          disabled={!prevPost}
+          onClick={() => prevPost && handleOpenPost(prevPost)}
+          className="rounded-[24px] border border-black/5 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(0,0,0,0.06)] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <p className="text-xs font-bold text-neutral-400">이전 기사</p>
+          <h3 className="mt-2 line-clamp-2 text-[17px] font-black leading-6 text-neutral-950">
+            {prevPost ? prevPost.title : "이전 기사가 없습니다"}
+          </h3>
+        </button>
+
+        <button
+          type="button"
+          disabled={!nextPost}
+          onClick={() => nextPost && handleOpenPost(nextPost)}
+          className="rounded-[24px] border border-black/5 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(0,0,0,0.06)] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <p className="text-xs font-bold text-[#2563eb]">다음 기사</p>
+          <h3 className="mt-2 line-clamp-2 text-[17px] font-black leading-6 text-neutral-950">
+            {nextPost ? nextPost.title : "다음 기사가 없습니다"}
+          </h3>
+        </button>
+      </>
+    );
+  })()}
+</div>
+
               <div className="mt-14 rounded-[28px] border border-black/5 bg-neutral-50 p-6">
   <p className="text-xs font-black tracking-[0.15em] text-[#2563eb]">
     REPORTER
