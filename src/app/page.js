@@ -3243,8 +3243,12 @@ const handleAddComment = async () => {
       {section.text}
     </div>
 
-    <div className="overflow-hidden rounded-xl border border-slate-200">
+    {policyType === "privacy" &&
+ section.title === "2. 개인정보의 보유 및 이용기간" && (
+
+<div className="overflow-hidden rounded-xl border border-slate-200 mt-6">
   <table className="w-full text-sm">
+
     <thead className="bg-slate-100">
       <tr>
         <th className="p-3 text-left">보유항목</th>
@@ -3272,8 +3276,11 @@ const handleAddComment = async () => {
         <td className="p-3">통신비밀보호법</td>
       </tr>
     </tbody>
+
   </table>
 </div>
+
+)}
 
   </div>
 ))}
