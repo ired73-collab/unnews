@@ -1566,6 +1566,19 @@ const text = [
     .slice(0, 3);
 }, [visiblePosts]);
 
+const trendingPosts = useMemo(() => {
+  return [...allPosts]
+    .map((post) => ({
+      ...post,
+      score:
+        (post.views || 0) +
+        (post.likes || 0) * 3 +
+        ((post.comments?.length || 0) * 5),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+}, [allPosts]);
+
   const featured = popularPosts;
   const latest = allPosts.slice(0, 8);
   const currentHero =
@@ -3574,6 +3587,41 @@ const handleAddComment = async () => {
                   {selectedPost.summary || fallbackSummary(selectedPost.body)}
                 </p>
               </div>
+
+              <div className="mt-10 rounded-[24px] border border-slate-200 bg-white p-6">
+  <p className="text-xs font-black tracking-[0.2em] text-[#2563eb]">
+    TRENDING NOW
+  </p>
+
+  <h3 className="mt-2 text-xl font-black">
+    실시간 인기기사
+  </h3>
+
+  <div className="mt-5 space-y-4">
+    {trendingPosts.map((post, index) => (
+      <button
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className="flex w-full items-start gap-4 text-left"
+      >
+        <span className="text-xl font-black text-[#2563eb]">
+          {index + 1}
+        </span>
+
+        <div>
+          <p className="line-clamp-2 font-bold">
+            {post.title}
+          </p>
+
+          <p className="mt-1 text-xs text-neutral-400">
+            조회 {post.views || 0}
+            · 좋아요 {post.likes || 0}
+          </p>
+        </div>
+      </button>
+    ))}
+  </div>
+</div>
 
               <div className="mt-10 text-[18px] leading-9 tracking-[-0.01em] text-neutral-700">
                 {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
