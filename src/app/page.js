@@ -3825,11 +3825,17 @@ const handleAddComment = async () => {
 </div>
 
               <div className="mt-10 border-t border-black/5 pt-7">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-[1.35rem] font-black tracking-[-0.04em]">
-                    댓글 {getCommentsArray(selectedPost).length}
-                  </h2>
-                </div>
+                <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h2 className="text-[1.4rem] font-black tracking-[-0.04em]">
+      댓글 {getCommentsArray(selectedPost).length}
+    </h2>
+
+    <p className="mt-1 text-sm text-neutral-400">
+      대학생들의 다양한 의견을 나눠보세요.
+    </p>
+  </div>
+</div>
 
                 <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(0,0,0,0.03)]">
   <div className="grid gap-3 md:grid-cols-[160px_1fr_auto]">
@@ -3871,11 +3877,12 @@ const handleAddComment = async () => {
     [...getCommentsArray(selectedPost)].reverse().map((comment) => (
       <div
         key={comment.id}
-        className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-[0_10px_28px_rgba(0,0,0,0.03)]"
+        className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
       >
         <div className="mb-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef6ff] text-sm font-black text-[#2563eb]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef6ff] font-black text-[#2563eb]"
+>
               {comment.name?.slice(0, 1) || "U"}
             </div>
 
@@ -3893,6 +3900,22 @@ const handleAddComment = async () => {
         <p className="text-sm leading-7 text-neutral-600">
           {comment.text}
         </p>
+        
+        <div className="mt-4 flex items-center gap-4 text-xs text-neutral-400">
+  <button
+    type="button"
+    className="transition hover:text-[#2563eb]"
+  >
+    👍 공감
+  </button>
+
+  <button
+    type="button"
+    className="transition hover:text-red-500"
+  >
+    🚨 신고
+  </button>
+</div>
       </div>
     ))
   )}
