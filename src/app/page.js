@@ -3564,15 +3564,6 @@ const handleAddComment = async () => {
 
   <span>unnews@daum.net</span>
 
-  <span>•</span>
-
-  <span>
-    {new Date(
-      selectedPost.createdAt?.toDate?.()
-        ? selectedPost.createdAt.toDate()
-        : selectedPost.createdAt
-    ).toLocaleDateString("ko-KR")}
-  </span>
 </div>
 
               <div className="mt-8 rounded-[24px] border border-[#dbeafe] bg-[#f8fbff] p-6 shadow-[0_12px_30px_rgba(37,99,235,0.06)]">
