@@ -3555,6 +3555,26 @@ const handleAddComment = async () => {
   {selectedPost.title}
 </h1>
 
+<div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-neutral-500">
+  <span className="font-bold text-neutral-800">
+    대학연합신문 편집부
+  </span>
+
+  <span>•</span>
+
+  <span>unnews@daum.net</span>
+
+  <span>•</span>
+
+  <span>
+    {new Date(
+      selectedPost.createdAt?.toDate?.()
+        ? selectedPost.createdAt.toDate()
+        : selectedPost.createdAt
+    ).toLocaleDateString("ko-KR")}
+  </span>
+</div>
+
               <div className="mt-8 rounded-[24px] border border-[#dbeafe] bg-[#f8fbff] p-6 shadow-[0_12px_30px_rgba(37,99,235,0.06)]">
                 <p className="text-xs font-black tracking-[0.16em] text-[#2563eb]">
   ARTICLE SUMMARY
