@@ -3492,11 +3492,19 @@ const handleAddComment = async () => {
     </span>
 
     <span className="text-xs font-medium text-neutral-400">
-      {selectedPost.readTime}
+  {new Date(
+    selectedPost.createdAt?.toDate?.()
+      ? selectedPost.createdAt.toDate()
+      : selectedPost.createdAt
+  ).toLocaleDateString("ko-KR")}
+</span>
+
+    <span className="text-xs font-medium text-neutral-400">
+      ⏱ {selectedPost.readTime}
     </span>
 
     <span className="text-xs font-medium text-neutral-400">
-      조회 {selectedPost.views || 0}
+      👁 조회 {selectedPost.views || 0}
     </span>
   </div>
 
