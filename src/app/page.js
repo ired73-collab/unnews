@@ -3588,42 +3588,7 @@ const handleAddComment = async () => {
                 </p>
               </div>
 
-              <div className="mt-10 rounded-[24px] border border-slate-200 bg-white p-6">
-  <p className="text-xs font-black tracking-[0.2em] text-[#2563eb]">
-    TRENDING NOW
-  </p>
-
-  <h3 className="mt-2 text-xl font-black">
-    실시간 인기기사
-  </h3>
-
-  <div className="mt-5 space-y-4">
-    {trendingPosts.map((post, index) => (
-      <button
-        key={post.id}
-        onClick={() => handleOpenPost(post)}
-        className="flex w-full items-start gap-4 text-left"
-      >
-        <span className="text-xl font-black text-[#2563eb]">
-          {index + 1}
-        </span>
-
-        <div>
-          <p className="line-clamp-2 font-bold">
-            {post.title}
-          </p>
-
-          <p className="mt-1 text-xs text-neutral-400">
-            조회 {post.views || 0}
-            · 좋아요 {post.likes || 0}
-          </p>
-        </div>
-      </button>
-    ))}
-  </div>
-</div>
-
-              <div className="mt-10 text-[18px] leading-9 tracking-[-0.01em] text-neutral-700">
+              <div className="mt-12 text-[19px] leading-[2.1] tracking-[-0.01em] text-neutral-700">
                 {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
                   <div className="space-y-6">
                     {selectedPost.contentBlocks.map((block, index) => {
@@ -3648,7 +3613,16 @@ const handleAddComment = async () => {
     return (
       <h2
         key={index}
-        className="mt-12 border-l-4 border-[#4dbbff] pl-4 text-2xl font-black leading-tight tracking-[-0.04em] text-neutral-950"
+        className="
+mt-16
+border-l-[6px]
+border-[#2563eb]
+pl-5
+text-[2rem]
+font-black
+tracking-[-0.04em]
+text-neutral-950
+"
       >
         {block.value}
       </h2>
