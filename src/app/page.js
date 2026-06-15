@@ -3444,13 +3444,13 @@ const handleAddComment = async () => {
   type="button"
   key={post.id}
   onClick={() => handleOpenPost(post)}
-  className="group flex items-center gap-5 rounded-[28px] border border-slate-200 bg-white p-4 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#bfdbfe] hover:shadow-[0_18px_44px_rgba(37,99,235,0.10)]"
+  className="group flex items-center gap-5 rounded-[28px] border border-slate-200 bg-white p-4 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition duration-300 hover:border-slate-300 hover:shadow-lg"
 >
   <div className="overflow-hidden rounded-[22px] bg-slate-100">
     <img
       src={post.image}
       alt={post.title}
-      className="h-28 w-28 object-cover transition duration-500 group-hover:scale-105"
+      className="h-28 w-28 object-cover"
       onError={(e) => {
         e.currentTarget.src =
           "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
@@ -3463,7 +3463,7 @@ const handleAddComment = async () => {
       {getCategoryLabel(post)}
     </span>
 
-    <h3 className="mt-3 line-clamp-2 text-[1.08rem] font-black leading-6 tracking-[-0.03em] text-neutral-950">
+    <h3 className="mt-3 line-clamp-2 text-[1.12rem] font-black leading-6 tracking-[-0.03em] text-neutral-950">
       {post.title}
     </h3>
 
