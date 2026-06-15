@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { PRIMARY_CATEGORIES } from "../lib/categories";
 
 export default function Header({
@@ -8,6 +9,15 @@ export default function Header({
   setActiveSubCategory,
   setPage,
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleMenuClick = (item) => {
+    setActiveCategory(item);
+    setActiveSubCategory("전체");
+    setPage("category");
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="sticky top-0 z-20 border-b border-black/5 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 md:px-8">
@@ -56,6 +66,17 @@ export default function Header({
             ))}
           </nav>
 
+          <button
+  type="button"
+  onClick={() => setIsMenuOpen((prev) => !prev)}
+  className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-neutral-900 shadow-sm md:hidden"
+  aria-label="모바일 메뉴 열기"
+>
+  <span className="text-2xl leading-none">
+    {isMenuOpen ? "×" : "☰"}
+  </span>
+</button>
+
           <div className="hidden items-center gap-2 md:flex">
   <a
     href="https://tv.naver.com/withmagazine"
@@ -83,6 +104,39 @@ export default function Header({
 </div>
         </div>
       </div>
-    </header>
+
+{isMenuOpen && (
+  <div className="border-t border-black/5 bg-white px-5 py-4 md:hidden">
+    <div className="grid gap-2">
+      {PRIMARY_CATEGORIES.slice(1).map((item) => (
+        <button
+          key={item}
+          type="button"
+          onClick={() => handleMenuClick(item)}
+          className={`rounded-2xl px-4 py-3 text-left text-sm font-bold transition ${
+            activeCategory === item
+              ? "bg-[#2563eb] text-white"
+              : "bg-slate-50 text-neutral-800"
+          }`}
+        >
+          {item}
+        </button>
+      ))}
+
+      <button
+        type="button"
+        onClick={() => {
+          setPage("admin");
+          setIsMenuOpen(false);
+        }}
+        className="rounded-2xl bg-neutral-950 px-4 py-3 text-left text-sm font-bold text-white"
+      >
+        관리자
+      </button>
+    </div>
+  </div>
+)}
+
+</header>
   );
 }
