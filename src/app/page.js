@@ -3441,32 +3441,37 @@ const handleAddComment = async () => {
       <div className="grid gap-5 xl:grid-cols-2">
         {visiblePosts.map((post) => (
           <button
-            type="button"
-            key={post.id}
-            onClick={() => handleOpenPost(post)}
-            className="flex items-center gap-4 rounded-[24px] border border-white/60 bg-white/78 p-3.5 text-left shadow-[0_16px_42px_rgba(0,0,0,0.06)] backdrop-blur transition hover:-translate-y-1"
-          >
-            <img
-              src={post.image}
-              alt={post.title}
-              className="h-24 w-24 rounded-[18px] object-cover md:h-28 md:w-28"
-              onError={(e) => {
-  e.currentTarget.src =
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
-}}
-            />
-            <div className="min-w-0 flex-1">
-              <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-500">
-                {getCategory2(post)}
-              </span>
-              <h3 className="mt-2 line-clamp-2 text-[1rem] font-semibold leading-6 tracking-[-0.03em]">
-                {post.title}
-              </h3>
-              <p className="mt-1 line-clamp-2 text-[14px] leading-6 text-neutral-600">
-                {post.body}
-              </p>
-            </div>
-          </button>
+  type="button"
+  key={post.id}
+  onClick={() => handleOpenPost(post)}
+  className="group flex items-center gap-5 rounded-[28px] border border-slate-200 bg-white p-4 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#bfdbfe] hover:shadow-[0_18px_44px_rgba(37,99,235,0.10)]"
+>
+  <div className="overflow-hidden rounded-[22px] bg-slate-100">
+    <img
+      src={post.image}
+      alt={post.title}
+      className="h-28 w-28 object-cover transition duration-500 group-hover:scale-105"
+      onError={(e) => {
+        e.currentTarget.src =
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
+      }}
+    />
+  </div>
+
+  <div className="min-w-0 flex-1">
+    <span className="rounded-full bg-[#eef6ff] px-2.5 py-1 text-xs font-bold text-[#2563eb]">
+      {getCategoryLabel(post)}
+    </span>
+
+    <h3 className="mt-3 line-clamp-2 text-[1.08rem] font-black leading-6 tracking-[-0.03em] text-neutral-950">
+      {post.title}
+    </h3>
+
+    <p className="mt-2 line-clamp-2 text-[14px] leading-6 text-neutral-500">
+      {post.summary || post.body}
+    </p>
+  </div>
+</button>
         ))}
       </div>
     </section>
