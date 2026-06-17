@@ -2600,12 +2600,12 @@ const handleAddComment = async () => {
       {getCategory2(currentHero)}
     </span>
 
-    <h1 className="mt-4 min-h-[96px] max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white md:min-h-[94px] md:text-[2.8rem] line-clamp-2 break-keep">
+    <h1 className="mt-3 min-h-[72px] max-w-2xl text-[1.55rem] font-bold leading-[1.1] tracking-[-0.03em] text-white md:min-h-[94px] md:text-[2.8rem] line-clamp-2 break-keep">
   {currentHero.title}
 </h1>
 
-    <p className="mt-3 max-w-lg text-sm leading-6 text-white/90 md:text-[15px] md:leading-6 line-clamp-2">
-  {clip(currentHero.body, 70)}
+    <p className="mt-2 max-w-lg text-[13px] leading-5 text-white/85 md:text-[15px] md:leading-6 line-clamp-2">
+  {clip(currentHero.body, 45)}
 </p>
 
     <button
@@ -2811,7 +2811,7 @@ const handleAddComment = async () => {
 </section>
 
           <section>
-            <div className="mb-4 flex gap-2 overflow-auto pb-1">
+            <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {PRIMARY_CATEGORIES.map((category) => (
                 <button
                   key={category}
@@ -2820,7 +2820,7 @@ const handleAddComment = async () => {
                     setActiveSubCategory("전체");
                     setPage("category");
                   }}
-                  className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
+                  className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                     activeCategory === category
                       ? "bg-[#4dbbff] text-white shadow-[0_10px_24px_rgba(77,187,255,0.28)]"
                       : "border border-black/5 bg-white/80 text-neutral-700 backdrop-blur hover:border-[#4dbbff]/40 hover:text-[#4dbbff] hover:bg-white"

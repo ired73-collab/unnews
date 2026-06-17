@@ -20,7 +20,7 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-20 border-b border-black/5 bg-white/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 md:px-8">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 md:px-8">
         <button
           type="button"
           onClick={() => {
@@ -36,10 +36,10 @@ export default function Header({
           <img
   src="/unnews_logo.png"
   alt="대학연합신문"
-  className="h-12 w-12 object-contain"
+  className="h-10 w-10 object-contain md:h-12 md:w-12"
 />
 
-          <span className="text-[21px] font-black tracking-[-0.06em] text-neutral-900">
+          <span className="text-[18px] font-black tracking-[-0.06em] text-neutral-900 md:text-[21px]">
             대학연합신문
           </span>
         </button>
