@@ -2811,7 +2811,7 @@ const handleAddComment = async () => {
 </section>
 
           <section>
-            <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="mb-5 flex gap-2 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {PRIMARY_CATEGORIES.map((category) => (
                 <button
                   key={category}
