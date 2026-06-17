@@ -2628,7 +2628,7 @@ const handleAddComment = async () => {
   ))}
 </div>
 
-    <div className="mt-5 flex gap-3 overflow-x-auto pb-1 md:mt-7 md:grid md:grid-cols-3">
+    <div className="mt-5 flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mt-7 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
       {heroPosts.map((post, index) => (
         <button
           key={post.id}
