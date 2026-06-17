@@ -2615,17 +2615,18 @@ const handleAddComment = async () => {
   지금 읽기 →
 </button>
 
-    <div className="mt-5 flex gap-2 overflow-x-auto pb-1 md:grid md:grid-cols-3 md:gap-3 md:overflow-visible md:pb-0">
-        <button
-          key={post.id}
-          onClick={() => setHeroIndex(index)}
-          className={`h-2.5 rounded-full transition-all ${
-            heroIndex === index ? "w-10 bg-white" : "w-2.5 bg-white/45"
-          }`}
-          aria-label={`${index + 1}번 히어로 보기`}
-        />
-      ))}
-    </div>
+    <div className="mt-5 flex gap-2 overflow-x-auto pb-1 md:hidden">
+  {heroPosts.map((post, index) => (
+    <button
+      key={post.id}
+      onClick={() => setHeroIndex(index)}
+      className={`h-2.5 rounded-full transition-all ${
+        heroIndex === index ? "w-10 bg-white" : "w-2.5 bg-white/45"
+      }`}
+      aria-label={`${index + 1}번 히어로 보기`}
+    />
+  ))}
+</div>
 
     <div className="mt-5 flex gap-3 overflow-x-auto pb-1 md:mt-7 md:grid md:grid-cols-3">
       {heroPosts.map((post, index) => (
