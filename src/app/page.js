@@ -2600,12 +2600,12 @@ const handleAddComment = async () => {
       {getCategory2(currentHero)}
     </span>
 
-    <h1 className="mt-3 min-h-[72px] max-w-2xl text-[1.55rem] font-bold leading-[1.1] tracking-[-0.03em] text-white md:min-h-[94px] md:text-[2.8rem] line-clamp-2 break-keep">
+    <h1 className="mt-4 max-w-2xl text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.04em] text-white md:text-[2.8rem] line-clamp-3 break-keep">
   {currentHero.title}
 </h1>
 
-    <p className="mt-2 max-w-lg text-[13px] leading-5 text-white/85 md:text-[15px] md:leading-6 line-clamp-2">
-  {clip(currentHero.body, 45)}
+    <p className="mt-3 max-w-lg text-[13px] leading-5 text-white/90 md:text-[15px] md:leading-6 line-clamp-2">
+  {clip(currentHero.body, 80)}
 </p>
 
     <button
@@ -2615,8 +2615,7 @@ const handleAddComment = async () => {
   지금 읽기 →
 </button>
 
-    <div className="mt-6 flex items-center gap-3">
-      {heroPosts.map((post, index) => (
+    <div className="mt-5 flex gap-2 overflow-x-auto pb-1 md:grid md:grid-cols-3 md:gap-3 md:overflow-visible md:pb-0">
         <button
           key={post.id}
           onClick={() => setHeroIndex(index)}
@@ -2628,7 +2627,7 @@ const handleAddComment = async () => {
       ))}
     </div>
 
-    <div className="mt-7 hidden grid-cols-3 gap-3 md:grid">
+    <div className="mt-5 flex gap-3 overflow-x-auto pb-1 md:mt-7 md:grid md:grid-cols-3">
       {heroPosts.map((post, index) => (
         <button
           key={post.id}
@@ -2636,7 +2635,7 @@ const handleAddComment = async () => {
             setHeroIndex(index);
             handleOpenPost(post);
           }}
-          className={`group rounded-[22px] border px-5 py-3 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
+          className={`shrink-0 w-[78%] md:w-auto group rounded-[22px] border px-5 py-3 text-left text-white shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${
             heroIndex === index
               ? "border-white/45 bg-white/18"
               : "border-white/25 bg-white/10 hover:border-white/35 hover:bg-white/16"
