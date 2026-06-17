@@ -3340,44 +3340,42 @@ const handleAddComment = async () => {
       초기화
     </button>
   )}
+<div className="mb-3 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+  {PRIMARY_CATEGORIES.map((category) => (
+    <button
+      key={category}
+      onClick={() => {
+        setActiveCategory(category);
+        setActiveSubCategory("전체");
+      }}
+      className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium transition ${
+        activeCategory === category
+          ? "bg-[#4dbbff] text-white shadow-[0_10px_24px_rgba(77,187,255,0.28)]"
+          : "border border-black/5 bg-white/80 text-neutral-700 backdrop-blur hover:border-[#4dbbff]/40 hover:text-[#4dbbff] hover:bg-white"
+      }`}
+    >
+      {category}
+    </button>
+  ))}
 </div>
 
-    className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
-      {PRIMARY_CATEGORIES.map((category) => (
-        <button
-          key={category}
-          onClick={() => {
-            setActiveCategory(category);
-            setActiveSubCategory("전체");
-          }}
-          className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium transition ${
-            activeCategory === category
-              ? "bg-[#4dbbff] text-white shadow-[0_10px_24px_rgba(77,187,255,0.28)]"
-              : "border border-black/5 bg-white/80 text-neutral-700 backdrop-blur hover:border-[#4dbbff]/40 hover:text-[#4dbbff] hover:bg-white"
-          }`}
-        >
-          {category}
-        </button>
-      ))}
-    </div>
-
-    {activeCategory !== "전체" && (
-      <div className="mb-5 flex gap-2 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {["전체", ...(CATEGORY_MAP[activeCategory] || [])].map((subCategory) => (
-          <button
-            key={subCategory}
-            onClick={() => setActiveSubCategory(subCategory)}
-            className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition ${
-              activeSubCategory === subCategory
-                ? "bg-neutral-900 text-white"
-                : "border border-black/5 bg-white/80 text-neutral-600 hover:text-neutral-900 hover:bg-white"
-            }`}
-          >
-            {subCategory}
-          </button>
-        ))}
-      </div>
-    )}
+{activeCategory !== "전체" && (
+  <div className="mb-5 flex gap-2 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    {["전체", ...(CATEGORY_MAP[activeCategory] || [])].map((subCategory) => (
+      <button
+        key={subCategory}
+        onClick={() => setActiveSubCategory(subCategory)}
+        className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition ${
+          activeSubCategory === subCategory
+            ? "bg-neutral-900 text-white"
+            : "border border-black/5 bg-white/80 text-neutral-600 hover:text-neutral-900 hover:bg-white"
+        }`}
+      >
+        {subCategory}
+      </button>
+    ))}
+  </div>
+)}
 
     <section className="mb-6">
       <div className="mb-3 flex items-end justify-between">
@@ -3474,9 +3472,10 @@ const handleAddComment = async () => {
     </p>
   </div>
 </button>
-        ))}
+                ))}
       </div>
     </section>
+    </div>
   </main>
 )}
 
