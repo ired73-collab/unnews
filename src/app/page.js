@@ -3342,7 +3342,7 @@ const handleAddComment = async () => {
   )}
 </div>
 
-    <div className="mb-3 flex gap-2 overflow-auto pb-1">
+    className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
       {PRIMARY_CATEGORIES.map((category) => (
         <button
           key={category}
@@ -3350,7 +3350,7 @@ const handleAddComment = async () => {
             setActiveCategory(category);
             setActiveSubCategory("전체");
           }}
-          className={`rounded-full px-4 py-2.5 text-sm font-medium transition ${
+          className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium transition ${
             activeCategory === category
               ? "bg-[#4dbbff] text-white shadow-[0_10px_24px_rgba(77,187,255,0.28)]"
               : "border border-black/5 bg-white/80 text-neutral-700 backdrop-blur hover:border-[#4dbbff]/40 hover:text-[#4dbbff] hover:bg-white"
@@ -3362,7 +3362,7 @@ const handleAddComment = async () => {
     </div>
 
     {activeCategory !== "전체" && (
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mb-5 flex gap-2 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {["전체", ...(CATEGORY_MAP[activeCategory] || [])].map((subCategory) => (
           <button
             key={subCategory}
