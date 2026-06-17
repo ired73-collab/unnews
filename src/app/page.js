@@ -1265,10 +1265,12 @@ function SiteFooter({ openPolicy }) {
               주소 : 대구 남구 현충로 206 3층 (대명동, 신화빌딩)
             </div>
 
-            <div className="text-sm text-white/60">
-  전화 : 053-765-4765 &nbsp;&nbsp;|&nbsp;&nbsp;
-  팩스 : 053-767-4766 &nbsp;&nbsp;|&nbsp;&nbsp;
-  이메일 : unnews@daum.net
+            <div className="space-y-1 text-neutral-400">
+  <p>사업자번호 : 504-81-47108</p>
+  <p>주소 : 대구 남구 현충로 206 3층 (대명동, 신화빌딩)</p>
+  <p>전화 : 053-765-4765</p>
+  <p>팩스 : 053-767-4766</p>
+  <p>이메일 : unnews@daum.net</p>
 </div>
           </div>
 
