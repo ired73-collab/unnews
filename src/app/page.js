@@ -3340,7 +3340,7 @@ const handleAddComment = async () => {
       초기화
     </button>
   )}
-<div className="mb-3 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+<div className="mt-4 mb-3 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
   {PRIMARY_CATEGORIES.map((category) => (
     <button
       key={category}
