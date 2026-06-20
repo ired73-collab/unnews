@@ -2487,6 +2487,73 @@ const handleAddComment = async () => {
   }
 };
 
+const handleLikeComment = async (commentId) => {
+  if (!selectedPost?.id) return;
+
+  const currentComments = getCommentsArray(selectedPost);
+
+  const nextComments = currentComments.map((comment) =>
+    comment.id === commentId
+      ? { ...comment, likes: (comment.likes || 0) + 1 }
+      : comment
+  );
+
+  setSelectedPost((prev) =>
+    prev ? { ...prev, comments: nextComments } : prev
+  );
+
+  setDrafts((prev) =>
+    prev.map((post) =>
+      post.id === selectedPost.id ? { ...post, comments: nextComments } : post
+    )
+  );
+
+  const { error } = await supabase
+    .from("posts")
+    .update({ comments: nextComments })
+    .eq("id", selectedPost.id);
+
+  if (error) {
+    console.error("Comment like error:", error);
+    alert("공감 저장에 실패했습니다.");
+  }
+};
+
+const handleReportComment = async (commentId) => {
+  if (!selectedPost?.id) return;
+
+  const currentComments = getCommentsArray(selectedPost);
+
+  const nextComments = currentComments.map((comment) =>
+    comment.id === commentId
+      ? { ...comment, reports: (comment.reports || 0) + 1 }
+      : comment
+  );
+
+  setSelectedPost((prev) =>
+    prev ? { ...prev, comments: nextComments } : prev
+  );
+
+  setDrafts((prev) =>
+    prev.map((post) =>
+      post.id === selectedPost.id ? { ...post, comments: nextComments } : post
+    )
+  );
+
+  const { error } = await supabase
+    .from("posts")
+    .update({ comments: nextComments })
+    .eq("id", selectedPost.id);
+
+  if (error) {
+    console.error("Comment report error:", error);
+    alert("신고 저장에 실패했습니다.");
+    return;
+  }
+
+  alert("신고가 접수되었습니다.");
+};
+
   const handleDeletePost = async (postId) => {
   if (!postId) {
     alert("삭제할 글 정보를 찾을 수 없습니다.");
@@ -3734,13 +3801,17 @@ text-neutral-950
 
   <div className="mt-5 flex items-center gap-5">
 
-    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-xl font-black text-white">
+    className="flex h-16 w-16 shrink-0 aspect-square items-center justify-center rounded-full bg-[#2563eb] text-xl font-black text-white"
       U
     </div>
 
     <div>
       <h3 className="text-xl font-black text-neutral-950">
-        대학연합신문 편집부
+        <>
+  대학연합신문
+  <br className="md:hidden" />
+  <span className="md:ml-1">편집부</span>
+</>
       </h3>
 
       <p className="mt-1 text-sm text-neutral-500">
@@ -3758,7 +3829,7 @@ text-neutral-950
       </p>
 
       <p className="font-bold">
-        248건
+        {allPosts.length}건
       </p>
     </div>
 
@@ -3931,18 +4002,20 @@ text-neutral-950
         
         <div className="mt-4 flex items-center gap-4 text-xs text-neutral-400">
   <button
-    type="button"
-    className="transition hover:text-[#2563eb]"
-  >
-    👍 공감
-  </button>
+  type="button"
+  onClick={() => handleLikeComment(comment.id)}
+  className="transition hover:text-[#2563eb]"
+>
+  👍 공감 {comment.likes || 0}
+</button>
 
   <button
-    type="button"
-    className="transition hover:text-red-500"
-  >
-    🚨 신고
-  </button>
+  type="button"
+  onClick={() => handleReportComment(comment.id)}
+  className="transition hover:text-red-500"
+>
+  🚨 신고 {comment.reports || 0}
+</button>
 </div>
       </div>
     ))
