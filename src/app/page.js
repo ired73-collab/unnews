@@ -3801,9 +3801,9 @@ text-neutral-950
 
   <div className="mt-5 flex items-center gap-5">
 
-    className="flex h-16 w-16 shrink-0 aspect-square items-center justify-center rounded-full bg-[#2563eb] text-xl font-black text-white"
-      U
-    </div>
+    <div className="flex h-16 w-16 shrink-0 aspect-square items-center justify-center rounded-full bg-[#2563eb] text-xl font-black text-white">
+  U
+</div>
 
     <div>
       <h3 className="text-xl font-black text-neutral-950">
