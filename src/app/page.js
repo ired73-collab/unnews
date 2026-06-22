@@ -1346,6 +1346,15 @@ function SiteFooter({ openPolicy }) {
 
 export default function Page() {
   const [page, setPage] = useState("home");
+  const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
+const [applyForm, setApplyForm] = useState({
+  name: "",
+  school: "",
+  phone: "",
+  email: "",
+  type: "기자단",
+  message: "",
+});
   const [policyType, setPolicyType] = useState("privacy");
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState("dashboard");
@@ -2443,13 +2452,14 @@ const handleAddComment = async () => {
     return;
   }
 
+  
   const newComment = {
     id: Date.now(),
     name: commentName.trim(),
     text: commentText.trim(),
     createdAt: new Date().toISOString(),
   };
-
+ 
   const currentComments = getCommentsArray(selectedPost);
   const nextComments = [...currentComments, newComment];
 
@@ -2484,6 +2494,52 @@ const handleAddComment = async () => {
     alert("댓글 저장에 실패했습니다.");
   } finally {
     setIsSavingComment(false);
+  }
+};
+
+const handleSubmitApplication = async (e) => {
+  e.preventDefault();
+
+  if (!applyForm.name.trim() || !applyForm.email.trim()) {
+    alert("이름과 이메일을 입력해주세요.");
+    return;
+  }
+
+  try {
+    setIsSubmittingApplication(true);
+
+    const { error } = await supabase
+      .from("applications")
+      .insert([
+        {
+          name: applyForm.name.trim(),
+          school: applyForm.school.trim(),
+          phone: applyForm.phone.trim(),
+          email: applyForm.email.trim(),
+          type: applyForm.type,
+          message: applyForm.message.trim(),
+        },
+      ]);
+
+    if (error) throw error;
+
+    alert("참여 신청이 접수되었습니다.");
+
+    setApplyForm({
+      name: "",
+      school: "",
+      phone: "",
+      email: "",
+      type: "기자단",
+      message: "",
+    });
+
+    setPage("about");
+  } catch (err) {
+    console.error(err);
+    alert("신청 저장 실패");
+  } finally {
+    setIsSubmittingApplication(false);
   }
 };
 
@@ -2987,7 +3043,7 @@ const handleReportComment = async (commentId) => {
   ))}
 </div>
 
-    <section className="mt-12 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
+    <section className="mt-12 rounded-[32px] bg-white p-6 md:p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
   <p className="text-sm font-bold text-[#4dbbff]">ABOUT UNNEWS</p>
 
   <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-neutral-900">
@@ -2996,11 +3052,19 @@ const handleReportComment = async (commentId) => {
 
   <div className="mt-8 grid gap-10 md:grid-cols-[0.85fr_1.15fr]">
     <div>
-      <p className="text-[1.65rem] font-black leading-10 tracking-[-0.05em] text-neutral-900">
-        대학생의 오늘을 읽고,
-        <br />
-        내일의 선택을 연결합니다.
-      </p>
+      <p className="
+  text-[1.2rem]
+  font-black
+  leading-[1.2]
+  tracking-[-0.05em]
+  text-neutral-900
+  md:text-[1.65rem]
+  md:leading-10
+">
+  대학생의 오늘을 읽고,
+  <br />
+  내일의 선택을 연결합니다.
+</p>
 
       <div className="mt-7 grid grid-cols-3 gap-3">
         {[
@@ -3147,11 +3211,12 @@ const handleReportComment = async (commentId) => {
         연결하는 콘텐츠를 만들어갑니다.
       </p>
       <button
-        type="button"
-        className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-bold text-black transition hover:scale-105"
-      >
-        참여하기 →
-      </button>
+  type="button"
+  onClick={() => setPage("apply")}
+  className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-bold text-black"
+>
+  참여하기 →
+</button>
     </div>
   </div>
 
@@ -3206,15 +3271,98 @@ const handleReportComment = async (commentId) => {
         뉴스 보러가기 →
       </button>
       <button
-        type="button"
-        className="rounded-full border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
-      >
-        참여 신청하기 →
-      </button>
+  type="button"
+  onClick={() => setPage("apply")}
+  className="rounded-full border border-white/40 px-5 py-3 text-sm font-bold text-white"
+>
+  참여 신청하기 →
+</button>
     </div>
   </div>
 </section>
 
+  </main>
+)}
+
+{page === "apply" && (
+  <main className="mx-auto max-w-[920px] px-5 py-10 md:px-8 md:py-14">
+    <button
+      type="button"
+      onClick={() => setPage("about")}
+      className="mb-8 rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-neutral-700"
+    >
+      ← 회사소개로
+    </button>
+
+    <section className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-[0_18px_44px_rgba(0,0,0,0.06)] md:p-8">
+      <p className="text-sm font-bold text-[#4dbbff]">APPLICATION</p>
+      <h1 className="mt-3 text-[2rem] font-black leading-tight tracking-[-0.06em] text-neutral-950 md:text-[3rem]">
+        대학연합신문 참여 신청
+      </h1>
+      <p className="mt-4 text-[15px] leading-7 text-neutral-500 md:text-base">
+        기자단, 서포터즈, 캠퍼스 리포터, 콘텐츠 제보 등 대학연합신문과 함께할 분들의 신청을 받습니다.
+      </p>
+
+      <form onSubmit={handleSubmitApplication} className="mt-8 grid gap-4">
+        <input
+          value={applyForm.name}
+          onChange={(e) => setApplyForm({ ...applyForm, name: e.target.value })}
+          placeholder="이름"
+          className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none focus:border-[#4dbbff]"
+        />
+
+        <input
+          value={applyForm.school}
+          onChange={(e) => setApplyForm({ ...applyForm, school: e.target.value })}
+          placeholder="학교 / 소속"
+          className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none focus:border-[#4dbbff]"
+        />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <input
+            value={applyForm.phone}
+            onChange={(e) => setApplyForm({ ...applyForm, phone: e.target.value })}
+            placeholder="연락처"
+            className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none focus:border-[#4dbbff]"
+          />
+
+          <input
+            value={applyForm.email}
+            onChange={(e) => setApplyForm({ ...applyForm, email: e.target.value })}
+            placeholder="이메일"
+            className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none focus:border-[#4dbbff]"
+          />
+        </div>
+
+        <select
+          value={applyForm.type}
+          onChange={(e) => setApplyForm({ ...applyForm, type: e.target.value })}
+          className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none focus:border-[#4dbbff]"
+        >
+          <option>기자단</option>
+          <option>서포터즈</option>
+          <option>캠퍼스 리포터</option>
+          <option>콘텐츠 제보</option>
+          <option>제휴문의</option>
+        </select>
+
+        <textarea
+          value={applyForm.message}
+          onChange={(e) => setApplyForm({ ...applyForm, message: e.target.value })}
+          placeholder="지원동기 또는 문의내용을 입력해주세요."
+          rows={6}
+          className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-7 outline-none focus:border-[#4dbbff]"
+        />
+
+        <button
+          type="submit"
+          disabled={isSubmittingApplication}
+          className="mt-2 rounded-full bg-neutral-950 px-6 py-4 text-sm font-bold text-white disabled:opacity-50"
+        >
+          {isSubmittingApplication ? "접수 중..." : "참여 신청하기"}
+        </button>
+      </form>
+    </section>
   </main>
 )}
 
@@ -3683,24 +3831,28 @@ const handleReportComment = async (commentId) => {
   }
 
   if (block.type === "heading") {
-    return (
-      <h2
-        key={index}
-        className="
-mt-16
-border-l-[6px]
-border-[#2563eb]
-pl-5
-text-[2rem]
-font-black
-tracking-[-0.04em]
-text-neutral-950
-"
-      >
-        {block.value}
-      </h2>
-    );
-  }
+  return (
+    <h2
+      key={index}
+      className="
+        mt-10
+        border-l-[5px]
+        border-[#2563eb]
+        pl-4
+        text-[1.55rem]
+        leading-[1.3]
+        font-black
+        tracking-[-0.04em]
+        text-neutral-950
+        md:mt-16
+        md:pl-5
+        md:text-[2rem]
+      "
+    >
+      {block.value}
+    </h2>
+  );
+}
 
   if (block.type === "quote") {
     return (
