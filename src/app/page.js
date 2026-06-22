@@ -3793,26 +3793,24 @@ text-neutral-950
   })()}
 </div>
 
-              <div className="mt-14 rounded-[32px] border border-slate-200 bg-white p-8">
+              <div className="mt-14 rounded-[32px] border border-slate-200 bg-white p-5 md:p-8">
 
   <p className="text-xs font-black tracking-[0.2em] text-[#2563eb]">
     EDITOR
   </p>
 
-  <div className="mt-5 flex items-center gap-5">
+  <div className="mt-5 flex items-center gap-4 md:gap-5">
 
-    <div className="flex h-16 w-16 shrink-0 aspect-square items-center justify-center rounded-full bg-[#2563eb] text-xl font-black text-white">
+    <div className="flex h-14 w-14 shrink-0 aspect-square items-center justify-center rounded-full bg-[#2563eb] text-lg font-black text-white md:h-16 md:w-16 md:text-xl">
   U
 </div>
 
     <div>
-      <h3 className="text-xl font-black text-neutral-950">
-        <>
+      <h3 className="text-[1.25rem] font-black leading-tight text-neutral-950 md:text-xl">
   대학연합신문
   <br className="md:hidden" />
   <span className="md:ml-1">편집부</span>
-</>
-      </h3>
+</h3>
 
       <p className="mt-1 text-sm text-neutral-500">
         뉴스 · 커리어 · AI · 창업 · 라이프
