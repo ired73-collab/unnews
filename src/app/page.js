@@ -1355,6 +1355,8 @@ const [applyForm, setApplyForm] = useState({
   type: "기자단",
   message: "",
 });
+const [applications, setApplications] = useState([]);
+const [loadingApplications, setLoadingApplications] = useState(false);
   const [policyType, setPolicyType] = useState("privacy");
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState("dashboard");
@@ -1778,6 +1780,12 @@ useEffect(() => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+  if (isAdmin) {
+    loadApplications();
+  }
+}, [isAdmin]);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -2540,6 +2548,25 @@ const handleSubmitApplication = async (e) => {
     alert("신청 저장 실패");
   } finally {
     setIsSubmittingApplication(false);
+  }
+};
+
+const loadApplications = async () => {
+  try {
+    setLoadingApplications(true);
+
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    setApplications(data || []);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingApplications(false);
   }
 };
 
@@ -4299,6 +4326,7 @@ const handleReportComment = async (commentId) => {
     { key: "dashboard", label: "대시보드" },
     { key: "write", label: "글등록" },
     { key: "posts", label: "글관리" },
+    { key: "applications", label: "신청자관리" },
     { key: "stats", label: "통계" },
   ].map((tab) => (
     <button
@@ -4501,7 +4529,86 @@ const handleReportComment = async (commentId) => {
       )}
     </div>
   </section>
-)}  
+)}
+
+{adminTab === "applications" && (
+  <section className="mt-8 rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_18px_44px_rgba(0,0,0,0.06)]">
+    <div className="mb-6 flex items-end justify-between gap-4">
+      <div>
+        <p className="text-sm font-bold text-[#4dbbff]">Applications</p>
+        <h2 className="mt-2 text-[2rem] font-black tracking-[-0.05em]">
+          신청자 관리
+        </h2>
+        <p className="mt-2 text-sm text-neutral-500">
+          참여신청 접수 내역을 확인할 수 있습니다.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={loadApplications}
+        className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold"
+      >
+        새로고침
+      </button>
+    </div>
+
+    {loadingApplications ? (
+      <p className="text-sm text-neutral-500">불러오는 중...</p>
+    ) : applications.length === 0 ? (
+      <p className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-neutral-500">
+        아직 접수된 신청이 없습니다.
+      </p>
+    ) : (
+      <div className="space-y-4">
+        {applications.map((item) => (
+          <div
+            key={item.id}
+            className="rounded-[24px] border border-slate-200 bg-white p-5"
+          >
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <strong className="text-lg text-neutral-950">
+                    {item.name}
+                  </strong>
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#2563eb]">
+                    {item.type}
+                  </span>
+                  <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-600">
+                    {item.status || "접수"}
+                  </span>
+                </div>
+
+                <p className="mt-2 text-sm text-neutral-500">
+                  {item.school || "학교 미입력"}
+                </p>
+              </div>
+
+              <p className="text-xs text-neutral-400">
+                {item.created_at
+                  ? new Date(item.created_at).toLocaleString()
+                  : ""}
+              </p>
+            </div>
+
+            <div className="mt-4 grid gap-2 text-sm text-neutral-600 md:grid-cols-2">
+              <p>이메일: {item.email}</p>
+              <p>연락처: {item.phone || "-"}</p>
+            </div>
+
+            {item.message && (
+              <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-neutral-600">
+                {item.message}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+)}
+
 {adminTab === "stats" && (
   <section className="mt-8 rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_24px_70px_rgba(79,70,229,0.10)] backdrop-blur">
     <div className="mb-8">
