@@ -2570,6 +2570,44 @@ const loadApplications = async () => {
   }
 };
 
+const updateApplicationStatus = async (id, status) => {
+  try {
+    const { error } = await supabase
+      .from("applications")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) throw error;
+
+    setApplications((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status } : item
+      )
+    );
+  } catch (err) {
+    console.error("Update application status error:", err);
+    alert("상태 변경에 실패했습니다.");
+  }
+};
+
+const deleteApplication = async (id) => {
+  if (!confirm("이 신청 내역을 삭제하시겠습니까?")) return;
+
+  try {
+    const { error } = await supabase
+      .from("applications")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    setApplications((prev) => prev.filter((item) => item.id !== id));
+  } catch (err) {
+    console.error("Delete application error:", err);
+    alert("삭제에 실패했습니다.");
+  }
+};
+
 const handleLikeComment = async (commentId) => {
   if (!selectedPost?.id) return;
 
@@ -4598,11 +4636,36 @@ const handleReportComment = async (commentId) => {
             </div>
 
             {item.message && (
-              <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-neutral-600">
-                {item.message}
-              </p>
-            )}
-          </div>
+  <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-neutral-600">
+    {item.message}
+  </p>
+)}
+
+<div className="mt-4 flex flex-wrap gap-2">
+  {["접수", "검토중", "연락완료", "선정", "보류", "종료"].map((status) => (
+    <button
+      key={status}
+      type="button"
+      onClick={() => updateApplicationStatus(item.id, status)}
+      className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+        (item.status || "접수") === status
+          ? "bg-neutral-950 text-white"
+          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
+      }`}
+    >
+      {status}
+    </button>
+  ))}
+
+  <button
+    type="button"
+    onClick={() => deleteApplication(item.id)}
+    className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-100"
+  >
+    삭제
+  </button>
+</div>
+</div>
         ))}
       </div>
     )}
