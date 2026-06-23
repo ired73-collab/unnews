@@ -28,6 +28,7 @@ const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
 
 const COLORS = ["#4F46E5", "#14B8A6", "#F59E0B"];
 
+const ENABLE_APPLICATION_SYSTEM = false;
 
 const POSTS = [
   {
@@ -4388,12 +4389,16 @@ ACTIVITY
   </div>
           <div className="mb-8 flex flex-wrap gap-2 border-b border-black/5 pb-4">
   {[
-    { key: "dashboard", label: "대시보드" },
-    { key: "write", label: "글등록" },
-    { key: "posts", label: "글관리" },
-    { key: "applications", label: "신청자관리" },
-    { key: "stats", label: "통계" },
-  ].map((tab) => (
+  { key: "dashboard", label: "대시보드" },
+  { key: "write", label: "글등록" },
+  { key: "posts", label: "글관리" },
+
+  ...(ENABLE_APPLICATION_SYSTEM
+    ? [{ key: "applications", label: "신청자관리" }]
+    : []),
+
+  { key: "stats", label: "통계" },
+].map((tab) => (
     <button
       key={tab.key}
       type="button"
