@@ -2608,6 +2608,20 @@ const deleteApplication = async (id) => {
   }
 };
 
+useEffect(() => {
+  const handlePopState = () => {
+    setPage("home");
+    setActiveCategory("전체");
+    setActiveSubCategory("전체");
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, []);
+
 const handleLikeComment = async (commentId) => {
   if (!selectedPost?.id) return;
 
@@ -3275,15 +3289,19 @@ ACTIVITY
 </h2>
 
 <p className="mt-4 text-[15px] leading-7 text-white/85">
-대학생에게 필요한 공모전,
-대외활동, 서포터즈 정보를
-빠르게 제공합니다.
+  대학생에게 필요한 공모전, 대외활동, 서포터즈 정보를 빠르게 제공합니다.
+  <br />
+  캠퍼스 밖에서 경험을 쌓고 성장할 수 있는 기회를 소개합니다.
+  <br />
+  관심 분야별 활동 정보를 한눈에 확인해보세요.
 </p>
       <button
   type="button"
   onClick={() => {
-  setActiveCategory("career");
+  setActiveCategory("취업/공모전");
+  setActiveSubCategory("전체");
   setPage("category");
+  window.history.pushState({}, "", "/category/career");
 }}
   className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-bold text-black"
 >
