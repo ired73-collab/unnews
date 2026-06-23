@@ -30,6 +30,18 @@ const COLORS = ["#4F46E5", "#14B8A6", "#F59E0B"];
 
 const ENABLE_APPLICATION_SYSTEM = false;
 
+const CATEGORY_LAYOUTS = {
+  "전체": "list",
+  "뉴스": "card",
+  "커뮤니티": "board",
+  "취업/공모전": "gallery",
+  "트렌드": "list",
+};
+
+const getCategoryLayout = (category) => {
+  return CATEGORY_LAYOUTS[category] || "list";
+};
+
 const POSTS = [
   {
     id: 1,
@@ -1595,6 +1607,7 @@ const trendingPosts = useMemo(() => {
 
   const featured = popularPosts;
   const latest = allPosts.slice(0, 8);
+  const currentLayout = getCategoryLayout(activeCategory);
   const currentHero =
   heroPosts[heroIndex] ||
   allPosts[0] ||
@@ -3745,7 +3758,7 @@ ACTIVITY
           </h2>
         </div>
       </div>
-
+{currentLayout === "list" && (
       <div className="grid gap-5 xl:grid-cols-2">
         {visiblePosts.map((post) => (
           <button
@@ -3782,6 +3795,52 @@ ACTIVITY
 </button>
                 ))}
       </div>
+      )}
+
+{currentLayout === "card" && (
+  <div className="grid gap-6 md:grid-cols-3">
+    {visiblePosts.map((post) => (
+      <button
+        type="button"
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className="group text-left"
+      >
+        <div className="overflow-hidden rounded-[28px] bg-slate-100">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+            }}
+          />
+        </div>
+
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-xs font-bold text-[#4dbbff]">
+            {getCategoryLabel(post)}
+          </span>
+          <span className="text-neutral-300">♡</span>
+        </div>
+
+        <h3 className="mt-2 line-clamp-2 text-[1.1rem] font-black leading-6 tracking-[-0.04em] text-neutral-950">
+          {post.title}
+        </h3>
+
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-neutral-500">
+          {post.summary || post.body}
+        </p>
+
+        <p className="mt-3 text-xs text-neutral-400">
+          조회 {post.views || 0}
+        </p>
+      </button>
+    ))}
+  </div>
+)}
+
     </section>
     </div>
   </main>
