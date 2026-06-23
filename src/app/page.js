@@ -4601,7 +4601,7 @@ ACTIVITY
   </section>
 )}
 
-{adminTab === "applications" && (
+{ENABLE_APPLICATION_SYSTEM && adminTab === "applications" && (
   <section className="mt-8 rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_18px_44px_rgba(0,0,0,0.06)]">
     <div className="mb-6 flex items-end justify-between gap-4">
       <div>
