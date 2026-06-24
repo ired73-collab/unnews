@@ -3841,6 +3841,108 @@ ACTIVITY
   </div>
 )}
 
+{currentLayout === "board" && (
+  <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white">
+    <div className="hidden grid-cols-[90px_1fr_110px_110px] bg-slate-50 px-5 py-4 text-sm font-bold text-neutral-500 md:grid">
+      <div>번호</div>
+      <div>제목</div>
+      <div className="text-center">조회수</div>
+      <div className="text-center">등록일</div>
+    </div>
+
+    <div className="divide-y divide-slate-100">
+      {visiblePosts.map((post, index) => (
+        <button
+          type="button"
+          key={post.id}
+          onClick={() => handleOpenPost(post)}
+          className="grid w-full gap-2 px-5 py-4 text-left transition hover:bg-slate-50 md:grid-cols-[90px_1fr_110px_110px] md:items-center"
+        >
+          <div className="hidden text-sm text-neutral-400 md:block">
+            {visiblePosts.length - index}
+          </div>
+
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-[#2563eb]">
+                {getCategoryLabel(post)}
+              </span>
+              <h3 className="line-clamp-1 text-[15px] font-bold text-neutral-950">
+                {post.title}
+              </h3>
+            </div>
+
+            <p className="mt-1 line-clamp-1 text-sm text-neutral-500 md:hidden">
+              {post.summary || post.body}
+            </p>
+
+            <div className="mt-2 flex gap-3 text-xs text-neutral-400 md:hidden">
+              <span>조회 {post.views || 0}</span>
+              <span>
+                {post.created_at
+                  ? new Date(post.created_at).toLocaleDateString()
+                  : ""}
+              </span>
+            </div>
+          </div>
+
+          <div className="hidden text-center text-sm text-neutral-500 md:block">
+            {post.views || 0}
+          </div>
+
+          <div className="hidden text-center text-sm text-neutral-400 md:block">
+            {post.created_at
+              ? new Date(post.created_at).toLocaleDateString()
+              : ""}
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+
+{currentLayout === "gallery" && (
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    {visiblePosts.map((post) => (
+      <button
+        type="button"
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className="group text-left"
+      >
+        <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-100">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80";
+            }}
+          />
+        </div>
+
+        <div className="mt-3 flex items-center gap-2">
+          <span className="rounded-full bg-emerald-400 px-3 py-1 text-xs font-bold text-white">
+            D-{post.dday || "7"}
+          </span>
+          <span className="rounded-full bg-neutral-800 px-3 py-1 text-xs font-bold text-white">
+            {getCategoryLabel(post)}
+          </span>
+        </div>
+
+        <h3 className="mt-3 line-clamp-2 text-[1.08rem] font-black leading-6 tracking-[-0.04em] text-neutral-950">
+          {post.title}
+        </h3>
+
+        <p className="mt-2 line-clamp-1 text-sm text-neutral-500">
+          {post.school || post.author || post.category2 || "UNNEWS"}
+        </p>
+      </button>
+    ))}
+  </div>
+)}
+
     </section>
     </div>
   </main>
