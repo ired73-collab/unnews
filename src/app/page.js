@@ -1380,6 +1380,7 @@ const [loadingApplications, setLoadingApplications] = useState(false);
   const [activeCategory, setActiveCategory] = useState("전체");
   const [activeSubCategory, setActiveSubCategory] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState(POSTS[0]);
   const [seoTitle, setSeoTitle] = useState("UNNEWS");
 const [seoDescription, setSeoDescription] = useState(
@@ -1493,7 +1494,7 @@ const adminPieData = [
   return drafts;
 }, [drafts, isLoadingPosts]);
 
-const visiblePosts = useMemo(() => {
+const filteredPosts = useMemo(() => {
   const keyword = searchKeyword.trim().toLowerCase();
 
   return allPosts.filter((post) => {
@@ -1541,6 +1542,33 @@ const text = [
     return matchPrimary && matchSub && matchSearch;
   });
 }, [activeCategory, activeSubCategory, allPosts, searchKeyword]);
+
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [activeCategory, activeSubCategory, searchKeyword]);
+
+const currentLayout = getCategoryLayout(activeCategory);
+
+const postsPerPage =
+  currentLayout === "board" ? 10 :
+  currentLayout === "gallery" ? 12 :
+  currentLayout === "card" ? 9 :
+  8;
+
+const totalPages = Math.max(
+  1,
+  Math.ceil(filteredPosts.length / postsPerPage)
+);
+
+const visiblePosts = useMemo(() => {
+  const startIndex = (currentPage - 1) * postsPerPage;
+
+  return filteredPosts.slice(
+    startIndex,
+    startIndex + postsPerPage
+  );
+}, [filteredPosts, currentPage, postsPerPage]);
 
   const heroPosts = allPosts.slice(0, 3);
 
@@ -1607,7 +1635,7 @@ const trendingPosts = useMemo(() => {
 
   const featured = popularPosts;
   const latest = allPosts.slice(0, 8);
-  const currentLayout = getCategoryLayout(activeCategory);
+  
   const currentHero =
   heroPosts[heroIndex] ||
   allPosts[0] ||
@@ -3942,6 +3970,45 @@ ACTIVITY
     ))}
   </div>
 )}
+
+{totalPages > 1 && (
+  <div className="mt-10 flex items-center justify-center gap-2">
+    <button
+      type="button"
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-neutral-700 disabled:opacity-30"
+    >
+      ‹
+    </button>
+
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      <button
+        key={page}
+        type="button"
+        onClick={() => setCurrentPage(page)}
+        className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition ${
+          currentPage === page
+            ? "bg-neutral-950 text-white"
+            : "bg-white text-neutral-500 hover:bg-neutral-100"
+        }`}
+      >
+        {page}
+      </button>
+    ))}
+
+    <button
+      type="button"
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-neutral-700 disabled:opacity-30"
+    >
+      ›
+    </button>
+  </div>
+)}
+
+
 
     </section>
     </div>
