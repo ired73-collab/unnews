@@ -1373,6 +1373,13 @@ const [loadingApplications, setLoadingApplications] = useState(false);
   const [policyType, setPolicyType] = useState("privacy");
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState("dashboard");
+  const [categoryLayouts, setCategoryLayouts] = useState({
+  "뉴스": "card",
+  "커뮤니티": "board",
+  "취업/공모전": "gallery",
+  "트렌드": "list",
+});
+const [isSavingLayouts, setIsSavingLayouts] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [adminError, setAdminError] = useState("");
@@ -1548,7 +1555,7 @@ useEffect(() => {
   setCurrentPage(1);
 }, [activeCategory, activeSubCategory, searchKeyword]);
 
-const currentLayout = getCategoryLayout(activeCategory);
+const currentLayout = categoryLayouts[activeCategory] || "list";
 
 const postsPerPage =
   currentLayout === "board" ? 10 :
@@ -1829,6 +1836,51 @@ useEffect(() => {
   }
 }, [isAdmin]);
 
+const loadSiteSettings = async () => {
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "category_layouts")
+    .single();
+
+  if (error) {
+    console.error("Load site settings error:", error);
+    return;
+  }
+
+  if (data?.value) {
+    setCategoryLayouts(data.value);
+  }
+};
+
+const saveCategoryLayouts = async () => {
+  try {
+    setIsSavingLayouts(true);
+
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({
+        key: "category_layouts",
+        value: categoryLayouts,
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) throw error;
+
+    alert("스킨 설정이 저장되었습니다.");
+
+  } catch (err) {
+
+    console.error(err);
+    alert("저장 실패");
+
+  } finally {
+
+    setIsSavingLayouts(false);
+
+  }
+};
+
   useEffect(() => {
     const loadPosts = async () => {
   try {
@@ -1874,6 +1926,7 @@ useEffect(() => {
 };
 
     loadPosts();
+    loadSiteSettings();
   }, []);
 
   useEffect(() => {
@@ -4620,6 +4673,7 @@ ACTIVITY
   { key: "dashboard", label: "대시보드" },
   { key: "write", label: "글등록" },
   { key: "posts", label: "글관리" },
+  { key: "skins", label: "스킨관리" },
 
   ...(ENABLE_APPLICATION_SYSTEM
     ? [{ key: "applications", label: "신청자관리" }]
@@ -5087,6 +5141,122 @@ ACTIVITY
       </button>
     </div>
   </section>
+)}
+
+{adminTab === "skins" && (
+<section className="mt-8 rounded-[28px] border border-white/70 bg-white/90 p-6 shadow-xl">
+
+  <div className="mb-8">
+    <p className="text-sm font-semibold text-[#4dbbff]">
+      Category Layout
+    </p>
+
+    <h2 className="mt-2 text-[2rem] font-black">
+      게시판 스킨관리
+    </h2>
+
+    <p className="mt-2 text-sm text-neutral-500">
+      카테고리별 게시판 레이아웃을 선택할 수 있습니다.
+    </p>
+  </div>
+
+  <div className="overflow-hidden rounded-2xl border border-slate-200">
+
+    <table className="w-full">
+
+      <thead className="bg-slate-50">
+
+        <tr>
+
+          <th className="px-5 py-4 text-left">
+            카테고리
+          </th>
+
+          <th className="px-5 py-4 text-left">
+            현재 스킨
+          </th>
+
+          <th className="px-5 py-4 text-left">
+            변경
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        {Object.entries(categoryLayouts).map(
+          ([category, layout]) => (
+
+          <tr
+            key={category}
+            className="border-t"
+          >
+
+            <td className="px-5 py-4 font-bold">
+              {category}
+            </td>
+
+            <td className="px-5 py-4">
+
+              {layout === "list" && "리스트형"}
+
+              {layout === "card" && "카드형"}
+
+              {layout === "board" && "게시판형"}
+
+              {layout === "gallery" && "갤러리형"}
+
+            </td>
+
+            <td className="px-5 py-4">
+
+              <select
+                value={layout}
+                onChange={(e)=>
+                  setCategoryLayouts(prev=>({
+                    ...prev,
+                    [category]:e.target.value
+                  }))
+                }
+                className="rounded-xl border px-4 py-2"
+              >
+
+                <option value="list">리스트형</option>
+
+                <option value="card">카드형</option>
+
+                <option value="board">게시판형</option>
+
+                <option value="gallery">갤러리형</option>
+
+              </select>
+
+            </td>
+
+          </tr>
+
+        ))}
+
+            </tbody>
+
+    </table>
+
+  </div>
+
+  <div className="mt-6 flex justify-end">
+    <button
+      type="button"
+      onClick={saveCategoryLayouts}
+      disabled={isSavingLayouts}
+      className="rounded-full bg-neutral-950 px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
+    >
+      {isSavingLayouts ? "저장 중..." : "스킨 설정 저장"}
+    </button>
+  </div>
+
+</section>
 )}
 
           {adminTab === "write" && (
