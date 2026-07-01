@@ -38,8 +38,8 @@ const CATEGORY_LAYOUTS = {
   "트렌드": "list",
 };
 
-const getCategoryLayout = (category) => {
-  return CATEGORY_LAYOUTS[category] || "list";
+const getCategoryLayout = (category, layouts = CATEGORY_LAYOUTS) => {
+  return layouts?.[category] || "list";
 };
 
 const POSTS = [
@@ -1867,7 +1867,8 @@ const saveCategoryLayouts = async () => {
 
     if (error) throw error;
 
-    alert("스킨 설정이 저장되었습니다.");
+    await loadSiteSettings();
+alert("스킨 설정이 저장되었습니다.");
 
   } catch (err) {
 
