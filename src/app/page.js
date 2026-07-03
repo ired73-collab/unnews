@@ -1561,6 +1561,10 @@ const postsPerPage =
   currentLayout === "board" ? 10 :
   currentLayout === "gallery" ? 12 :
   currentLayout === "card" ? 9 :
+  currentLayout === "magazine" ? 6 :
+  currentLayout === "ranking" ? 10 :
+  currentLayout === "timeline" ? 8 :
+  currentLayout === "masonry" ? 12 :
   8;
 
 const totalPages = Math.max(
@@ -3983,6 +3987,203 @@ ACTIVITY
   </div>
 )}
 
+{currentLayout === "magazine" && (
+  <div className="grid gap-5 md:grid-cols-2">
+    {visiblePosts.map((post, index) => (
+      <button
+        type="button"
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className={`group overflow-hidden rounded-[28px] border border-slate-200 bg-white text-left transition hover:-translate-y-1 hover:shadow-xl ${
+          index === 0 ? "md:col-span-2" : ""
+        }`}
+      >
+        <div className="grid gap-0 md:grid-cols-2">
+          <div className="overflow-hidden bg-slate-100">
+            <img
+              src={post.image}
+              alt={post.title}
+              className={`w-full object-cover transition duration-500 group-hover:scale-105 ${
+                index === 0 ? "h-80" : "h-56"
+              }`}
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+              }}
+            />
+          </div>
+
+          <div className="flex flex-col justify-center p-6">
+            <span className="w-fit rounded-full bg-[#eef6ff] px-3 py-1 text-xs font-bold text-[#2563eb]">
+              {getCategoryLabel(post)}
+            </span>
+
+            <h3 className="mt-4 line-clamp-2 text-[1.35rem] font-black leading-tight tracking-[-0.04em]">
+              {post.title}
+            </h3>
+
+            <p className="mt-3 line-clamp-3 text-sm leading-7 text-neutral-500">
+              {post.summary || post.body}
+            </p>
+
+            <p className="mt-5 text-xs font-medium text-neutral-400">
+              조회 {post.views || 0}
+            </p>
+          </div>
+        </div>
+      </button>
+    ))}
+  </div>
+)}
+
+{currentLayout === "ranking" && (
+  <div className="space-y-3">
+    {visiblePosts.map((post, index) => (
+      <button
+        type="button"
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className="group flex w-full items-center gap-4 rounded-[24px] border border-slate-200 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
+      >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-neutral-950 text-lg font-black text-white">
+          {String((currentPage - 1) * postsPerPage + index + 1).padStart(2, "0")}
+        </div>
+
+        <div className="h-20 w-28 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+            }}
+          />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-[#eef6ff] px-2.5 py-1 text-xs font-bold text-[#2563eb]">
+              {getCategoryLabel(post)}
+            </span>
+            <span className="text-xs text-neutral-400">
+              조회 {post.views || 0}
+            </span>
+          </div>
+
+          <h3 className="mt-2 line-clamp-1 text-[1.05rem] font-black tracking-[-0.04em]">
+            {post.title}
+          </h3>
+
+          <p className="mt-1 line-clamp-1 text-sm text-neutral-500">
+            {post.summary || post.body}
+          </p>
+        </div>
+      </button>
+    ))}
+  </div>
+)}
+
+{currentLayout === "timeline" && (
+  <div className="relative space-y-5 pl-5 before:absolute before:left-2 before:top-0 before:h-full before:w-px before:bg-slate-200">
+    {visiblePosts.map((post) => (
+      <button
+        type="button"
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className="group relative w-full rounded-[24px] border border-slate-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:shadow-lg"
+      >
+        <span className="absolute -left-[22px] top-7 h-4 w-4 rounded-full border-4 border-white bg-[#4dbbff] shadow" />
+
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+          <div className="h-32 w-full overflow-hidden rounded-2xl bg-slate-100 md:w-48 md:shrink-0">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+              }}
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-[#eef6ff] px-2.5 py-1 text-xs font-bold text-[#2563eb]">
+                {getCategoryLabel(post)}
+              </span>
+
+              <span className="text-xs text-neutral-400">
+                {post.created_at
+                  ? new Date(post.created_at).toLocaleDateString()
+                  : "UNNEWS"}
+              </span>
+            </div>
+
+            <h3 className="mt-3 line-clamp-2 text-[1.15rem] font-black leading-6 tracking-[-0.04em]">
+              {post.title}
+            </h3>
+
+            <p className="mt-2 line-clamp-2 text-sm leading-6 text-neutral-500">
+              {post.summary || post.body}
+            </p>
+          </div>
+        </div>
+      </button>
+    ))}
+  </div>
+)}
+
+{currentLayout === "masonry" && (
+  <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
+    {visiblePosts.map((post, index) => (
+      <button
+        type="button"
+        key={post.id}
+        onClick={() => handleOpenPost(post)}
+        className="group mb-6 inline-block w-full break-inside-avoid overflow-hidden rounded-[28px] border border-slate-200 bg-white text-left transition hover:-translate-y-1 hover:shadow-xl"
+      >
+        <div className="overflow-hidden bg-slate-100">
+          <img
+            src={post.image}
+            alt={post.title}
+            className={`w-full object-cover transition duration-500 group-hover:scale-105 ${
+              index % 3 === 0
+                ? "h-72"
+                : index % 3 === 1
+                ? "h-52"
+                : "h-64"
+            }`}
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+            }}
+          />
+        </div>
+
+        <div className="p-5">
+          <span className="rounded-full bg-[#eef6ff] px-3 py-1 text-xs font-bold text-[#2563eb]">
+            {getCategoryLabel(post)}
+          </span>
+
+          <h3 className="mt-3 line-clamp-2 text-[1.1rem] font-black leading-6 tracking-[-0.04em] text-neutral-950">
+            {post.title}
+          </h3>
+
+          <p className="mt-2 line-clamp-3 text-sm leading-6 text-neutral-500">
+            {post.summary || post.body}
+          </p>
+
+          <p className="mt-4 text-xs text-neutral-400">
+            조회 {post.views || 0}
+          </p>
+        </div>
+      </button>
+    ))}
+  </div>
+)}
+
 {currentLayout === "gallery" && (
   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
     {visiblePosts.map((post) => (
@@ -5209,6 +5410,11 @@ ACTIVITY
 
               {layout === "gallery" && "갤러리형"}
 
+              {layout === "magazine" && "매거진형"}
+{layout === "ranking" && "랭킹형"}
+{layout === "timeline" && "타임라인형"}
+{layout === "masonry" && "메이슨리형"}
+
             </td>
 
             <td className="px-5 py-4">
@@ -5231,6 +5437,11 @@ ACTIVITY
                 <option value="board">게시판형</option>
 
                 <option value="gallery">갤러리형</option>
+
+                <option value="magazine">매거진형</option>
+<option value="ranking">랭킹형</option>
+<option value="timeline">타임라인형</option>
+<option value="masonry">메이슨리형</option>
 
               </select>
 
