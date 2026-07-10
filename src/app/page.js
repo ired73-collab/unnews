@@ -23,6 +23,42 @@ import {
   Cell,
 } from "recharts";
 
+import { clip, fallbackSummary, createSlug } from "../utils/text";
+
+import {
+  getAutoImage,
+  getSuggestionTopic,
+  getSmartImageSuggestions,
+} from "../utils/image";
+
+import { POLICY_PAGES } from "../data/policies";
+
+import {
+  updateBlockById,
+  removeBlockById,
+  moveBlockById,
+  getPlainBodyFromBlocks,
+  getCleanContentBlocks,
+  insertTextBlockAfter,
+  duplicateBlockById,
+} from "../utils/editor";
+
+import { normalizePost } from "../services/postService";
+
+import { uploadImageToCloudinary } from "../services/uploadService";
+
+import SlashMenu from "../components/editor/SlashMenu";
+
+import TextBlockEditor from "../components/editor/TextBlockEditor";
+
+import ImageBlockEditor from "../components/editor/ImageBlockEditor";
+
+import BlockToolbar from "../components/editor/BlockToolbar";
+
+import LinkBlockEditor from "../components/editor/LinkBlockEditor";
+
+import BlockTypeLabel from "../components/editor/BlockTypeLabel";
+
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
 
@@ -142,477 +178,6 @@ import {
 } from "../lib/categories";
 import { suggestImages } from "../lib/imageSuggest";
 
-function clip(text, max = 130) {
-  if (!text) return "";
-  return text.length > max ? `${text.slice(0, max)}...` : text;
-}
-
-function fallbackSummary(text) {
-  if (!text) return "";
-  const compact = text.replace(/\s+/g, " ").trim();
-  const sentences = compact
-    .split(/(?<=다\.|요\.|니다\.|[.!?])\s+/)
-    .filter(Boolean)
-    .slice(0, 3);
-
-  if (sentences.length >= 2) return sentences.join("\n");
-  return clip(compact, 160);
-}
-
-function createSlug(text = "") {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9가-힣\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 80);
-}
-
-function getAutoImage(category, text = "") {
-  const keyword = `${category} ${text}`.toLowerCase();
-
-  // AI / 기술
-  if (
-    keyword.includes("ai") ||
-    keyword.includes("인공지능") ||
-    keyword.includes("챗gpt") ||
-    keyword.includes("chatgpt") ||
-    keyword.includes("디지털") ||
-    keyword.includes("기술") ||
-    keyword.includes("로봇") ||
-    keyword.includes("데이터")
-  ) {
-    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 음주 / 술 / 대학 음주문화
-  if (
-    keyword.includes("음주") ||
-    keyword.includes("술") ||
-    keyword.includes("주류") ||
-    keyword.includes("회식") ||
-    keyword.includes("맥주") ||
-    keyword.includes("소주") ||
-    keyword.includes("음주문화")
-  ) {
-    return "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 연애 / 관계 / 데이트
-  if (
-    keyword.includes("연애") ||
-    keyword.includes("사랑") ||
-    keyword.includes("관계") ||
-    keyword.includes("데이트") ||
-    keyword.includes("커플") ||
-    keyword.includes("썸") ||
-    keyword.includes("이별")
-  ) {
-    return "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 취업 / 인턴 / 포트폴리오 / 커리어
-  if (
-    keyword.includes("취업") ||
-    keyword.includes("인턴") ||
-    keyword.includes("채용") ||
-    keyword.includes("면접") ||
-    keyword.includes("자소서") ||
-    keyword.includes("포트폴리오") ||
-    keyword.includes("포폴") ||
-    keyword.includes("커리어") ||
-    keyword.includes("스펙")
-  ) {
-    return "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 공모전 / 대외활동 / 창업
-  if (
-    keyword.includes("공모전") ||
-    keyword.includes("대외활동") ||
-    keyword.includes("서포터즈") ||
-    keyword.includes("창업") ||
-    keyword.includes("아이디어") ||
-    keyword.includes("프로젝트")
-  ) {
-    return "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 대학 / 캠퍼스 / 교육 / 학사
-  if (
-    keyword.includes("대학") ||
-    keyword.includes("캠퍼스") ||
-    keyword.includes("교육") ||
-    keyword.includes("수업") ||
-    keyword.includes("강의") ||
-    keyword.includes("학과") ||
-    keyword.includes("학생") ||
-    keyword.includes("학사") ||
-    keyword.includes("의대")
-  ) {
-    return "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 지역 / 사회 / 도시
-  if (
-    keyword.includes("지역") ||
-    keyword.includes("사회") ||
-    keyword.includes("도시") ||
-    keyword.includes("정책") ||
-    keyword.includes("청년") ||
-    keyword.includes("지자체")
-  ) {
-    return "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 문화 / 콘텐츠 / 공연 / 전시
-  if (
-    keyword.includes("문화") ||
-    keyword.includes("콘텐츠") ||
-    keyword.includes("공연") ||
-    keyword.includes("전시") ||
-    keyword.includes("영화") ||
-    keyword.includes("음악") ||
-    keyword.includes("축제")
-  ) {
-    return "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 라이프 / 생활 / 루틴
-  if (
-    keyword.includes("라이프") ||
-    keyword.includes("생활") ||
-    keyword.includes("루틴") ||
-    keyword.includes("일상") ||
-    keyword.includes("습관") ||
-    keyword.includes("건강")
-  ) {
-    return "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=1200&q=80";
-  }
-
-  // 기본 이미지
-  return "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80";
-}
-
-const IMAGE_SUGGESTION_POOLS = {
-  medical: [
-    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1200&q=80",
-  ],
-  ai: [
-  "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1526378722484-bd91ca387e72?auto=format&fit=crop&w=1200&q=80",
-],
-  education: [
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80",
-],
-
-student: [
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
-],
-
-project: [
-  "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
-],
-
-research: [
-  "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1518152006812-edab29b069ac?auto=format&fit=crop&w=1200&q=80",
-],
-  drinking: [
-    "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1525268323446-0505b6fe7778?auto=format&fit=crop&w=1200&q=80",
-  ],
-  relationship: [
-    "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=1200&q=80",
-  ],
-  career: [
-    "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-  ],
-  activity: [
-    "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80",
-  ],
-  campus: [
-    "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
-  ],
-  society: [
-    "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80",
-  ],
-  culture: [
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
-  ],
-  lifestyle: [
-    "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-  ],
-};
-
-function getSuggestionTopic(category, text = "") {
-  const keyword = `${category} ${text}`.toLowerCase();
-
-  const topicRules = [
-    {
-      key: "medical",
-      label: "의료·보건",
-      words: [
-        "의료",
-        "의대",
-        "의학",
-        "의사",
-        "간호",
-        "병원",
-        "환자",
-        "진료",
-        "수술",
-        "보건",
-        "의료현장",
-        "응급",
-        "임상",
-        "교수",
-        "칼럼",
-        "건강",
-      ],
-    },
-    {
-      key: "ai",
-      label: "AI·기술",
-      words: ["ai", "인공지능", "챗gpt", "chatgpt", "기술", "디지털", "로봇", "데이터"],
-    },
-    {
-      key: "drinking",
-      label: "음주문화·모임",
-      words: ["음주", "술", "주류", "회식", "맥주", "소주", "음주문화"],
-    },
-    {
-      key: "relationship",
-      label: "연애·관계",
-      words: ["연애", "사랑", "관계", "데이트", "커플", "썸", "이별"],
-    },
-    {
-      key: "career",
-      label: "취업·커리어",
-      words: ["취업", "인턴", "채용", "면접", "자소서", "포트폴리오", "포폴", "커리어", "스펙"],
-    },
-    {
-      key: "activity",
-      label: "공모전·대외활동",
-      words: ["공모전", "대외활동", "서포터즈", "창업", "아이디어", "프로젝트"],
-    },
-    {
-      key: "campus",
-      label: "대학·캠퍼스",
-      words: ["대학", "캠퍼스", "교육", "수업", "강의", "학과", "학생", "학사"],
-    },
-    {
-      key: "society",
-      label: "사회·지역",
-      words: ["지역", "사회", "도시", "정책", "청년", "지자체"],
-    },
-    {
-      key: "culture",
-      label: "문화·콘텐츠",
-      words: ["문화", "콘텐츠", "공연", "전시", "영화", "음악", "축제"],
-    },
-    {
-      key: "lifestyle",
-      label: "대학생 라이프",
-      words: ["라이프", "생활", "루틴", "일상", "습관"],
-    },
-  ];
-
-  const scores = topicRules.map((rule) => {
-    const score = rule.words.reduce((total, word) => {
-      const titleWeight = keyword.indexOf(word) >= 0 ? 1 : 0;
-      const strongWeight = text.toLowerCase().slice(0, 80).includes(word) ? 2 : 0;
-      const repeatWeight = keyword.split(word).length - 1;
-      return total + titleWeight + strongWeight + repeatWeight;
-    }, 0);
-
-    return { ...rule, score };
-  });
-
-  const best = scores.sort((a, b) => b.score - a.score)[0];
-
-  if (best && best.score > 0) {
-    return { key: best.key, label: best.label };
-  }
-
-  return { key: "lifestyle", label: "대학생 라이프" };
-}
-
-function getSmartImageSuggestions(category, title, body) {
-  const fullText = `${category || ""} ${title || ""} ${body || ""}`.toLowerCase();
-
-  const topicRules = [
-    {
-      key: "ai",
-      label: "AI·기술",
-      words: ["ai", "인공지능", "챗gpt", "chatgpt", "생성형", "디지털", "기술", "데이터", "자동화"],
-    },
-    {
-      key: "education",
-      label: "교육·학습",
-      words: ["교육", "학습", "수업", "강의", "교과목", "교육과정", "역량", "학습환경"],
-    },
-    {
-      key: "student",
-      label: "학생·대학생",
-      words: ["학생", "대학생", "청년", "팀플", "과제", "포트폴리오", "취업"],
-    },
-    {
-      key: "campus",
-      label: "대학·캠퍼스",
-      words: ["대학", "캠퍼스", "학과", "학사", "교수", "학교"],
-    },
-    {
-      key: "project",
-      label: "프로젝트·창업",
-      words: ["프로젝트", "창업", "아이디어", "검증", "팀", "협업", "공모전", "대외활동"],
-    },
-    {
-      key: "research",
-      label: "연구·데이터",
-      words: ["연구", "데이터", "분석", "실험", "논문", "랩", "연구실"],
-    },
-    {
-      key: "career",
-      label: "취업·커리어",
-      words: ["취업", "채용", "면접", "자소서", "스펙", "커리어", "인턴"],
-    },
-    {
-      key: "medical",
-      label: "의료·보건",
-      words: ["의료", "의대", "의학", "병원", "보건", "건강", "간호"],
-    },
-    {
-      key: "culture",
-      label: "문화·콘텐츠",
-      words: ["문화", "콘텐츠", "공연", "전시", "영화", "축제"],
-    },
-    {
-      key: "society",
-      label: "사회·지역",
-      words: ["지역", "사회", "정책", "도시", "지자체"],
-    },
-    {
-      key: "lifestyle",
-      label: "대학생 라이프",
-      words: ["생활", "루틴", "일상", "습관", "라이프"],
-    },
-  ];
-
-  const scoredTopics = topicRules
-    .map((topic) => {
-      const score = topic.words.reduce((total, word) => {
-        const count = fullText.split(word).length - 1;
-        const titleBonus = `${title || ""}`.toLowerCase().includes(word) ? 2 : 0;
-        const categoryBonus = `${category || ""}`.toLowerCase().includes(word) ? 1 : 0;
-
-        return total + count + titleBonus + categoryBonus;
-      }, 0);
-
-      return {
-        ...topic,
-        score,
-      };
-    })
-    .filter((topic) => topic.score > 0)
-    .sort((a, b) => b.score - a.score);
-
-  const primaryTopic = scoredTopics[0] || {
-    key: "campus",
-    label: "대학·캠퍼스",
-    score: 1,
-  };
-
-  const blendedTopics = [
-    primaryTopic,
-    ...scoredTopics.filter((topic) => topic.key !== primaryTopic.key),
-  ];
-
-  const fallbackTopics = ["campus", "education", "student", "lifestyle"]
-    .map((key) => topicRules.find((topic) => topic.key === key))
-    .filter(Boolean)
-    .filter((topic) => !blendedTopics.some((item) => item.key === topic.key));
-
-  const finalTopics = [...blendedTopics, ...fallbackTopics].slice(0, 4);
-
-  const picked = [];
-  const usedUrls = new Set();
-
-  finalTopics.forEach((topic, topicIndex) => {
-    const pool = IMAGE_SUGGESTION_POOLS[topic.key] || IMAGE_SUGGESTION_POOLS.campus || [];
-    const url = pool.find((item) => !usedUrls.has(item));
-
-    if (url) {
-      usedUrls.add(url);
-      picked.push({
-        id: `${topic.key}-${topicIndex}`,
-        url,
-        label: topic.label,
-      });
-    }
-  });
-
-  if (picked.length < 4) {
-    Object.entries(IMAGE_SUGGESTION_POOLS).forEach(([key, pool]) => {
-      if (picked.length >= 4) return;
-
-      const url = pool.find((item) => !usedUrls.has(item));
-
-      if (url) {
-        usedUrls.add(url);
-        const topic = topicRules.find((item) => item.key === key);
-
-        picked.push({
-          id: `${key}-${picked.length}`,
-          url,
-          label: topic?.label || "추천 이미지",
-        });
-      }
-    });
-  }
-
-  return picked.slice(0, 4);
-}
-
 function BrandLogo() {
   return (
     <div className="flex items-center gap-3">
@@ -666,597 +231,6 @@ function ShortcutAdminIcon() {
     </svg>
   );
 }
-
-const POLICY_PAGES = {
-  privacy: {
-  label: "PRIVACY POLICY",
-  title: "개인정보처리방침",
-  desc: "대학연합신문은 이용자의 개인정보를 소중히 보호하며, 관련 법령에 따라 안전하게 관리합니다.",
-  sections: [
-    {
-      title: "0. 총칙",
-      text: `대학연합신문은 이용자의 개인정보를 중요시하며, 「개인정보 보호법」, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 등 개인정보 보호 관련 법령을 준수하고 있습니다.
-
-대학연합신문은 본 개인정보처리방침을 통하여 이용자가 제공하는 개인정보가 어떠한 용도와 방식으로 이용되고 있으며, 개인정보 보호를 위해 어떠한 조치가 취해지고 있는지 알려드립니다.
-
-본 개인정보처리방침은 관계 법령 및 내부 운영 방침에 따라 변경될 수 있으며, 변경 시 웹사이트 공지사항 또는 개별 안내를 통해 고지합니다.
-
-개인정보처리방침 시행일자: 2026.03.16`,
-    },
-    {
-      title: "1. 수집하는 개인정보의 항목 및 수집방법",
-      text: `(1) 수집하는 개인정보의 항목 및 목적
-
-대학연합신문은 서비스 이용, 문의, 제휴, 댓글 작성, 콘텐츠 제보, 이벤트 참여 등 필요한 경우 아래와 같은 개인정보를 수집할 수 있습니다.
-
-[필수항목]
-- 문의/신고하기: 이름, 연락처, 이메일, 문의 내용
-- 댓글 작성: 이름, 댓글 내용, 작성일시
-- 제휴 및 협업 문의: 이름, 소속, 연락처, 이메일, 문의 내용
-- 이벤트 지원 및 운영: 이름, 이메일, 연락처
-
-[선택항목]
-- 소속 학교, 학과, 직책, 프로필 이미지, SNS 주소, 기타 이용자가 자발적으로 제공한 정보
-
-대학연합신문은 이용자의 사생활을 현저히 침해할 우려가 있는 민감정보를 원칙적으로 수집하지 않습니다.
-
-(2) 개인정보 수집방법
-
-대학연합신문은 다음과 같은 방법으로 개인정보를 수집할 수 있습니다.
-
-- 웹사이트 문의/신고하기
-- 댓글 작성
-- 이메일 문의
-- 제휴 및 콘텐츠 제보
-- 이벤트, 캠페인, 서포터즈 신청
-- 서비스 이용 과정에서 자동 생성되는 접속기록, 쿠키, IP 정보`,
-    },
-    {
-      title: "2. 개인정보의 보유 및 이용기간",
-      text: `대학연합신문은 원칙적으로 개인정보 수집 및 이용 목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다.
-
-단, 관계 법령의 규정에 따라 보존할 필요가 있는 경우에는 아래와 같이 일정 기간 동안 보관할 수 있습니다.
-
-[보유 항목 / 보유 기간 / 법적 근거]
-
-- 계약 또는 청약철회 등에 관한 기록 / 5년 / 전자상거래 등에서의 소비자보호에 관한 법률
-- 대금결제 및 재화 등의 공급에 관한 기록 / 5년 / 전자상거래 등에서의 소비자보호에 관한 법률
-- 소비자의 불만 또는 분쟁처리에 관한 기록 / 3년 / 전자상거래 등에서의 소비자보호에 관한 법률
-- 신용정보의 수집·처리 및 이용 등에 관한 기록 / 3년 / 신용정보의 이용 및 보호에 관한 법률
-- 표시·광고에 관한 기록 / 6개월 / 전자상거래 등에서의 소비자보호에 관한 법률
-- 이용자의 인터넷 등 로그기록 및 접속지 추적자료 / 3개월 / 통신비밀보호법
-- 그 외 통신사실 확인자료 / 12개월 / 통신비밀보호법`,
-    },
-    {
-      title: "3. 개인정보의 파기 절차 및 파기방법",
-      text: `(1) 파기절차
-
-이용자의 개인정보는 목적이 달성된 후 별도의 DB 또는 보관 장소로 옮겨져 내부 방침 및 관계 법령에 따라 일정 기간 저장된 후 파기됩니다. 별도 보관된 개인정보는 법률에 의한 경우가 아니면 보관 목적 이외의 다른 목적으로 이용되지 않습니다.
-
-(2) 파기방법
-
-전자적 파일 형태로 저장된 개인정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제합니다. 종이에 출력된 개인정보는 분쇄기로 분쇄하거나 소각을 통하여 파기합니다.`,
-    },
-    {
-      title: "4. 수집한 개인정보의 위탁",
-      text: `대학연합신문은 원활한 서비스 운영을 위하여 필요한 경우 개인정보 처리 업무의 일부를 외부 전문업체에 위탁할 수 있습니다.
-
-개인정보 처리 위탁 시 개인정보 보호의 안전을 기하기 위하여 개인정보보호 관련 지시 엄수, 개인정보에 대한 비밀 유지, 제3자 제공 금지, 사고 발생 시 책임 부담, 위탁기간 및 처리 종료 후 개인정보의 반환 또는 파기 등을 명확히 규정하고 있습니다.
-
-[수탁 업체 / 위탁 업무 내용]
-
-- 클라우드 및 서버 운영 업체 / 웹사이트 및 데이터 보관 관리
-- 이메일 및 문의 시스템 제공 업체 / 문의 접수 및 답변 관리
-- 이미지 및 파일 저장 서비스 제공 업체 / 콘텐츠 이미지 및 첨부파일 저장 관리
-
-위탁업체 또는 위탁업무의 내용이 변경될 경우 웹사이트 공지사항 또는 개인정보처리방침을 통해 고지합니다.`,
-    },
-    {
-      title: "5. 제3자에게의 개인정보 제공",
-      text: `대학연합신문은 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다.
-
-다만, 아래의 경우에는 예외로 합니다.
-
-- 이용자가 사전에 동의한 경우
-- 법령의 규정에 의하거나 수사 목적으로 관계기관의 적법한 절차와 방법에 따라 요청이 있는 경우
-- 통계 작성, 학술연구, 시장조사를 위하여 특정 개인을 식별할 수 없는 형태로 제공하는 경우
-- 서비스 제공에 따른 요금 정산 또는 분쟁 처리를 위해 필요한 경우
-
-대학연합신문은 개인정보를 제3자에게 제공하는 경우 제공받는 자, 제공 목적, 제공 항목, 보유 및 이용기간 등을 사전에 고지하고 동의를 받습니다.`,
-    },
-    {
-      title: "6. 이용자 및 법정대리인의 권리와 그 행사방법",
-      text: `이용자 및 법정대리인은 언제든지 등록되어 있는 본인 또는 만 14세 미만 아동의 개인정보에 대해 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다.
-
-개인정보 열람, 정정, 삭제, 처리정지 요청은 이메일 또는 전화로 접수할 수 있으며, 대학연합신문은 지체 없이 필요한 조치를 취합니다.
-
-이용자가 개인정보의 오류에 대한 정정을 요청한 경우에는 정정을 완료하기 전까지 해당 개인정보를 이용하거나 제3자에게 제공하지 않습니다.
-
-대학연합신문은 이용자 또는 법정대리인의 요청에 의해 삭제 또는 처리정지된 개인정보를 관계 법령 및 본 개인정보처리방침에 명시된 바에 따라 처리하고, 그 외의 용도로 열람 또는 이용할 수 없도록 관리합니다.
-
-이용자는 본인의 개인정보를 최신의 상태로 정확하게 입력하여야 하며, 부정확한 정보 입력으로 발생하는 문제의 책임은 이용자 본인에게 있습니다.`,
-    },
-    {
-      title: "7. 개인정보 자동수집 장치의 설치, 운영 및 거부에 관한 사항",
-      text: `대학연합신문은 이용자에게 더 나은 서비스를 제공하기 위해 쿠키(cookie) 등 개인정보 자동수집 장치를 사용할 수 있습니다.
-
-(1) 쿠키 사용 목적
-
-- 이용자의 접속 빈도 및 방문 시간 분석
-- 이용자의 관심 분야 파악
-- 서비스 개선 및 맞춤형 콘텐츠 제공
-- 이벤트 참여 정도 및 방문 회수 파악
-- 보안 및 부정 이용 방지
-
-(2) 쿠키 설정 거부 방법
-
-이용자는 웹브라우저 설정을 통해 쿠키 저장을 허용하거나 거부할 수 있습니다. 다만 쿠키 저장을 거부할 경우 일부 서비스 이용에 어려움이 있을 수 있습니다.`,
-    },
-    {
-      title: "8. 기타 개인정보 처리에 관한 방침",
-      text: `(1) 개인정보 보호를 위한 기술적·관리적 조치
-
-대학연합신문은 이용자의 개인정보가 분실, 도난, 유출, 변조 또는 훼손되지 않도록 안정성 확보를 위해 다음과 같은 조치를 취하고 있습니다.
-
-- 내부 관리계획의 수립 및 시행
-- 개인정보 접근 권한의 제한
-- 개인정보 처리 직원의 최소화 및 교육
-- 접속 기록의 보관 및 위·변조 방지
-- 개인정보의 암호화
-- 해킹 및 악성코드 등에 대비한 보안 조치
-- 개인정보와 일반 데이터의 분리 보관
-- 외부 침입에 대비한 보안 시스템 운영
-
-(2) 링크 사이트
-
-대학연합신문은 이용자에게 다른 웹사이트 또는 자료에 대한 링크를 제공할 수 있습니다. 이 경우 대학연합신문은 외부 사이트 및 자료에 대한 통제권이 없으므로 해당 사이트의 개인정보처리방침과 무관합니다. 링크를 통해 외부 사이트로 이동하는 경우 해당 사이트의 정책을 확인하시기 바랍니다.
-
-(3) 게시물 운영 방침
-
-대학연합신문은 이용자의 게시물을 소중하게 생각하며, 변조·훼손·삭제되지 않도록 최선을 다합니다. 다만 다음에 해당하는 게시물은 사전 통보 없이 삭제 또는 이동될 수 있습니다.
-
-- 스팸성 게시물
-- 타인을 비방하거나 명예를 훼손하는 게시물
-- 동의 없는 개인정보 공개 게시물
-- 저작권 등 권리를 침해하는 게시물
-- 기타 서비스 운영 목적과 다른 내용의 게시물
-
-(4) 이메일 무단수집 거부
-
-대학연합신문은 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를 이용해 무단 수집되는 것을 거부합니다. 이를 위반할 경우 관련 법령에 따라 처벌될 수 있습니다.
-
-(5) 광고성 정보의 전송
-
-대학연합신문은 이용자의 사전 동의를 받은 경우 광고성 정보를 전송할 수 있으며, 관련 법령에 따라 제목 및 본문에 광고성 정보임을 명확히 표시합니다.`,
-    },
-    {
-      title: "9. 개인정보 보호책임자 및 고객서비스 담당부서 등 안내",
-      text: `대학연합신문은 이용자의 개인정보를 보호하고 개인정보와 관련한 불만을 처리하기 위하여 아래와 같이 개인정보 보호책임자 및 담당부서를 지정하고 있습니다.
-
-[개인정보 보호책임자 및 개인정보 보호 업무 담당부서]
-
-- 개인정보 보호책임자: 김영일
-- 소속: 대학연합신문 편집국
-- 전화: 053-765-4765
-- 이메일: unnews@daum.net
-
-[기타 기관]
-
-이용자는 대학연합신문의 서비스를 이용하며 발생하는 모든 개인정보보호 관련 민원을 개인정보 보호책임자 또는 담당부서로 신고할 수 있습니다. 기타 개인정보 침해에 대한 신고나 상담이 필요한 경우 아래 기관에 문의할 수 있습니다.
-
-- 개인정보침해신고센터: privacy.kisa.or.kr / 118
-- 대검찰청: www.spo.go.kr / 1301
-- 경찰청 사이버수사국: cyberbureau.police.go.kr / 182
-
-개인정보처리방침 버전번호: v1.0
-개인정보처리방침 시행일자: 2026.03.16`,
-    },
-  ],
-},
-
-  terms: {
-  label: "TERMS OF USE",
-  title: "이용약관",
-  desc: "본 약관은 대학연합신문이 제공하는 인터넷 관련 서비스 이용에 관한 권리, 의무 및 책임사항을 규정합니다.",
-  sections: [
-    {
-      title: "제1장 총칙",
-      text: `제1조(목적)
-
-이 약관은 대학연합신문의 미디어사이트인 대학연합신문(https://unnews.vercel.app)에서 제공하는 인터넷 관련 서비스(이하 “대학연합신문”이라 한다)를 이용함에 있어 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.
-
-※ PC통신, 무선 등을 이용하는 전자상거래에 대해서도 그 성질에 반하지 않는 한 이 약관을 준용합니다.`,
-    },
-    {
-      title: "제2조(용어의 정의)",
-      text: `① 회사란 “대학연합신문”을 의미하며, 대학연합신문이 콘텐츠 및 서비스를 이용자에게 제공하기 위하여 컴퓨터 등 정보통신설비를 이용하여 운영하는 가상의 서비스 공간을 말하고, 아울러 “대학연합신문”을 운영하는 사업자의 의미로도 사용합니다.
-
-② “이용자”란 이 약관에 따라 회사가 제공하는 서비스를 받는 회원 및 비회원을 말합니다.
-
-③ “회원”이라 함은 회사에 개인정보를 제공하여 회원등록을 한 자로서, 회사가 제공하는 정보를 지속적으로 받으며, 회사가 제공하는 서비스를 계속적으로 이용할 수 있는 자를 말합니다.
-
-④ “비회원”이라 함은 회원에 가입하지 않고 회사가 제공하는 서비스를 이용하는 자를 말합니다.
-
-⑤ “ID”란 회원의 식별과 서비스 이용을 위하여 회원이 신청하고 회사가 승인한 이메일을 말합니다.
-
-⑥ “비밀번호”란 회원의 동일성 확인과 회원의 권익 및 비밀보호를 위하여 회원 스스로가 설정하여 등록한 영문 또는 숫자, 특수문자 등의 조합을 말합니다.
-
-⑦ “콘텐츠”란 회사가 제공하는 디지털 콘텐츠를 말합니다.
-
-⑧ 상기 항에 정의되지 않은 용어는 일반적인 상관례에 따릅니다.`,
-    },
-    {
-      title: "제3조(약관 등의 명시와 설명 및 개정)",
-      text: `① 대학연합신문은 이 약관의 내용과 상호, 주소, 전화번호, 전자우편주소, 개인정보처리방침, 저작권 정책, 청소년보호정책 등을 이용자가 쉽게 알 수 있도록 초기 서비스화면 또는 연결화면에 게시합니다.
-
-② 대학연합신문은 전자상거래 등에서의 소비자보호에 관한 법률, 약관의 규제에 관한 법률, 전자문서 및 전자거래 기본법, 전자서명법, 정보통신망 이용촉진 및 정보보호 등에 관한 법률 등 관련 법령을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.
-
-③ 대학연합신문이 약관을 개정할 경우 적용일자 및 개정사유를 명시하여 현행 약관과 함께 초기화면에 그 적용일자 7일 이전부터 적용일자 전일까지 공지합니다. 다만 이용자에게 불리하게 약관 내용을 변경하는 경우에는 최소 30일 이상의 사전 유예기간을 두고 공지합니다.
-
-④ 개정된 약관은 적용일자 이후 체결되는 서비스 이용계약에 적용되며, 그 이전에 이미 체결된 계약에 대해서는 개정 전 약관이 적용됩니다. 다만 이용자가 개정약관의 적용을 원하는 뜻을 공지기간 내 회사에 전달하고 회사가 동의한 경우에는 개정약관이 적용됩니다.
-
-⑤ 이 약관에서 정하지 아니한 사항과 해석에 관하여는 관련 법령 및 상관례에 따릅니다.`,
-    },
-    {
-      title: "제2장 회사의 서비스",
-      text: `제4조(서비스의 제공 및 변경)
-
-① 대학연합신문은 다음과 같은 업무를 수행합니다.
-
-1. 디지털 콘텐츠 발행
-2. 회원 글쓰기 서비스
-3. 커뮤니티 서비스
-4. 뉴스, 커리어, 취업·공모전, 트렌드 정보 제공
-5. 기타 대학연합신문이 정하는 업무
-
-② 대학연합신문은 서비스 변경 또는 기술적 사양 변경 등의 경우 제공할 서비스 내용을 변경할 수 있습니다. 이 경우 변경된 서비스의 내용 및 제공일자를 명시하여 현재의 서비스 내용을 게시한 곳에 즉시 공지합니다.
-
-③ 대학연합신문이 제공하기로 이용자와 계약을 체결한 서비스의 내용을 변경할 경우에는 그 사유를 이용자에게 통지 가능한 이메일 주소로 즉시 통지합니다.
-
-④ 전항의 경우 대학연합신문은 이로 인하여 이용자가 입은 손해를 배상합니다. 다만 대학연합신문이 고의 또는 과실이 없음을 입증하는 경우에는 그러하지 아니합니다.`,
-    },
-    {
-      title: "제5조(서비스의 중단)",
-      text: `① 대학연합신문은 컴퓨터 등 정보통신설비의 보수점검, 교체 및 고장, 통신 두절 등의 사유가 발생한 경우 서비스 제공을 일시적으로 중단할 수 있습니다.
-
-② 대학연합신문은 제1항의 사유로 서비스 제공이 일시적으로 중단됨으로 인하여 이용자 또는 제3자가 입은 손해에 대하여 배상합니다. 단, 대학연합신문이 고의 또는 과실이 없음을 입증하는 경우에는 그러하지 아니합니다.
-
-③ 사업종목의 전환, 사업의 포기, 업체 간 통합 등의 이유로 서비스를 제공할 수 없게 되는 경우 대학연합신문은 이용자에게 통지하고 관련 법령 및 내부 기준에 따라 처리합니다.`,
-    },
-    {
-      title: "제3장 회원관리",
-      text: `제6조(회원가입)
-
-① 이용자는 대학연합신문이 정한 가입 양식에 따라 회원정보를 기입한 후 이 약관에 동의한다는 의사표시를 함으로써 회원가입을 신청합니다.
-
-② 대학연합신문은 회원가입을 신청한 이용자 중 다음 각 호에 해당하지 않는 한 회원으로 등록합니다.
-
-1. 이전에 회원자격을 상실한 적이 있는 경우
-2. 등록 내용에 허위, 기재누락, 오기가 있는 경우
-3. 기타 회원으로 등록하는 것이 대학연합신문의 기술상 현저히 지장이 있다고 판단되는 경우
-
-③ 회원가입계약의 성립시기는 대학연합신문의 승낙이 회원에게 도달한 시점으로 합니다.
-
-④ 회원은 등록사항에 변경이 있는 경우 즉시 전자우편 기타 방법으로 대학연합신문에 그 변경사항을 알려야 합니다.`,
-    },
-    {
-      title: "제7조(회원 탈퇴 및 자격 상실 등)",
-      text: `① 회원은 대학연합신문에 언제든지 탈퇴를 요청할 수 있으며 대학연합신문은 즉시 회원탈퇴를 처리합니다.
-
-② 회원이 다음 각 호의 사유에 해당하는 경우 대학연합신문은 회원자격을 제한 및 정지시킬 수 있습니다.
-
-1. 가입 신청 시 허위 내용을 등록한 경우
-2. 대학연합신문 이용과 관련하여 회원이 부담하는 채무를 기일에 지급하지 않는 경우
-3. 다른 사람의 대학연합신문 이용을 방해하거나 그 정보를 도용하는 경우
-4. 대학연합신문을 이용하여 법령 또는 이 약관이 금지하거나 공서양속에 반하는 행위를 하는 경우
-5. 타인에게 아이디 및 비밀번호 등을 공유하여 사용하는 경우
-
-③ 대학연합신문이 회원자격을 제한 또는 정지시킨 후 동일한 행위가 반복되거나 일정 기간 내 사유가 시정되지 아니하는 경우 회원자격을 상실시킬 수 있습니다.
-
-④ 대학연합신문이 회원자격을 상실시키는 경우에는 회원등록을 말소합니다. 이 경우 회원에게 이를 통지하고 소명할 기회를 부여합니다.`,
-    },
-    {
-      title: "제8조(회원에 대한 통지)",
-      text: `① 대학연합신문이 회원에 대한 통지를 하는 경우 회원이 지정한 전자우편 주소 또는 전화번호로 할 수 있습니다.
-
-② 대학연합신문은 불특정다수 회원에 대한 통지의 경우 1주일 이상 게시판에 게시함으로써 개별 통지를 대신할 수 있습니다. 다만 회원 본인의 거래 또는 권리와 관련하여 중대한 영향을 미치는 사항에 대해서는 개별 통지를 합니다.`,
-    },
-    {
-      title: "제4장 회사와 이용자의 의무사항",
-      text: `제9조(개인정보보호)
-
-① 대학연합신문은 이용자의 정보 수집 시 서비스 제공에 필요한 최소한의 정보를 수집합니다.
-
-필수사항은 다음과 같습니다.
-
-1. 이메일 아이디
-2. 이름
-3. 연락처
-4. 비밀번호
-5. 연락 가능한 전자우편주소
-
-② 대학연합신문이 이용자의 개인식별이 가능한 개인정보를 수집하는 때에는 반드시 해당 이용자의 동의를 받습니다.
-
-③ 제공된 개인정보는 이용자의 동의 없이 목적 외 이용이나 제3자에게 제공할 수 없으며, 이에 대한 모든 책임은 대학연합신문이 집니다. 다만 다음의 경우에는 예외로 합니다.
-
-1. 통계작성, 학술연구 또는 시장조사를 위하여 특정 개인을 식별할 수 없는 형태로 제공하는 경우
-2. 본인확인 또는 도용방지를 위하여 필요한 경우
-3. 법률의 규정 또는 법률에 의하여 필요한 불가피한 사유가 있는 경우
-
-④ 이용자는 언제든지 대학연합신문이 가지고 있는 자신의 개인정보에 대해 열람 및 오류정정을 요구할 수 있으며 대학연합신문은 이에 대해 지체 없이 필요한 조치를 취합니다.
-
-⑤ 대학연합신문은 개인정보 보호를 위하여 관리자를 한정하고 이용자의 개인정보 분실, 도난, 유출, 변조 등으로 인한 손해를 방지하기 위해 필요한 조치를 취합니다.`,
-    },
-    {
-      title: "제10조(회사의 의무)",
-      text: `① 대학연합신문은 법령과 이 약관이 금지하거나 공서양속에 반하는 행위를 하지 않으며 지속적이고 안정적으로 서비스를 제공하기 위해 최선을 다합니다.
-
-② 대학연합신문은 이용자가 안전하게 인터넷 서비스를 이용할 수 있도록 개인정보 보호를 위한 보안 시스템을 갖추어야 합니다.
-
-③ 대학연합신문은 이용자가 원하지 않는 영리 목적의 광고성 전자우편을 발송하지 않습니다.`,
-    },
-    {
-      title: "제11조(회원의 ID 및 비밀번호에 대한 의무)",
-      text: `① ID와 비밀번호에 관한 관리책임은 회원에게 있습니다.
-
-② 회원은 자신의 ID 및 비밀번호를 제3자에게 이용하게 해서는 안 됩니다.
-
-③ 회원이 자신의 ID 및 비밀번호를 도난당하거나 제3자가 사용하고 있음을 인지한 경우에는 즉시 대학연합신문에 통보하고 대학연합신문의 안내가 있는 경우 그에 따라야 합니다.`,
-    },
-    {
-      title: "제12조(이용자의 의무)",
-      text: `이용자는 다음 행위를 하여서는 안 됩니다.
-
-1. 신청 또는 변경 시 허위 내용의 등록
-2. 타인의 정보 도용
-3. 대학연합신문에 게시된 정보의 변경
-4. 대학연합신문이 정한 정보 이외의 정보 송신 또는 게시
-5. 대학연합신문 또는 제3자의 저작권 등 지적재산권 침해
-6. 대학연합신문 또는 제3자의 명예를 손상시키거나 업무를 방해하는 행위
-7. 외설 또는 폭력적인 메시지, 화상, 음성, 기타 공서양속에 반하는 정보를 공개 또는 게시하는 행위`,
-    },
-    {
-      title: "제5장 게시물 저작권과 관리 사항",
-      text: `제13조(저작권의 귀속 및 이용제한)
-
-① 대학연합신문이 작성한 저작물에 대한 저작권 및 기타 지적재산권은 대학연합신문에 귀속합니다.
-
-② 이용자가 작성한 게시물에 대한 저작권 및 기타 지적재산권은 작성자에게 귀속합니다.
-
-③ 이용자는 대학연합신문을 이용함으로써 얻은 정보 중 대학연합신문에게 지적재산권이 귀속된 정보를 대학연합신문의 사전 승낙 없이 복제, 송신, 출판, 배포, 방송 기타 방법으로 영리 목적에 이용하거나 제3자에게 이용하게 하여서는 안 됩니다.
-
-④ 이용자가 서비스 내에 게시물을 작성하는 경우 해당 게시물은 서비스에 노출될 수 있으며, 필요한 범위 내에서 사용, 저장, 복사, 수정, 배포, 전시, 공중송신 등의 방식으로 이용될 수 있습니다.
-
-⑤ 회원의 게시물이 타인의 저작권을 침해할 경우 회사는 이에 대한 민·형사상 책임을 지지 않습니다. 회원의 저작권 침해 행위로 인해 회사가 손해를 입은 경우 회원은 그 손해를 부담할 수 있습니다.`,
-    },
-    {
-      title: "제14조(게시물의 관리)",
-      text: `① 모든 게시물에 대한 책임은 게시한 자에게 있으며 게시물이 전달하는 정보의 신뢰도, 정확성 등에 대해서 회사는 책임지지 않습니다.
-
-② 회원이 직접 삭제한 게시물은 시스템 상에서 삭제되며 회사는 이를 별도로 보관하거나 복구할 책임을 지지 않습니다.
-
-③ 게시물이 아래 각 호에 해당할 경우 회사가 이를 삭제, 이동하거나 등록을 거부할 수 있습니다.
-
-1. 공공질서와 미풍양속을 저해하는 내용
-2. 폭력적이거나 저속하고 음란한 내용
-3. 불법 복제, 해킹, 기타 현행법을 위반하거나 저촉할 우려가 있는 내용
-4. 특정 개인이나 단체를 모욕하거나 명예를 훼손하는 내용
-5. 개인신상에 대한 내용으로 타인의 명예나 프라이버시를 침해할 수 있는 내용
-6. 타인의 지적재산권, 초상권 등 권리를 침해하는 내용
-7. 광고, 홍보, 판촉 등 영리를 목적으로 한 상업적 내용
-8. 사적인 정치적 판단이나 종교적 견해로 이용자 간 위화감을 조장하는 내용
-9. 서비스 운영 원칙에 어긋나거나 부합하지 않는 내용
-10. 동일한 내용을 반복 게시하는 등 다른 이용자의 서비스 이용에 지장을 초래하는 내용
-11. 회사의 원활한 서비스 제공을 방해하는 내용
-12. 범죄와 결부된다고 객관적으로 인정되는 내용
-13. 기타 관계법령에 위배된다고 판단되는 내용`,
-    },
-    {
-      title: "제15조(자료의 보관)",
-      text: `① 회원이 서비스를 이용하며 축적한 데이터에 대한 보관 책임은 회원에게 있으며, 무료 서비스의 장애, 제공 중단, 자료 멸실, 삭제, 변조 등으로 인한 손해에 대해서 회사는 원상 복구에 최선을 다할 의무만을 지닙니다.
-
-② 회원이 서비스 이용계약을 해지하였을 경우 회원의 게시물은 삭제될 수 있으며 삭제된 자료는 복구할 수 없습니다.
-
-③ 회사가 약관에 따라 게시물을 삭제하는 경우 삭제된 자료에 대해서 복구할 책임을 지지 않습니다.`,
-    },
-    {
-      title: "제6장 기타",
-      text: `제16조(분쟁해결)
-
-① 대학연합신문은 이용자가 제기하는 정당한 의견이나 불만을 반영하고 그 피해를 처리하기 위하여 필요한 절차를 운영합니다.
-
-② 대학연합신문은 이용자로부터 제출되는 불만사항 및 의견을 우선적으로 처리합니다. 다만 신속한 처리가 곤란한 경우에는 이용자에게 그 사유와 처리일정을 통보합니다.
-
-③ 대학연합신문과 이용자 간에 발생한 분쟁과 관련하여 이용자의 피해구제신청이 있는 경우에는 관련 분쟁조정기관의 조정에 따를 수 있습니다.`,
-    },
-    {
-      title: "제17조(재판권 및 준거법)",
-      text: `① 대학연합신문과 이용자 간에 발생한 분쟁에 관한 소송은 관련 법령에 따른 관할 법원에 제기합니다.
-
-② 대학연합신문과 이용자 간에 제기된 소송에는 대한민국 법을 적용합니다.`,
-    },
-    {
-      title: "제18조(법령 및 준용)",
-      text: `이 약관에 명시하지 않은 사항은 관련 법령과 회사의 규정 및 기타 상관례에 따릅니다.`,
-    },
-    {
-      title: "제19조(개별약관)",
-      text: `① 이 약관은 대학연합신문과 회원 간에 성립되는 서비스 이용계약의 기본약정입니다. 대학연합신문은 필요한 경우 특정 서비스에 관하여 적용될 사항을 정하여 미리 알릴 수 있으며, 회원이 개별약관에 동의하고 특정 서비스를 이용하면 개별약관이 우선 적용됩니다.
-
-② 대학연합신문은 필요한 경우 서비스 이용과 관련된 세부적인 내용을 사이트 등을 통하여 공지할 수 있습니다.`,
-    },
-    {
-      title: "제20조(이메일 무단 수집 거부)",
-      text: `본 웹사이트는 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를 이용해 무단으로 수집되는 것을 거부하며, 이를 위반할 경우 정보통신망법에 의해 형사처벌될 수 있습니다.`,
-    },
-    {
-      title: "제21조(저작권 정책)",
-      text: `대학연합신문의 저작권 정책을 안내합니다.
-
-대학연합신문에서 발행하는 모든 콘텐츠는 저작권법에 의하여 보호받는 저작물로서 저작권은 대학연합신문에 있습니다.
-
-별도의 규정이 없는 한 대학연합신문에서 발행되는 콘텐츠에 대한 무단 복제 및 배포 등 저작권을 침해하는 행위를 금합니다.
-
-대학연합신문에서 발행하는 콘텐츠를 상업적으로 이용하거나 기타 영리 목적으로 이용하고자 하는 경우 사전에 회사와 별도 협의를 하거나 허락을 얻어야 하며, 협의 또는 허락을 얻어 자료의 내용을 게재하는 경우에도 출처가 대학연합신문임을 반드시 밝혀야 합니다.
-
-본 사이트에서 제공하는 콘텐츠를 타 사이트, 블로그, SNS 등에 인터넷 링크하는 것은 허용되나 이 경우에도 출처를 대학연합신문으로 명시하여야 합니다.
-
-위와 관련된 자세한 사항은 unnews@daum.net 으로 문의해 주십시오.
-
-부칙
-
-제1조(시행일) 이 약관은 2026년 3월 16일부터 시행합니다.`,
-    },
-  ],
-},
-
-  copyright: {
-  label: "COPYRIGHT POLICY",
-  title: "저작권 정책",
-  desc: "대학연합신문의 모든 콘텐츠는 저작권법의 보호를 받으며 무단 이용을 금지합니다.",
-  sections: [
-    {
-      title: "제1조(목적)",
-      text: `본 정책은 대학연합신문이 제공하는 기사, 사진, 이미지, 영상, 디자인, 로고, 데이터베이스 및 기타 모든 콘텐츠의 저작권 보호와 이용 기준을 규정함을 목적으로 합니다.
-
-대학연합신문은 저작권자의 권리를 보호하고 건전한 콘텐츠 이용 문화를 조성하기 위해 본 정책을 운영합니다.`,
-    },
-
-    {
-      title: "제2조(저작권의 귀속)",
-      text: `대학연합신문에서 제작·배포하는 모든 콘텐츠의 저작권은 대학연합신문 또는 정당한 권리자에게 귀속됩니다.
-
-별도의 저작권 표시가 없는 경우에도 동일하게 보호되며, 대한민국 저작권법 및 국제 저작권 협약에 의해 보호됩니다.
-
-기사, 사진, 삽화, 그래픽, 영상, 편집 디자인, 로고, 데이터베이스 등의 모든 콘텐츠는 저작권자의 사전 동의 없이 사용할 수 없습니다.`,
-    },
-
-    {
-      title: "제3조(콘텐츠 이용 기준)",
-      text: `이용자는 대학연합신문의 콘텐츠를 개인적·비상업적 목적으로 열람할 수 있습니다.
-
-다음 각 호의 행위는 금지됩니다.
-
-① 기사 전문 무단 복제
-② 기사 재배포 및 재판매
-③ 이미지 및 사진 무단 사용
-④ 기사 내용의 왜곡 및 변형
-⑤ 상업적 목적의 재가공 및 배포
-⑥ 출처 미표기 전재
-
-위 행위는 저작권법에 따라 민형사상 책임이 발생할 수 있습니다.`,
-    },
-
-    {
-      title: "제4조(인용 및 링크)",
-      text: `보도, 교육, 연구, 비평 등을 위한 제한적 인용은 저작권법이 허용하는 범위 내에서 가능합니다.
-
-인용 시 반드시 아래 사항을 준수하여야 합니다.
-
-① 출처 명시
-② 기사 제목 표기
-③ 대학연합신문 명칭 표기
-④ 원문 링크 제공
-
-단순 링크 연결은 허용되나 기사 전문 복제는 허용되지 않습니다.`,
-    },
-
-    {
-      title: "제5조(저작권 침해 신고)",
-      text: `대학연합신문의 콘텐츠가 무단 이용되었거나 제3자의 저작권을 침해하는 콘텐츠가 게시된 경우 신고할 수 있습니다.
-
-신고 접수 시 권리 확인 절차를 거쳐 필요한 조치를 진행합니다.
-
-- 이메일 : unnews@daum.net`,
-    },
-
-    {
-      title: "제6조(면책조항)",
-      text: `대학연합신문은 이용자가 게시한 게시물로 인하여 발생하는 저작권 분쟁에 대하여 법적 책임을 부담하지 않습니다.
-
-다만 권리 침해가 확인될 경우 해당 콘텐츠를 삭제하거나 이용을 제한할 수 있습니다.`,
-    },
-
-    {
-      title: "부칙",
-      text: `본 저작권 정책은 2026년 3월 16일부터 시행합니다.`,
-    },
-  ],
-},
-
-  teen: {
-  label: "YOUTH PROTECTION POLICY",
-  title: "청소년보호정책",
-  desc: "대학연합신문은 청소년이 안전하게 이용할 수 있는 건강한 정보 환경 조성을 위해 노력합니다.",
-  sections: [
-    {
-      title: "제1조(목적)",
-      text: `대학연합신문은 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 청소년보호법 등 관계 법령에 따라 청소년을 유해정보로부터 보호하고 건전한 인터넷 이용 환경을 조성하기 위하여 본 정책을 수립·시행합니다.
-
-대학연합신문은 청소년의 올바른 가치관 형성과 건강한 성장을 지원하는 콘텐츠 제공을 지향합니다.`,
-    },
-
-    {
-      title: "제2조(청소년 보호 원칙)",
-      text: `대학연합신문은 청소년에게 유해한 정보가 노출되지 않도록 관리합니다.
-
-다음 원칙을 준수합니다.
-
-① 청소년 유해정보 차단
-② 건전한 정보 제공
-③ 이용자 신고 시스템 운영
-④ 지속적인 모니터링
-⑤ 관련 법령 준수`,
-    },
-
-    {
-      title: "제3조(유해정보로부터의 보호)",
-      text: `대학연합신문은 청소년에게 유해한 정보가 게시되지 않도록 운영 정책을 수립하고 관리합니다.
-
-폭력, 음란, 도박, 마약, 범죄 조장, 혐오 표현 등 청소년의 정서와 가치관 형성에 부정적 영향을 줄 수 있는 정보에 대하여 엄격한 운영 기준을 적용합니다.`,
-    },
-
-    {
-      title: "제4조(콘텐츠 관리 및 운영)",
-      text: `대학연합신문은 게시물 및 댓글을 지속적으로 모니터링할 수 있습니다.
-
-다음 각 호의 게시물은 사전 통보 없이 삭제 또는 이용 제한될 수 있습니다.
-
-① 청소년 유해매체물
-② 음란·선정적 게시물
-③ 폭력 및 범죄 조장 게시물
-④ 혐오 및 차별 표현 게시물
-⑤ 불법 정보 게시물
-⑥ 기타 관계 법령을 위반하는 게시물`,
-    },
-
-    {
-      title: "제5조(이용자 신고)",
-      text: `이용자는 청소년에게 부적절하거나 유해한 콘텐츠를 발견한 경우 신고할 수 있습니다.
-
-접수된 신고는 운영정책에 따라 검토 후 필요한 조치를 진행합니다.
-
-- 신고 이메일 : unnews@daum.net`,
-    },
-
-    {
-      title: "제6조(청소년보호 책임자)",
-      text: `대학연합신문은 청소년 보호 업무를 수행하기 위하여 청소년보호책임자를 지정·운영합니다.
-
-[청소년보호책임자]
-
-- 성명 : 김영일
-- 소속 : 대학연합신문 편집국
-- 이메일 : unnews@daum.net`,
-    },
-
-    {
-      title: "부칙",
-      text: `본 청소년보호정책은 2026년 3월 16일부터 시행합니다.`,
-    },
-  ],
-},
-};
 
 function SiteFooter({ openPolicy }) {
   return (
@@ -1486,6 +460,10 @@ const adminPieData = [
   const [contentBlocks, setContentBlocks] = useState([
   { id: "block-1", type: "text", value: "" },
 ]);
+const [lastSavedAt, setLastSavedAt] = useState(null);
+const [autoSaveStatus, setAutoSaveStatus] = useState("");
+const [activeSlashBlockId, setActiveSlashBlockId] = useState(null);
+const [activeBlockId, setActiveBlockId] = useState(null);
   const [uploadingBlockId, setUploadingBlockId] = useState(null);
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [isSuggestingImages, setIsSuggestingImages] = useState(false);
@@ -1898,26 +876,9 @@ alert("스킨 설정이 저장되었습니다.");
 
     if (error) throw error;
 
-    const savedPosts = (data || []).map((post) => ({
-      id: post.id,
-      slug: post.slug || createSlug(post.title || `post-${post.id}`),
-      title: post.title,
-      body: post.body || "",
-      contentBlocks: post.content_blocks || [],
-      summary: post.summary || "",
-      category1: post.category1 || "뉴스",
-      category2: post.category2 || "교육",
-      category: post.category || post.category2 || "교육",
-      readTime: post.read_time || "1분 읽기",
-      image: post.image || "",
-      views: post.views || 0,
-      likes: post.likes || 0,
-      comments: Array.isArray(post.comments)
-  ? post.comments
-  : [],
-      createdAt: post.created_at,
-      updatedAt: post.updated_at,
-    }));
+    const savedPosts = (data || []).map((post) =>
+  normalizePost(post, createSlug(post.title || `post-${post.id}`))
+);
 
     setDrafts(savedPosts);
 
@@ -1943,6 +904,29 @@ alert("스킨 설정이 저장되었습니다.");
 
     return () => clearInterval(timer);
   }, [page, heroPosts.length]);
+
+  useEffect(() => {
+  if (!page || page !== "admin") return;
+  if (!form.title.trim() && !getPlainBodyFromBlocks(contentBlocks)) return;
+
+  setAutoSaveStatus("자동저장 대기 중...");
+
+  const timer = setTimeout(() => {
+    const draft = {
+      form,
+      summary,
+      contentBlocks,
+      editingId,
+      savedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("unnews_auto_draft", JSON.stringify(draft));
+    setLastSavedAt(new Date());
+    setAutoSaveStatus("자동저장 완료");
+  }, 1200);
+
+  return () => clearTimeout(timer);
+}, [page, form, summary, contentBlocks, editingId]);
 
   useEffect(() => {
     const text = getPlainBodyFromBlocks(contentBlocks);
@@ -1994,37 +978,16 @@ alert("스킨 설정이 저장되었습니다.");
     return () => clearTimeout(timer);
   }, [form.body, contentBlocks]);
 
-  const uploadImageToCloudinary = async (file) => {
-    if (!file || !file.type.startsWith("image/")) return "";
-
-    const uploadData = new FormData();
-    uploadData.append("file", file);
-    uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: uploadData,
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Cloudinary upload error:", errorText);
-      throw new Error("이미지 업로드 실패");
-    }
-
-    const data = await response.json();
-    return data.secure_url;
-  };
-
   const handleImageFile = async (file) => {
     if (!file || !file.type.startsWith("image/")) return;
 
     try {
       setIsUploading(true);
-      const imageUrl = await uploadImageToCloudinary(file);
+      const imageUrl = await uploadImageToCloudinary(
+  file,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_UPLOAD_PRESET
+);
 
       setForm((prev) => ({
         ...prev,
@@ -2084,36 +1047,72 @@ const addLinkBlock = () => {
 };
 
   const updateBlock = (blockId, patch) => {
-    setContentBlocks((prev) =>
-      prev.map((block) => (block.id === blockId ? { ...block, ...patch } : block))
-    );
-  };
+  setContentBlocks((prev) => updateBlockById(prev, blockId, patch));
+};
 
   const removeBlock = (blockId) => {
-    setContentBlocks((prev) => {
-      if (prev.length <= 1) return prev;
-      return prev.filter((block) => block.id !== blockId);
-    });
-  };
+  setContentBlocks((prev) => removeBlockById(prev, blockId));
+};
 
   const moveBlock = (blockId, direction) => {
-    setContentBlocks((prev) => {
-      const index = prev.findIndex((block) => block.id === blockId);
-      const nextIndex = index + direction;
-      if (index < 0 || nextIndex < 0 || nextIndex >= prev.length) return prev;
-      const next = [...prev];
-      const [target] = next.splice(index, 1);
-      next.splice(nextIndex, 0, target);
-      return next;
-    });
+  setContentBlocks((prev) => moveBlockById(prev, blockId, direction));
+};
+
+const insertTextBlock = (blockId) => {
+  setContentBlocks((prev) => insertTextBlockAfter(prev, blockId));
+};
+
+const insertImageBlockAfter = (targetBlockId, imageUrl, fileName = "이미지") => {
+  const newBlock = {
+    id: Date.now() + Math.random(),
+    type: "image",
+    url: imageUrl,
+    caption: "",
+    fileName,
   };
+
+  setContentBlocks((prev) => {
+    if (!targetBlockId) return [...prev, newBlock];
+
+    const index = prev.findIndex((block) => block.id === targetBlockId);
+    if (index < 0) return [...prev, newBlock];
+
+    return [
+      ...prev.slice(0, index + 1),
+      newBlock,
+      ...prev.slice(index + 1),
+    ];
+  });
+};
+
+const applySlashCommand = (blockId, type) => {
+  const base =
+    type === "image"
+      ? { type: "image", url: "", caption: "", value: "" }
+      : type === "link"
+        ? { type: "link", text: "", url: "", value: "" }
+        : { type, value: "" };
+
+  updateBlock(blockId, base);
+  setActiveSlashBlockId(null);
+};
+
+const duplicateBlock = (blockId) => {
+  setContentBlocks((prev) =>
+    duplicateBlockById(prev, blockId)
+  );
+};
 
   const uploadBlockImage = async (blockId, file) => {
     if (!file || !file.type.startsWith("image/")) return;
 
     try {
       setUploadingBlockId(blockId);
-      const imageUrl = await uploadImageToCloudinary(file);
+      const imageUrl = await uploadImageToCloudinary(
+  file,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_UPLOAD_PRESET
+);
       updateBlock(blockId, { url: imageUrl, fileName: file.name });
     } catch (error) {
       console.error(error);
@@ -2122,6 +1121,56 @@ const addLinkBlock = () => {
       setUploadingBlockId(null);
     }
   };
+
+  const handlePasteImage = async (e) => {
+    
+  const items = Array.from(e.clipboardData?.items || []);
+  const imageItem = items.find((item) => item.type.startsWith("image/"));
+
+  if (!imageItem) return;
+
+  e.preventDefault();
+
+  const file = imageItem.getAsFile();
+  if (!file) return;
+
+  try {
+    const imageUrl = await uploadImageToCloudinary(
+      file,
+      CLOUDINARY_CLOUD_NAME,
+      CLOUDINARY_UPLOAD_PRESET
+    );
+
+    insertImageBlockAfter(activeBlockId, imageUrl, "붙여넣은 이미지");
+  } catch (error) {
+    console.error(error);
+    alert("붙여넣은 이미지 업로드에 실패했습니다.");
+  }
+};
+
+const handleDropImage = async (e) => {
+  e.preventDefault();
+  setIsDragging(false);
+
+  const file = Array.from(e.dataTransfer?.files || []).find((item) =>
+    item.type.startsWith("image/")
+  );
+
+  if (!file) return;
+
+  try {
+    const imageUrl = await uploadImageToCloudinary(
+      file,
+      CLOUDINARY_CLOUD_NAME,
+      CLOUDINARY_UPLOAD_PRESET
+    );
+
+    insertImageBlockAfter(activeBlockId, imageUrl, file.name || "드래그 이미지");
+  } catch (error) {
+    console.error(error);
+    alert("드래그한 이미지 업로드에 실패했습니다.");
+  }
+};
 
   const buildImageSuggestions = () => {
     const plainBody = getPlainBodyFromBlocks(contentBlocks);
@@ -2177,54 +1226,6 @@ const addLinkBlock = () => {
     }));
   };
 
-  const getPlainBodyFromBlocks = (blocks) => {
-  const text = blocks
-    .filter((block) =>
-      ["text", "heading", "quote", "highlight"].includes(block.type)
-    )
-    .map((block) => block.value || "")
-    .join("\n\n")
-    .trim();
-
-  return text || form.body.trim();
-};
-
-  const getCleanContentBlocks = () => {
-  return contentBlocks
-    .map((block) => {
-      if (["text", "heading", "quote", "highlight"].includes(block.type)) {
-        return {
-          type: block.type,
-          value: (block.value || "").trim(),
-        };
-      }
-
-      if (block.type === "link") {
-        return {
-          type: "link",
-          text: (block.text || "").trim(),
-          url: (block.url || "").trim(),
-        };
-      }
-
-      return {
-        type: "image",
-        url: block.url || "",
-        caption: (block.caption || "").trim(),
-      };
-    })
-    .filter((block) => {
-      if (["text", "heading", "quote", "highlight"].includes(block.type)) {
-        return block.value;
-      }
-
-      if (block.type === "link") {
-        return block.text && block.url;
-      }
-
-      return block.url;
-    });
-};
 
   const resetForm = () => {
     setForm({
@@ -2298,26 +1299,10 @@ const addLinkBlock = () => {
 
     if (error) throw error;
 
-    const localUpdatedPost = {
-      id: data.id,
-      slug: data.slug || postData.slug || createSlug(data.title || ""),
-      title: data.title,
-      body: data.body,
-      contentBlocks: data.content_blocks || [],
-      summary: data.summary,
-      category1: data.category1,
-      category2: data.category2,
-      category: data.category,
-      readTime: data.read_time || "1분 읽기",
-      image: data.image,
-      views: data.views || 0,
-      likes: data.likes || 0,
-      comments: Array.isArray(data.comments)
-  ? data.comments
-  : [],
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-    };
+    const localUpdatedPost = normalizePost(
+  data,
+  postData.slug || createSlug(data.title || "")
+);
 
     setDrafts((prev) =>
       prev.map((post) => (post.id === editingId ? localUpdatedPost : post))
@@ -2351,26 +1336,10 @@ const addLinkBlock = () => {
 
   if (error) throw error;
 
-  const newPost = {
-    id: data.id,
-    slug: data.slug || postData.slug || createSlug(data.title || ""),
-    title: data.title,
-    body: data.body,
-    contentBlocks: data.content_blocks || [],
-    summary: data.summary,
-    category1: data.category1,
-    category2: data.category2,
-    category: data.category,
-    readTime: data.read_time || "1분 읽기",
-    image: data.image,
-    views: data.views || 0,
-    likes: data.likes || 0,
-    comments: Array.isArray(data.comments)
-  ? data.comments
-  : [],
-createdAt: data.created_at,
-    updatedAt: data.updated_at,
-  };
+  const newPost = normalizePost(
+  data,
+  postData.slug || createSlug(data.title || "")
+);
 
   setDrafts((prev) => [newPost, ...prev]);
   resetForm();
@@ -3545,6 +2514,16 @@ ACTIVITY
           rows={6}
           className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-7 outline-none focus:border-[#4dbbff]"
         />
+
+        {block.type === "text" && (
+  <div className="mt-2 rounded-2xl bg-slate-50 px-4 py-2 text-xs font-medium text-slate-500">
+    명령어: <span className="font-bold text-slate-700">/image</span> 이미지 ·{" "}
+    <span className="font-bold text-slate-700">/quote</span> 인용 ·{" "}
+    <span className="font-bold text-slate-700">/heading</span> 제목 ·{" "}
+    <span className="font-bold text-slate-700">/highlight</span> 강조 ·{" "}
+    <span className="font-bold text-slate-700">/link</span> 링크
+  </div>
+)}
 
         <button
           type="submit"
@@ -5362,9 +4341,8 @@ ACTIVITY
     </p>
   </div>
 
-  <div className="overflow-hidden rounded-2xl border border-slate-200">
-
-    <table className="w-full">
+  <div className="hidden overflow-x-auto rounded-2xl border border-slate-200 md:block">
+  <table className="min-w-[720px] w-full">
 
       <thead className="bg-slate-50">
 
@@ -5401,21 +4379,103 @@ ACTIVITY
             </td>
 
             <td className="px-5 py-4">
+  <div className="flex items-center gap-3">
+    <div className="h-12 w-16 rounded-xl border border-slate-200 bg-slate-50 p-1">
+      {layout === "list" && (
+        <div className="space-y-1">
+          <div className="h-2 rounded bg-slate-300" />
+          <div className="h-2 rounded bg-slate-200" />
+          <div className="h-2 rounded bg-slate-200" />
+        </div>
+      )}
 
-              {layout === "list" && "리스트형"}
+      {layout === "card" && (
+        <div className="grid grid-cols-2 gap-1">
+          <div className="h-4 rounded bg-slate-300" />
+          <div className="h-4 rounded bg-slate-200" />
+          <div className="h-4 rounded bg-slate-200" />
+          <div className="h-4 rounded bg-slate-300" />
+        </div>
+      )}
 
-              {layout === "card" && "카드형"}
+      {layout === "board" && (
+        <div className="space-y-1">
+          <div className="grid grid-cols-3 gap-1">
+            <div className="h-1.5 rounded bg-slate-300" />
+            <div className="h-1.5 rounded bg-slate-300" />
+            <div className="h-1.5 rounded bg-slate-300" />
+          </div>
+          <div className="h-1.5 rounded bg-slate-200" />
+          <div className="h-1.5 rounded bg-slate-200" />
+          <div className="h-1.5 rounded bg-slate-200" />
+        </div>
+      )}
 
-              {layout === "board" && "게시판형"}
+      {layout === "gallery" && (
+        <div className="grid grid-cols-3 gap-1">
+          <div className="h-5 rounded bg-slate-300" />
+          <div className="h-5 rounded bg-slate-200" />
+          <div className="h-5 rounded bg-slate-300" />
+        </div>
+      )}
 
-              {layout === "gallery" && "갤러리형"}
+      {layout === "magazine" && (
+        <div className="grid grid-cols-2 gap-1">
+          <div className="h-9 rounded bg-slate-300" />
+          <div className="space-y-1">
+            <div className="h-2 rounded bg-slate-300" />
+            <div className="h-2 rounded bg-slate-200" />
+            <div className="h-2 rounded bg-slate-200" />
+          </div>
+        </div>
+      )}
 
-              {layout === "magazine" && "매거진형"}
-{layout === "ranking" && "랭킹형"}
-{layout === "timeline" && "타임라인형"}
-{layout === "masonry" && "메이슨리형"}
+      {layout === "ranking" && (
+        <div className="space-y-1">
+          <div className="flex gap-1">
+            <div className="h-2 w-2 rounded-full bg-slate-400" />
+            <div className="h-2 flex-1 rounded bg-slate-300" />
+          </div>
+          <div className="flex gap-1">
+            <div className="h-2 w-2 rounded-full bg-slate-300" />
+            <div className="h-2 flex-1 rounded bg-slate-200" />
+          </div>
+          <div className="flex gap-1">
+            <div className="h-2 w-2 rounded-full bg-slate-300" />
+            <div className="h-2 flex-1 rounded bg-slate-200" />
+          </div>
+        </div>
+      )}
 
-            </td>
+      {layout === "timeline" && (
+        <div className="relative ml-2 space-y-1 border-l border-slate-300 pl-2">
+          <div className="h-2 rounded bg-slate-300" />
+          <div className="h-2 rounded bg-slate-200" />
+          <div className="h-2 rounded bg-slate-200" />
+        </div>
+      )}
+
+      {layout === "masonry" && (
+        <div className="grid grid-cols-3 gap-1">
+          <div className="h-7 rounded bg-slate-300" />
+          <div className="h-4 rounded bg-slate-200" />
+          <div className="h-6 rounded bg-slate-300" />
+        </div>
+      )}
+    </div>
+
+    <span className="font-bold">
+      {layout === "list" && "리스트형"}
+      {layout === "card" && "카드형"}
+      {layout === "board" && "게시판형"}
+      {layout === "gallery" && "갤러리형"}
+      {layout === "magazine" && "매거진형"}
+      {layout === "ranking" && "랭킹형"}
+      {layout === "timeline" && "타임라인형"}
+      {layout === "masonry" && "메이슨리형"}
+    </span>
+  </div>
+</td>
 
             <td className="px-5 py-4">
 
@@ -5457,12 +4517,138 @@ ACTIVITY
 
   </div>
 
+<div className="space-y-4 md:hidden">
+  {Object.entries(categoryLayouts).map(([category, layout]) => (
+    <div
+      key={category}
+      className="rounded-2xl border border-slate-200 bg-white p-4"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-[#4dbbff]">CATEGORY</p>
+          <h3 className="mt-1 text-lg font-black">{category}</h3>
+        </div>
+
+        <div className="h-12 w-16 rounded-xl border border-slate-200 bg-slate-50 p-1">
+          {layout === "list" && (
+            <div className="space-y-1">
+              <div className="h-2 rounded bg-slate-300" />
+              <div className="h-2 rounded bg-slate-200" />
+              <div className="h-2 rounded bg-slate-200" />
+            </div>
+          )}
+
+          {layout === "card" && (
+            <div className="grid grid-cols-2 gap-1">
+              <div className="h-4 rounded bg-slate-300" />
+              <div className="h-4 rounded bg-slate-200" />
+              <div className="h-4 rounded bg-slate-200" />
+              <div className="h-4 rounded bg-slate-300" />
+            </div>
+          )}
+
+          {layout === "board" && (
+            <div className="space-y-1">
+              <div className="grid grid-cols-3 gap-1">
+                <div className="h-1.5 rounded bg-slate-300" />
+                <div className="h-1.5 rounded bg-slate-300" />
+                <div className="h-1.5 rounded bg-slate-300" />
+              </div>
+              <div className="h-1.5 rounded bg-slate-200" />
+              <div className="h-1.5 rounded bg-slate-200" />
+              <div className="h-1.5 rounded bg-slate-200" />
+            </div>
+          )}
+
+          {layout === "gallery" && (
+            <div className="grid grid-cols-3 gap-1">
+              <div className="h-5 rounded bg-slate-300" />
+              <div className="h-5 rounded bg-slate-200" />
+              <div className="h-5 rounded bg-slate-300" />
+            </div>
+          )}
+
+          {layout === "magazine" && (
+            <div className="grid grid-cols-2 gap-1">
+              <div className="h-9 rounded bg-slate-300" />
+              <div className="space-y-1">
+                <div className="h-2 rounded bg-slate-300" />
+                <div className="h-2 rounded bg-slate-200" />
+                <div className="h-2 rounded bg-slate-200" />
+              </div>
+            </div>
+          )}
+
+          {layout === "ranking" && (
+            <div className="space-y-1">
+              <div className="flex gap-1">
+                <div className="h-2 w-2 rounded-full bg-slate-400" />
+                <div className="h-2 flex-1 rounded bg-slate-300" />
+              </div>
+              <div className="flex gap-1">
+                <div className="h-2 w-2 rounded-full bg-slate-300" />
+                <div className="h-2 flex-1 rounded bg-slate-200" />
+              </div>
+              <div className="flex gap-1">
+                <div className="h-2 w-2 rounded-full bg-slate-300" />
+                <div className="h-2 flex-1 rounded bg-slate-200" />
+              </div>
+            </div>
+          )}
+
+          {layout === "timeline" && (
+            <div className="relative ml-2 space-y-1 border-l border-slate-300 pl-2">
+              <div className="h-2 rounded bg-slate-300" />
+              <div className="h-2 rounded bg-slate-200" />
+              <div className="h-2 rounded bg-slate-200" />
+            </div>
+          )}
+
+          {layout === "masonry" && (
+            <div className="grid grid-cols-3 gap-1">
+              <div className="h-7 rounded bg-slate-300" />
+              <div className="h-4 rounded bg-slate-200" />
+              <div className="h-6 rounded bg-slate-300" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="mb-2 block text-xs font-bold text-neutral-400">
+          게시판 스킨 선택
+        </label>
+
+        <select
+          value={layout}
+          onChange={(e) =>
+            setCategoryLayouts((prev) => ({
+              ...prev,
+              [category]: e.target.value,
+            }))
+          }
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold"
+        >
+          <option value="list">리스트형</option>
+          <option value="card">카드형</option>
+          <option value="board">게시판형</option>
+          <option value="gallery">갤러리형</option>
+          <option value="magazine">매거진형</option>
+          <option value="ranking">랭킹형</option>
+          <option value="timeline">타임라인형</option>
+          <option value="masonry">메이슨리형</option>
+        </select>
+      </div>
+    </div>
+  ))}
+</div>
+
   <div className="mt-6 flex justify-end">
     <button
       type="button"
       onClick={saveCategoryLayouts}
       disabled={isSavingLayouts}
-      className="rounded-full bg-neutral-950 px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
+      className="w-full rounded-full bg-neutral-950 px-6 py-3 text-sm font-bold text-white disabled:opacity-50 md:w-auto"
     >
       {isSavingLayouts ? "저장 중..." : "스킨 설정 저장"}
     </button>
@@ -5504,6 +4690,16 @@ ACTIVITY
             <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
               <div className="space-y-4">
                 <div>
+
+                  <div className="flex justify-end">
+  <span className="text-xs text-neutral-400">
+    {autoSaveStatus}
+    {lastSavedAt && (
+      <> · {lastSavedAt.toLocaleTimeString()} 저장</>
+    )}
+  </span>
+</div>
+
                   <label className="mb-2 block text-sm font-medium text-neutral-600">
                     제목
                   </label>
@@ -5748,136 +4944,64 @@ ACTIVITY
   </div>
 </div>
 
-<div className="space-y-3">
-                    {contentBlocks.map((block, index) => (
-                      <div
-                        key={block.id}
-                        className="rounded-[20px] border border-black/5 bg-neutral-50 p-4"
-                      >
-                        <div className="mb-3 flex items-center justify-between gap-3">
-                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-500">
-  {`${index + 1}. ${
-    block.type === "text"
-      ? "텍스트"
-      : block.type === "heading"
-        ? "소제목"
-        : block.type === "quote"
-          ? "인용문"
-          : block.type === "highlight"
-            ? "강조박스"
-            : block.type === "link"
-              ? "링크버튼"
-              : "이미지"
+<div
+  className={`space-y-3 rounded-[24px] ${
+    isDragging ? "ring-2 ring-blue-400 ring-offset-4" : ""
   }`}
-</span>
-                          <div className="flex gap-1">
-                            <button
-                              type="button"
-                              onClick={() => moveBlock(block.id, -1)}
-                              className="rounded-full bg-white px-2.5 py-1 text-xs text-neutral-500 hover:text-neutral-900"
-                            >
-                              ↑
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => moveBlock(block.id, 1)}
-                              className="rounded-full bg-white px-2.5 py-1 text-xs text-neutral-500 hover:text-neutral-900"
-                            >
-                              ↓
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => removeBlock(block.id)}
-                              className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-500 hover:bg-red-100"
-                            >
-                              삭제
-                            </button>
-                          </div>
+  onPaste={handlePasteImage}
+  onDragOver={(e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }}
+  onDragLeave={() => setIsDragging(false)}
+  onDrop={handleDropImage}
+>
+  {contentBlocks.map((block, index) => (
+                      <div
+  key={block.id}
+  onClick={() => setActiveBlockId(block.id)}
+  className={`rounded-[20px] border p-4 ${
+    activeBlockId === block.id
+      ? "border-blue-300 bg-blue-50/40"
+      : "border-black/5 bg-neutral-50"
+  }`}
+>
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <BlockTypeLabel
+  block={block}
+  index={index}
+/>
+                          <BlockToolbar
+  block={block}
+  moveBlock={moveBlock}
+  duplicateBlock={duplicateBlock}
+  removeBlock={removeBlock}
+/>
                         </div>
 
-                        {["text", "heading", "quote", "highlight"].includes(block.type) ? (
-  <textarea
-    value={block.value || ""}
-    onChange={(e) => {
-      updateBlock(block.id, { value: e.target.value });
-    }}
-    rows={block.type === "heading" ? 2 : 5}
-    className={`w-full rounded-[18px] border px-4 py-3 text-sm leading-7 outline-none ${
-      block.type === "heading"
-        ? "border-black/10 bg-white text-lg font-bold"
-        : block.type === "quote"
-          ? "border-blue-100 bg-blue-50 text-blue-900 italic"
-          : block.type === "highlight"
-            ? "border-amber-100 bg-amber-50 text-amber-900 font-medium"
-            : "border-black/10 bg-white"
-    }`}
-    placeholder={
-      block.type === "heading"
-        ? "소제목을 입력하세요"
-        : block.type === "quote"
-          ? "인용문을 입력하세요"
-          : block.type === "highlight"
-            ? "강조할 내용을 입력하세요"
-            : "텍스트를 입력하세요"
-    }
+                        {["text", "heading", "quote", "highlight"].includes(block.type)
+  ? (
+    <TextBlockEditor
+  block={block}
+  updateBlock={updateBlock}
+  insertTextBlock={insertTextBlock}
+  activeSlashBlockId={activeSlashBlockId}
+  setActiveSlashBlockId={setActiveSlashBlockId}
+  applySlashCommand={applySlashCommand}
+/>
+) 
+: block.type === "link" ? (
+  <LinkBlockEditor
+    block={block}
+    updateBlock={updateBlock}
   />
-) : block.type === "link" ? (
-  <div className="space-y-3">
-    <input
-      value={block.text || ""}
-      onChange={(e) => updateBlock(block.id, { text: e.target.value })}
-      className="w-full rounded-[18px] border border-emerald-100 bg-white px-4 py-3 text-sm outline-none"
-      placeholder="버튼 문구를 입력하세요. 예: 자세히 보기"
-    />
-
-    <input
-      value={block.url || ""}
-      onChange={(e) => updateBlock(block.id, { url: e.target.value })}
-      className="w-full rounded-[18px] border border-emerald-100 bg-white px-4 py-3 text-sm outline-none"
-      placeholder="링크 주소를 입력하세요. 예: https://example.com"
-    />
-  </div>
 ) : (
-  <div className="space-y-3">
-    {block.url ? (
-      <div className="overflow-hidden rounded-[18px] bg-white">
-        <img
-          src={block.url}
-          alt="본문 이미지"
-          className="h-56 w-full object-cover"
-        />
-      </div>
-    ) : (
-      <div className="rounded-[18px] border border-dashed border-black/10 bg-white px-4 py-8 text-center text-sm text-neutral-400">
-        아직 이미지가 없습니다.
-      </div>
-    )}
-
-    <label className="flex cursor-pointer items-center justify-between rounded-[18px] border border-black/10 bg-white px-4 py-3 text-sm text-neutral-600">
-      <span>
-        {uploadingBlockId === block.id
-          ? "본문 이미지 업로드 중..."
-          : block.fileName || "본문 이미지 선택"}
-      </span>
-      <span className="rounded-full bg-neutral-950 px-3 py-1 text-xs font-semibold text-white">
-        파일 선택
-      </span>
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        disabled={uploadingBlockId === block.id}
-        onChange={(e) => uploadBlockImage(block.id, e.target.files?.[0])}
-      />
-    </label>
-
-    <input
-      value={block.caption || ""}
-      onChange={(e) => updateBlock(block.id, { caption: e.target.value })}
-      className="w-full rounded-[18px] border border-black/10 bg-white px-4 py-3 text-sm outline-none"
-      placeholder="이미지 설명 또는 캡션을 입력하세요"
-    />
-  </div>
+  <ImageBlockEditor
+    block={block}
+    updateBlock={updateBlock}
+    uploadBlockImage={uploadBlockImage}
+    uploadingBlockId={uploadingBlockId}
+  />
 )}
                       </div>
                     ))}
