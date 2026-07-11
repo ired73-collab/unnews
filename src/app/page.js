@@ -59,6 +59,8 @@ import LinkBlockEditor from "../components/editor/LinkBlockEditor";
 
 import BlockTypeLabel from "../components/editor/BlockTypeLabel";
 
+import DraftRecovery from "../components/editor/DraftRecovery";
+
 const CLOUDINARY_CLOUD_NAME = "dciqqfwdb";
 const CLOUDINARY_UPLOAD_PRESET = "unnews_upload";
 
@@ -640,6 +642,7 @@ const trendingPosts = useMemo(() => {
     (sum, post) => sum + ((post.comments || []).length || 0),
     0
   );
+  
 
   const topPosts = [...posts]
     .sort((a, b) => {
@@ -665,6 +668,11 @@ const trendingPosts = useMemo(() => {
   };
 }, [drafts]);
   
+const currentPolicy =
+  POLICY_PAGES?.[policyType] ||
+  POLICY_PAGES?.privacy ||
+  null;
+
   const previewImage = form.uploadedImage
     ? form.uploadedImage
     : form.image.trim()
@@ -1226,6 +1234,27 @@ const handleDropImage = async (e) => {
     }));
   };
 
+  const restoreAutoDraft = (draft) => {
+  if (draft?.form) {
+    setForm(draft.form);
+  }
+
+  if (typeof draft?.summary === "string") {
+    setSummary(draft.summary);
+  }
+
+  if (Array.isArray(draft?.contentBlocks) && draft.contentBlocks.length > 0) {
+    setContentBlocks(draft.contentBlocks);
+  }
+
+  setEditingId(draft?.editingId || null);
+
+  if (draft?.savedAt) {
+    setLastSavedAt(new Date(draft.savedAt));
+  }
+
+  setAutoSaveStatus("임시저장 글 복구 완료");
+};
 
   const resetForm = () => {
     setForm({
@@ -1309,8 +1338,9 @@ const handleDropImage = async (e) => {
     );
 
     setSelectedPost(localUpdatedPost);
-    resetForm();
-    setPage("post");
+localStorage.removeItem("unnews_auto_draft");
+resetForm();
+setPage("post");
     return;
   }
 
@@ -1342,9 +1372,10 @@ const handleDropImage = async (e) => {
 );
 
   setDrafts((prev) => [newPost, ...prev]);
-  resetForm();
-  setSelectedPost(newPost);
-  setPage("post");
+localStorage.removeItem("unnews_auto_draft");
+resetForm();
+setSelectedPost(newPost);
+setPage("post");
 } catch (error) {
   console.error("Supabase save/update error:", error);
   alert("글 저장에 실패했습니다. Supabase 테이블 컬럼과 API Key를 확인해주세요.");
@@ -2537,7 +2568,7 @@ ACTIVITY
   </main>
 )}
 
-{page === "policy" && (
+{page === "policy" && currentPolicy && (
   <main className="mx-auto max-w-[980px] px-5 py-10 md:px-8 md:py-14">
     <button
       type="button"
@@ -2598,13 +2629,13 @@ ACTIVITY
 
     <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#2563eb] to-[#4dbbff] p-6 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-8">
       <p className="text-sm font-bold text-white/75">
-        {POLICY_PAGES[policyType].label}
+        {currentPolicy.label}
       </p>
       <h1 className="mt-3 text-[2.3rem] font-black tracking-[-0.05em] md:text-[3.2rem]">
-        {POLICY_PAGES[policyType].title}
+        {currentPolicy.title}
       </h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-7 text-white/85">
-        {POLICY_PAGES[policyType].desc}
+        {currentPolicy.desc}
       </p>
     </section>
 
@@ -2631,7 +2662,10 @@ ACTIVITY
 
     <section className="mt-8 rounded-[32px] bg-white p-8 shadow-[0_18px_44px_rgba(0,0,0,0.04)] md:p-10">
       <div className="space-y-8">
-        {POLICY_PAGES[policyType].sections.map((section) => (
+        {(Array.isArray(currentPolicy.sections)
+  ? currentPolicy.sections
+  : []
+).map((section) => (
   <div
     key={section.title}
     className="border-b border-black/5 pb-7 last:border-b-0 last:pb-0"
@@ -4687,8 +4721,17 @@ ACTIVITY
     </div>
 
     <div className="grid gap-6 md:grid-cols-[1fr_0.9fr]">
-            <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
-              <div className="space-y-4">
+  <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
+
+    <DraftRecovery
+      onRestore={restoreAutoDraft}
+      onDiscard={() => {
+        setAutoSaveStatus("임시저장 글 삭제");
+        setLastSavedAt(null);
+      }}
+    />
+
+    <div className="space-y-4">
                 <div>
 
                   <div className="flex justify-end">
