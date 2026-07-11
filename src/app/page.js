@@ -2583,7 +2583,10 @@ ACTIVITY
 
     <div className="mb-8 flex flex-wrap gap-2">
   <button
-    onClick={() => setPolicyType("privacy")}
+    onClick={() => {
+  setPolicyType("privacy");
+  window.history.pushState({}, "", "/privacy");
+}}
     className={`rounded-full px-4 py-2 text-sm font-bold ${
       policyType === "privacy"
         ? "bg-[#0759C8] text-white"
@@ -2594,7 +2597,10 @@ ACTIVITY
   </button>
 
   <button
-    onClick={() => setPolicyType("terms")}
+    onClick={() => {
+  setPolicyType("terms");
+  window.history.pushState({}, "", "/terms");
+}}
     className={`rounded-full px-4 py-2 text-sm font-bold ${
       policyType === "terms"
         ? "bg-[#0759C8] text-white"
@@ -2605,7 +2611,10 @@ ACTIVITY
   </button>
 
   <button
-    onClick={() => setPolicyType("copyright")}
+    onClick={() => {
+  setPolicyType("copyright");
+  window.history.pushState({}, "", "/copyright");
+}}
     className={`rounded-full px-4 py-2 text-sm font-bold ${
       policyType === "copyright"
         ? "bg-[#0759C8] text-white"
@@ -2616,7 +2625,10 @@ ACTIVITY
   </button>
 
   <button
-    onClick={() => setPolicyType("teen")}
+    onClick={() => {
+  setPolicyType("teen");
+  window.history.pushState({}, "", "/teen");
+}}
     className={`rounded-full px-4 py-2 text-sm font-bold ${
       policyType === "teen"
         ? "bg-[#0759C8] text-white"
@@ -2629,14 +2641,16 @@ ACTIVITY
 
     <section className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#2563eb] to-[#4dbbff] p-6 text-white shadow-[0_20px_60px_rgba(37,99,235,0.18)] md:p-8">
       <p className="text-sm font-bold text-white/75">
-        {currentPolicy.label}
-      </p>
-      <h1 className="mt-3 text-[2.3rem] font-black tracking-[-0.05em] md:text-[3.2rem]">
-        {currentPolicy.title}
-      </h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-7 text-white/85">
-        {currentPolicy.desc}
-      </p>
+  {currentPolicy.label}
+</p>
+
+<h1 className="mt-3 text-[2.3rem] font-black tracking-[-0.05em] md:text-[3.2rem]">
+  {currentPolicy.title}
+</h1>
+
+<p className="mt-3 max-w-2xl text-[15px] leading-7 text-white/85">
+  {currentPolicy.desc}
+</p>
     </section>
 
 {policyType === "privacy" && (
