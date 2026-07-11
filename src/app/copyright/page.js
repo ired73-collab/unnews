@@ -1,5 +1,9 @@
-import MainPage from "../page";
+import PolicyPage from "../../components/PolicyPage";
+
+export const metadata = {
+  title: "저작권 정책 | 대학연합신문",
+};
 
 export default function CopyrightPage() {
-  return <MainPage />;
+  return <PolicyPage type="copyright" />;
 }

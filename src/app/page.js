@@ -43,6 +43,8 @@ import {
   duplicateBlockById,
 } from "../utils/editor";
 
+import Link from "next/link";
+
 import { normalizePost } from "../services/postService";
 
 import { uploadImageToCloudinary } from "../services/uploadService";
@@ -234,7 +236,7 @@ function ShortcutAdminIcon() {
   );
 }
 
-function SiteFooter({ openPolicy }) {
+function SiteFooter() {
   return (
     <footer className="mt-16 bg-black text-white">
       <div className="mx-auto max-w-[1440px] px-6 py-10 md:px-8">
@@ -280,46 +282,31 @@ function SiteFooter({ openPolicy }) {
 </a>
 
             <div className="flex flex-wrap gap-3 text-sm text-white/70">
+  <Link
+    href="/privacy"
+    className="text-[#4DBBFF] hover:text-[#73CCFF]"
+  >
+    개인정보처리방침
+  </Link>
 
-              <button
-  type="button"
-  onClick={() => openPolicy("privacy")}
-  className="text-[#4DBBFF] hover:text-[#73CCFF]"
->
-  개인정보처리방침
-</button>
+  <span>|</span>
 
-<span>|</span>
+  <Link href="/terms" className="hover:text-white">
+    이용약관
+  </Link>
 
-<button
-  type="button"
-  onClick={() => openPolicy("terms")}
-  className="hover:text-white"
->
-  이용약관
-</button>
+  <span>|</span>
 
-<span>|</span>
+  <Link href="/copyright" className="hover:text-white">
+    저작권 정책
+  </Link>
 
-<button
-  type="button"
-  onClick={() => openPolicy("copyright")}
-  className="hover:text-white"
->
-  저작권 정책
-</button>
+  <span>|</span>
 
-<span>|</span>
-
-<button
-  type="button"
-  onClick={() => openPolicy("teen")}
-  className="hover:text-white"
->
-  청소년 보호 정책
-</button>
-
-            </div>
+  <Link href="/teen" className="hover:text-white">
+    청소년 보호 정책
+  </Link>
+</div>
           </div>
 
         </div>
@@ -5190,7 +5177,7 @@ ACTIVITY
   </main>
 )}
 
-      <SiteFooter openPolicy={openPolicy} />
+      <SiteFooter />
 </div>
 </>
 );

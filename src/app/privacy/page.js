@@ -1,5 +1,9 @@
-import MainPage from "../page";
+import PolicyPage from "../../components/PolicyPage";
+
+export const metadata = {
+  title: "개인정보처리방침 | 대학연합신문",
+};
 
 export default function PrivacyPage() {
-  return <MainPage />;
+  return <PolicyPage type="privacy" />;
 }
