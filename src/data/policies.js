@@ -1,4 +1,4 @@
-const POLICY_PAGES = {
+export const POLICY_PAGES = {
   privacy: {
   label: "PRIVACY POLICY",
   title: "개인정보처리방침",

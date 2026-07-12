@@ -375,15 +375,28 @@ const [seoImage, setSeoImage] = useState(
     setActiveCategory("전체");
     setActiveSubCategory("전체");
     return;
-  }
+}
 
-  if (path === "/admin") {
+if (path === "/admin") {
     setPage("admin");
     return;
-  }
+}
 
-  setPage("home");
-  setSelectedPost(null);
+const policyMap = {
+    "/privacy": "privacy",
+    "/terms": "terms",
+    "/copyright": "copyright",
+    "/teen": "teen",
+};
+
+if (policyMap[path]) {
+    setPolicyType(policyMap[path]);
+    setPage("policy");
+    return;
+}
+
+setPage("home");
+setSelectedPost(null);
 };
 
   window.addEventListener("popstate", handlePopState);
@@ -1694,20 +1707,6 @@ const deleteApplication = async (id) => {
     alert("삭제에 실패했습니다.");
   }
 };
-
-useEffect(() => {
-  const handlePopState = () => {
-    setPage("home");
-    setActiveCategory("전체");
-    setActiveSubCategory("전체");
-  };
-
-  window.addEventListener("popstate", handlePopState);
-
-  return () => {
-    window.removeEventListener("popstate", handlePopState);
-  };
-}, []);
 
 const handleLikeComment = async (commentId) => {
   if (!selectedPost?.id) return;
