@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Header from "./Header";
 import { POLICY_PAGES } from "../data/policies";
+import SiteFooter from "./SiteFooter";
 
 const POLICY_LINKS = [
   { key: "privacy", label: "개인정보처리방침", href: "/privacy" },
@@ -108,7 +109,7 @@ export default function PolicyPage({ type }) {
           </h1>
         </main>
 
-        <PolicyFooter />
+        <SiteFooter />
       </>
     );
   }
@@ -193,7 +194,8 @@ export default function PolicyPage({ type }) {
         </section>
       </main>
 
-      <PolicyFooter />
+      <SiteFooter />
+
     </div>
   );
 }
