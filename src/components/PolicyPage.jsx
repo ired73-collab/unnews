@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import Header from "./Header";
 import { POLICY_PAGES } from "../data/policies";
 
 const POLICY_LINKS = [
@@ -8,78 +12,6 @@ const POLICY_LINKS = [
   { key: "teen", label: "청소년 보호 정책", href: "/teen" },
 ];
 
-function PolicyHeader() {
-  return (
-    <header className="border-b border-black/5 bg-white">
-      <div className="mx-auto flex h-[88px] max-w-[1440px] items-center justify-between px-5 md:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <img
-            src="/unnews_logo.png"
-            alt="대학연합신문"
-            className="h-11 w-11 object-contain"
-          />
-
-          <span className="text-[21px] font-black tracking-[-0.06em] text-neutral-900">
-            대학연합신문
-          </span>
-        </Link>
-
-        <nav className="hidden items-center gap-8 text-[16px] font-bold text-neutral-700 md:flex">
-          <Link href="/?category=뉴스" className="transition hover:text-[#4dbbff]">
-            뉴스
-          </Link>
-
-          <Link
-            href="/?category=커뮤니티"
-            className="transition hover:text-[#4dbbff]"
-          >
-            커뮤니티
-          </Link>
-
-          <Link
-            href="/?category=취업%2F공모전"
-            className="transition hover:text-[#4dbbff]"
-          >
-            취업/공모전
-          </Link>
-
-          <Link
-            href="/?category=트렌드"
-            className="transition hover:text-[#4dbbff]"
-          >
-            트렌드
-          </Link>
-
-          <a
-            href="https://tv.naver.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="네이버TV"
-          >
-            <img
-              src="/naver_tv.png"
-              alt="네이버TV"
-              className="h-9 w-9 object-contain"
-            />
-          </a>
-
-          <a
-            href="https://www.instagram.com/withcomm_official/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="인스타그램"
-          >
-            <img
-              src="/instagram.png"
-              alt="인스타그램"
-              className="h-9 w-9 object-contain"
-            />
-          </a>
-        </nav>
-      </div>
-    </header>
-  );
-}
 
 function PolicyFooter() {
   return (
@@ -151,12 +83,24 @@ function PolicyFooter() {
 }
 
 export default function PolicyPage({ type }) {
+  const [activeCategory, setActiveCategory] = useState("전체");
+  const [activeSubCategory, setActiveSubCategory] = useState("전체");
+
   const policy = POLICY_PAGES?.[type] || POLICY_PAGES?.privacy;
 
   if (!policy) {
     return (
       <>
-        <PolicyHeader />
+        <Header
+  activeCategory={activeCategory}
+  setActiveCategory={() => {
+    window.location.href = "/";
+  }}
+  setActiveSubCategory={() => {}}
+  setPage={() => {
+    window.location.href = "/";
+  }}
+/>
 
         <main className="mx-auto min-h-[500px] max-w-[980px] px-5 py-16 text-center">
           <h1 className="text-2xl font-bold">
@@ -175,7 +119,16 @@ export default function PolicyPage({ type }) {
 
   return (
     <div className="min-h-screen font-pretendard bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f7f5_45%,_#f3f2ef_100%)] text-neutral-900">
-      <PolicyHeader />
+      <Header
+  activeCategory={activeCategory}
+  setActiveCategory={() => {
+    window.location.href = "/";
+  }}
+  setActiveSubCategory={() => {}}
+  setPage={() => {
+    window.location.href = "/";
+  }}
+/>
 
       <main className="mx-auto max-w-[980px] px-5 py-10 md:px-8 md:py-14">
         <div className="mb-8 flex flex-wrap gap-2">
