@@ -174,7 +174,7 @@ export default function PolicyPage({ type }) {
     : [];
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f7f5_45%,_#f3f2ef_100%)] text-neutral-900">
+    <div className="min-h-screen font-pretendard bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f7f5_45%,_#f3f2ef_100%)] text-neutral-900">
       <PolicyHeader />
 
       <main className="mx-auto max-w-[980px] px-5 py-10 md:px-8 md:py-14">
