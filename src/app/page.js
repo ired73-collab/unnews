@@ -1100,8 +1100,43 @@ const insertBlockAt = (index, type = "text") => {
   });
 
   setActiveBlockId(newBlock.id);
+  return newBlock.id;
 };
 
+const focusBlockEditor = (blockId) => {
+  window.setTimeout(() => {
+    const blockElement = document.querySelector(
+      `[data-editor-block-id="${String(blockId)}"]`
+    );
+
+    const editableElement = blockElement?.querySelector(
+      'textarea, input[type="text"], [contenteditable="true"]'
+    );
+
+    editableElement?.focus();
+  }, 0);
+};
+
+const handleBlockEditorKeyDown = (event, block, index) => {
+  if (event.key !== "Enter") return;
+  if (event.shiftKey) return;
+  if (event.nativeEvent?.isComposing) return;
+  if (!["text", "heading", "quote", "highlight"].includes(block.type)) return;
+
+  const target = event.target;
+  const isEditableTarget =
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLInputElement ||
+    target?.isContentEditable;
+
+  if (!isEditableTarget) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const newBlockId = insertBlockAt(index + 1, "text");
+  focusBlockEditor(newBlockId);
+};
 
 
   const uploadBlockImage = async (blockId, file) => {
@@ -5067,14 +5102,21 @@ ACTIVITY
 
                         {["text", "heading", "quote", "highlight"].includes(block.type)
   ? (
-    <TextBlockEditor
-  block={block}
-  updateBlock={updateBlock}
-  insertTextBlock={insertTextBlock}
-  activeSlashBlockId={activeSlashBlockId}
-  setActiveSlashBlockId={setActiveSlashBlockId}
-  applySlashCommand={applySlashCommand}
-/>
+    <div
+      data-editor-block-id={String(block.id)}
+      onKeyDownCapture={(event) =>
+        handleBlockEditorKeyDown(event, block, index)
+      }
+    >
+      <TextBlockEditor
+        block={block}
+        updateBlock={updateBlock}
+        insertTextBlock={insertTextBlock}
+        activeSlashBlockId={activeSlashBlockId}
+        setActiveSlashBlockId={setActiveSlashBlockId}
+        applySlashCommand={applySlashCommand}
+      />
+    </div>
 ) 
 : block.type === "link" ? (
   <LinkBlockEditor
