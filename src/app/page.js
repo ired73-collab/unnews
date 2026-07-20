@@ -2835,19 +2835,19 @@ ACTIVITY
         </div>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid items-start gap-5 md:grid-cols-3">
         {categoryPopularPosts.map((post) => (
           <button
             type="button"
             key={post.id}
             onClick={() => handleOpenPost(post)}
-            className="group text-left"
+            className="group flex h-full w-full flex-col border-0 bg-transparent p-0 text-left align-top"
           >
-            <div className="overflow-hidden rounded-[22px] bg-neutral-100 shadow-[0_16px_42px_rgba(0,0,0,0.06)]">
+            <div className="w-full shrink-0 overflow-hidden rounded-[22px] bg-neutral-100 shadow-[0_16px_42px_rgba(0,0,0,0.06)]">
               <img
                 src={post.image}
                 alt={post.title}
-                className="h-[220px] w-full object-cover"
+                className="block h-[220px] w-full object-cover"
                 onError={(e) => {
   e.currentTarget.src =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
