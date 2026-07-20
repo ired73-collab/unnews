@@ -3,13 +3,20 @@
 import Head from "next/head";
 import { supabase } from "../lib/supabase";
 import Header from "../components/Header";
-import { useEffect, useMemo, useState } from "react";
 import { auth } from "../lib/firebase";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
+
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   BarChart,
@@ -1078,6 +1085,24 @@ const duplicateBlock = (blockId) => {
     duplicateBlockById(prev, blockId)
   );
 };
+
+const insertBlockAt = (index, type = "text") => {
+  const newBlock = {
+    id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    type,
+    value: "",
+  };
+
+  setContentBlocks((prev) => {
+    const nextBlocks = [...prev];
+    nextBlocks.splice(index, 0, newBlock);
+    return nextBlocks;
+  });
+
+  setActiveBlockId(newBlock.id);
+};
+
+
 
   const uploadBlockImage = async (blockId, file) => {
     if (!file || !file.type.startsWith("image/")) return;
@@ -4988,10 +5013,28 @@ ACTIVITY
     strategy={verticalListSortingStrategy}
   >
     {contentBlocks.map((block, index) => (
-      <SortableBlock
-        key={String(block.id)}
-        id={String(block.id)}
+  <Fragment key={String(block.id)}>
+    <div className="group/inserter relative flex h-5 items-center justify-center">
+      <div className="absolute left-0 right-0 h-px bg-transparent transition group-hover/inserter:bg-blue-200" />
+
+      <button
+        type="button"
+        onClick={() => insertBlockAt(index)}
+        className="
+          relative z-10 flex h-7 w-7 scale-75 items-center justify-center
+          rounded-full border border-blue-200 bg-white text-lg font-semibold
+          text-blue-600 opacity-0 shadow-sm transition
+          hover:scale-100 hover:border-blue-400 hover:bg-blue-50
+          group-hover/inserter:scale-100 group-hover/inserter:opacity-100
+        "
+        aria-label="이 위치에 블록 추가"
+        title="블록 추가"
       >
+        +
+      </button>
+    </div>
+
+    <SortableBlock id={String(block.id)}>
         <div
   key={block.id}
   onClick={() => setActiveBlockId(block.id)}
@@ -5047,8 +5090,29 @@ ACTIVITY
   />
 )}
                       </div>
-                    </SortableBlock>
-                  ))}
+                        </SortableBlock>
+  </Fragment>
+))}
+
+<div className="group/inserter relative flex h-8 items-center justify-center">
+  <div className="absolute left-0 right-0 h-px bg-transparent transition group-hover/inserter:bg-blue-200" />
+
+  <button
+    type="button"
+    onClick={() => insertBlockAt(contentBlocks.length)}
+    className="
+      relative z-10 flex h-7 w-7 scale-75 items-center justify-center
+      rounded-full border border-blue-200 bg-white text-lg font-semibold
+      text-blue-600 opacity-0 shadow-sm transition
+      hover:scale-100 hover:border-blue-400 hover:bg-blue-50
+      group-hover/inserter:scale-100 group-hover/inserter:opacity-100
+    "
+    aria-label="마지막에 블록 추가"
+    title="블록 추가"
+  >
+    +
+  </button>
+</div>
 
                 </SortableContext>
               </DndContext>
