@@ -43,6 +43,22 @@ import {
   duplicateBlockById,
 } from "../utils/editor";
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+
 import Link from "next/link";
 
 import { normalizePost } from "../services/postService";
@@ -62,6 +78,10 @@ import LinkBlockEditor from "../components/editor/LinkBlockEditor";
 import BlockTypeLabel from "../components/editor/BlockTypeLabel";
 
 import DraftRecovery from "../components/editor/DraftRecovery";
+
+import ArticlePreview from "../components/editor/ArticlePreview";
+
+import SortableBlock from "../components/editor/SortableBlock";
 
 import SiteFooter from "../components/SiteFooter";
 
@@ -384,6 +404,18 @@ const [lastSavedAt, setLastSavedAt] = useState(null);
 const [autoSaveStatus, setAutoSaveStatus] = useState("");
 const [activeSlashBlockId, setActiveSlashBlockId] = useState(null);
 const [activeBlockId, setActiveBlockId] = useState(null);
+
+const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 6,
+    },
+  }),
+  useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  })
+);
+
   const [uploadingBlockId, setUploadingBlockId] = useState(null);
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [isSuggestingImages, setIsSuggestingImages] = useState(false);
@@ -982,6 +1014,24 @@ const addLinkBlock = () => {
 
   const moveBlock = (blockId, direction) => {
   setContentBlocks((prev) => moveBlockById(prev, blockId, direction));
+};
+
+const handleBlockDragEnd = ({ active, over }) => {
+  if (!over || active.id === over.id) return;
+
+  setContentBlocks((prev) => {
+    const oldIndex = prev.findIndex(
+      (block) => String(block.id) === String(active.id)
+    );
+
+    const newIndex = prev.findIndex(
+      (block) => String(block.id) === String(over.id)
+    );
+
+    if (oldIndex < 0 || newIndex < 0) return prev;
+
+    return arrayMove(prev, oldIndex, newIndex);
+  });
 };
 
 const insertTextBlock = (blockId) => {
@@ -3321,13 +3371,15 @@ ACTIVITY
                   <div className="space-y-6">
                     {selectedPost.contentBlocks.map((block, index) => {
   if (block.type === "image") {
-    return (
-      <figure key={index} className="overflow-hidden rounded-[24px] bg-neutral-50">
-        <img
-          src={block.url}
-          alt={block.caption || selectedPost.title}
-          className="max-h-[520px] w-full object-cover"
-        />
+  if (!block.url?.trim()) return null;
+
+  return (
+    <figure key={index} className="overflow-hidden rounded-[24px] bg-neutral-50">
+      <img
+        src={block.url}
+        alt={block.caption || selectedPost.title || "본문 이미지"}
+        className="max-h-[520px] w-full object-cover"
+      />
         {block.caption && (
           <figcaption className="px-4 py-3 text-xs text-neutral-500">
             {block.caption}
@@ -4861,16 +4913,25 @@ ACTIVITY
                     </span>
                   </div>
                   <div className="overflow-hidden rounded-[18px] bg-white">
-                    <img
-  src={previewImage}
-  alt="미리보기"
-  onError={(e) => {
-    e.currentTarget.src =
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
-  }}
-/>
+  {previewImage?.trim() ? (
+    <img
+      src={previewImage}
+      alt="미리보기"
+      onError={(e) => {
+        e.currentTarget.src =
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+      }}
+      className="h-full w-full object-cover"
+    />
+  ) : (
+    <div className="flex h-52 items-center justify-center text-sm text-neutral-400">
+      대표 이미지가 선택되면 표시됩니다.
+    </div>
+  )}
+</div>
+  
                   </div>
-                </div>
+
 
                 <div>
                   <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -4917,14 +4978,27 @@ ACTIVITY
   onDragLeave={() => setIsDragging(false)}
   onDrop={handleDropImage}
 >
-  {contentBlocks.map((block, index) => (
-                      <div
+  <DndContext
+  sensors={sensors}
+  collisionDetection={closestCenter}
+  onDragEnd={handleBlockDragEnd}
+>
+  <SortableContext
+    items={contentBlocks.map((block) => String(block.id))}
+    strategy={verticalListSortingStrategy}
+  >
+    {contentBlocks.map((block, index) => (
+      <SortableBlock
+        key={String(block.id)}
+        id={String(block.id)}
+      >
+        <div
   key={block.id}
   onClick={() => setActiveBlockId(block.id)}
-  className={`rounded-[20px] border p-4 ${
+  className={`group relative rounded-[20px] border p-4 transition ${
     activeBlockId === block.id
       ? "border-blue-300 bg-blue-50/40"
-      : "border-black/5 bg-neutral-50"
+      : "border-black/5 bg-neutral-50 hover:border-blue-200"
   }`}
 >
                         <div className="mb-3 flex items-center justify-between gap-3">
@@ -4932,12 +5006,20 @@ ACTIVITY
   block={block}
   index={index}
 />
-                          <BlockToolbar
-  block={block}
-  moveBlock={moveBlock}
-  duplicateBlock={duplicateBlock}
-  removeBlock={removeBlock}
-/>
+                          <div
+  className="
+  opacity-0
+  transition
+  group-hover:opacity-100
+  "
+>
+    <BlockToolbar
+        block={block}
+        moveBlock={moveBlock}
+        duplicateBlock={duplicateBlock}
+        removeBlock={removeBlock}
+    />
+</div>
                         </div>
 
                         {["text", "heading", "quote", "highlight"].includes(block.type)
@@ -4965,7 +5047,11 @@ ACTIVITY
   />
 )}
                       </div>
-                    ))}
+                    </SortableBlock>
+                  ))}
+
+                </SortableContext>
+              </DndContext>
                   </div>
                 </div>
 
@@ -5013,7 +5099,14 @@ ACTIVITY
               </div>
             </div>
 
+
             <div className="space-y-6">
+  <ArticlePreview
+    form={form}
+    summary={summary}
+    contentBlocks={contentBlocks}
+    previewImage={previewImage}
+  />
               <div className="rounded-[24px] bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)]">
                 <p className="text-sm font-medium text-neutral-500">이미지 정책</p>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-700">
@@ -5038,52 +5131,72 @@ ACTIVITY
                 </p>
                 <div className="mt-4 space-y-3">
                   {allPosts.slice(0, 5).map((post) => (
-                    <button
-                      key={post.id}
-                      onClick={() => {
-                        setSelectedPost(post);
-                        setPage("post");
-                      }}
-                      className="block w-full rounded-2xl bg-neutral-50 px-4 py-3 text-left text-sm text-neutral-700"
-                    >
-                      <div className="mb-2 overflow-hidden rounded-xl">
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          className="h-24 w-full object-cover"
-                          onError={(e) => {
-  e.currentTarget.src =
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
-}}
-                        />
-                      </div>
-                      <strong>{post.title}</strong>
-                      <div className="mt-1 text-xs text-neutral-400">{getCategoryLabel(post)}</div>
+  <div
+    key={post.id}
+    role="button"
+    tabIndex={0}
+    onClick={() => {
+      setSelectedPost(post);
+      setPage("post");
+    }}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setSelectedPost(post);
+        setPage("post");
+      }
+    }}
+    className="block w-full cursor-pointer rounded-2xl bg-neutral-50 px-4 py-3 text-left text-sm text-neutral-700"
+  >
+    <div className="mb-2 overflow-hidden rounded-xl">
+      {post.image?.trim() ? (
+        <img
+          src={post.image}
+          alt={post.title || "등록된 기사"}
+          className="h-24 w-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+          }}
+        />
+      ) : (
+        <div className="flex h-24 items-center justify-center bg-neutral-100 text-xs text-neutral-400">
+          이미지 없음
+        </div>
+      )}
+    </div>
 
-                      <div className="mt-3 flex gap-2">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditPost(post);
-                          }}
-                          className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-100"
-                        >
-                          수정
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletePost(post.id);
-                          }}
-                          className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-100"
-                        >
-                          삭제
-                        </button>
-                      </div>
-                                        </button>
-                  ))}
+    <strong>{post.title}</strong>
+
+    <div className="mt-1 text-xs text-neutral-400">
+      {getCategoryLabel(post)}
+    </div>
+
+    <div className="mt-3 flex gap-2">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleEditPost(post);
+        }}
+        className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-100"
+      >
+        수정
+      </button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDeletePost(post.id);
+        }}
+        className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-100"
+      >
+        삭제
+      </button>
+    </div>
+  </div>
+))}
                 </div>
               </div>
             </div>
