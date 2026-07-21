@@ -4243,6 +4243,39 @@ ACTIVITY
       </p>
     </div>
 
+    <div className="mb-6 rounded-[28px] border border-emerald-100 bg-[linear-gradient(145deg,#ffffff,#f4fffb)] p-5 shadow-[0_18px_40px_rgba(16,185,129,0.08)]">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+            👥
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-neutral-800">접속·조회 통계</h3>
+            <p className="mt-1 text-xs text-neutral-500">등록 콘텐츠의 실제 조회 데이터를 기준으로 집계됩니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">누적 조회수</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">{adminStats.totalViews.toLocaleString()}</p>
+        </div>
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">게시글당 평균 조회</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">{adminStats.totalPosts ? Math.round(adminStats.totalViews / adminStats.totalPosts).toLocaleString() : 0}</p>
+        </div>
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">조회 발생 게시글</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">{drafts.filter((post) => (post.views || 0) > 0).length}</p>
+        </div>
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">최고 조회수</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">{Math.max(0, ...drafts.map((post) => post.views || 0)).toLocaleString()}</p>
+        </div>
+      </div>
+    </div>
+
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="rounded-[28px] border border-violet-100 bg-[linear-gradient(145deg,#ffffff,#f8f7ff)] p-5 shadow-[0_18px_40px_rgba(124,58,237,0.08)]">
         <div className="mb-5 flex items-center gap-3">
