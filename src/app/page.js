@@ -1483,7 +1483,7 @@ const openPolicy = (type) => {
   });
 };
 
-  const handleOpenPost = async (post) => {
+const handleOpenPost = async (post) => {
   setSelectedPost(post);
 
   window.history.pushState(
@@ -1519,14 +1519,39 @@ const openPolicy = (type) => {
   );
 
   try {
-    const { error } = await supabase
-      .from("posts")
-      .update({ views: nextViews })
-      .eq("id", post.id);
+    const { data, error } = await supabase.rpc("increment_post_views", {
+      post_id: post.id,
+    });
 
     if (error) throw error;
+
+    const savedViews = Number(data);
+
+    if (Number.isFinite(savedViews)) {
+      setDrafts((prev) =>
+        prev.map((item) =>
+          item.id === post.id ? { ...item, views: savedViews } : item
+        )
+      );
+
+      setSelectedPost((prev) =>
+        prev?.id === post.id ? { ...prev, views: savedViews } : prev
+      );
+    }
   } catch (error) {
     console.error("Supabase view count error:", error);
+
+    localStorage.setItem(viewedKey, JSON.stringify(viewedPosts));
+
+    setDrafts((prev) =>
+      prev.map((item) =>
+        item.id === post.id ? { ...item, views: post.views || 0 } : item
+      )
+    );
+
+    setSelectedPost((prev) =>
+      prev?.id === post.id ? { ...prev, views: post.views || 0 } : prev
+    );
   }
 };
 
@@ -3851,36 +3876,6 @@ ACTIVITY
       {page === "admin" && isAdmin && (
         <main className="mx-auto max-w-[1180px] px-5 py-8 md:px-8 md:py-10">
         <section className="mb-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
-        <section className="mb-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
-  <div className="mb-6">
-    <p className="text-sm font-semibold text-[#4dbbff]">Admin Dashboard</p>
-    <h1 className="text-[2rem] font-black tracking-[-0.05em]">
-      관리자 대시보드
-    </h1>
-  </div>
-
-  <div className="grid gap-4 md:grid-cols-4">
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 게시글</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalPosts}</div>
-    </div>
-
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 조회수</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalViews}</div>
-    </div>
-
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 좋아요</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalLikes}</div>
-    </div>
-
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 댓글</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalComments}</div>
-    </div>
-  </div>
-</section>
   <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
     <div>
       <p className="text-sm font-semibold text-[#4dbbff]">Admin Dashboard</p>
