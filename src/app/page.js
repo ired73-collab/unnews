@@ -309,6 +309,77 @@ const [seoImage, setSeoImage] = useState(
   const [isSavingPost, setIsSavingPost] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [heroIndex, setHeroIndex] = useState(0);
+  const [siteVisitStats, setSiteVisitStats] = useState({
+    today_visitors: 0,
+    total_visits: 0,
+    unique_visitors: 0,
+    last_7_days: [],
+  });
+  const [isLoadingVisitStats, setIsLoadingVisitStats] = useState(false);
+  const [visitStatsError, setVisitStatsError] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const recordVisit = async () => {
+      const tokenKey = "unnews_visitor_token";
+      let browserToken = localStorage.getItem(tokenKey);
+
+      if (!browserToken) {
+        browserToken =
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random()
+                .toString(36)
+                .slice(2)}`;
+        localStorage.setItem(tokenKey, browserToken);
+      }
+
+      const { error } = await supabase.rpc("record_site_visit", {
+        browser_token: browserToken,
+      });
+
+      if (error) {
+        console.error("Supabase site visit error:", error);
+      }
+    };
+
+    recordVisit();
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin || adminTab !== "stats") return;
+
+    const loadVisitStats = async () => {
+      try {
+        setIsLoadingVisitStats(true);
+        setVisitStatsError("");
+
+        const { data, error } = await supabase.rpc("get_site_visit_stats");
+
+        if (error) throw error;
+
+        setSiteVisitStats({
+          today_visitors: Number(data?.today_visitors) || 0,
+          total_visits: Number(data?.total_visits) || 0,
+          unique_visitors: Number(data?.unique_visitors) || 0,
+          last_7_days: Array.isArray(data?.last_7_days)
+            ? data.last_7_days.map((item) => ({
+                date: item.date,
+                visitors: Number(item.visitors) || 0,
+              }))
+            : [],
+        });
+      } catch (error) {
+        console.error("Load site visit stats error:", error);
+        setVisitStatsError("접속통계를 불러오지 못했습니다.");
+      } finally {
+        setIsLoadingVisitStats(false);
+      }
+    };
+
+    loadVisitStats();
+  }, [isAdmin, adminTab]);
 
   useEffect(() => {
   const handlePopState = () => {
@@ -708,68 +779,6 @@ const currentPolicy =
   );
 }, [selectedPost]);
 
-const incrementPostViews = async (post) => {
-  if (!post?.id) return;
-
-  const viewedKey = "unnews_viewed_posts";
-  const viewedPosts = JSON.parse(localStorage.getItem(viewedKey) || "[]");
-  const postId = String(post.id);
-
-  if (viewedPosts.includes(postId)) {
-    return;
-  }
-
-  const nextViews = (post.views || 0) + 1;
-
-  localStorage.setItem(viewedKey, JSON.stringify([...viewedPosts, postId]));
-
-  setDrafts((prev) =>
-    prev.map((item) =>
-      item.id === post.id ? { ...item, views: nextViews } : item
-    )
-  );
-
-  setSelectedPost((prev) =>
-    prev?.id === post.id ? { ...prev, views: nextViews } : prev
-  );
-
-  try {
-    const { data, error } = await supabase.rpc("increment_post_views", {
-      post_id: post.id,
-    });
-
-    if (error) throw error;
-
-    const savedViews = Number(data);
-
-    if (Number.isFinite(savedViews)) {
-      setDrafts((prev) =>
-        prev.map((item) =>
-          item.id === post.id ? { ...item, views: savedViews } : item
-        )
-      );
-
-      setSelectedPost((prev) =>
-        prev?.id === post.id ? { ...prev, views: savedViews } : prev
-      );
-    }
-  } catch (error) {
-    console.error("Supabase view count error:", error);
-
-    localStorage.setItem(viewedKey, JSON.stringify(viewedPosts));
-
-    setDrafts((prev) =>
-      prev.map((item) =>
-        item.id === post.id ? { ...item, views: post.views || 0 } : item
-      )
-    );
-
-    setSelectedPost((prev) =>
-      prev?.id === post.id ? { ...prev, views: post.views || 0 } : prev
-    );
-  }
-};
-
   useEffect(() => {
   if (typeof window === "undefined") return;
   if (isLoadingPosts) return;
@@ -808,7 +817,6 @@ if (policyPathMap[path]) {
     if (matchedPost) {
       setSelectedPost(matchedPost);
       setPage("post");
-      incrementPostViews(matchedPost);
     }
   }
 }, [allPosts, isLoadingPosts]);
@@ -1556,7 +1564,66 @@ const handleOpenPost = async (post) => {
   );
 
   setPage("post");
-  await incrementPostViews(post);
+
+  if (!post?.id) return;
+
+  const viewedKey = "unnews_viewed_posts";
+  const viewedPosts = JSON.parse(localStorage.getItem(viewedKey) || "[]");
+  const postId = String(post.id);
+
+  if (viewedPosts.includes(postId)) {
+    return;
+  }
+
+  const nextViews = (post.views || 0) + 1;
+
+  localStorage.setItem(viewedKey, JSON.stringify([...viewedPosts, postId]));
+
+  setDrafts((prev) =>
+    prev.map((item) =>
+      item.id === post.id ? { ...item, views: nextViews } : item
+    )
+  );
+
+  setSelectedPost((prev) =>
+    prev?.id === post.id ? { ...prev, views: nextViews } : prev
+  );
+
+  try {
+    const { data, error } = await supabase.rpc("increment_post_views", {
+      post_id: post.id,
+    });
+
+    if (error) throw error;
+
+    const savedViews = Number(data);
+
+    if (Number.isFinite(savedViews)) {
+      setDrafts((prev) =>
+        prev.map((item) =>
+          item.id === post.id ? { ...item, views: savedViews } : item
+        )
+      );
+
+      setSelectedPost((prev) =>
+        prev?.id === post.id ? { ...prev, views: savedViews } : prev
+      );
+    }
+  } catch (error) {
+    console.error("Supabase view count error:", error);
+
+    localStorage.setItem(viewedKey, JSON.stringify(viewedPosts));
+
+    setDrafts((prev) =>
+      prev.map((item) =>
+        item.id === post.id ? { ...item, views: post.views || 0 } : item
+      )
+    );
+
+    setSelectedPost((prev) =>
+      prev?.id === post.id ? { ...prev, views: post.views || 0 } : prev
+    );
+  }
 };
 
 const getCommentsArray = (post) => {
@@ -4250,27 +4317,82 @@ ACTIVITY
           </div>
           <div>
             <h3 className="text-sm font-black text-neutral-800">접속·조회 통계</h3>
-            <p className="mt-1 text-xs text-neutral-500">등록 콘텐츠의 실제 조회 데이터를 기준으로 집계됩니다.</p>
+            <p className="mt-1 text-xs text-neutral-500">같은 브라우저는 하루에 한 번 방문자로 집계됩니다.</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">누적 조회수</p>
+          <p className="text-xs font-bold text-neutral-400">오늘 방문자</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">
+            {isLoadingVisitStats ? "..." : siteVisitStats.today_visitors.toLocaleString()}
+          </p>
+        </div>
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">누적 방문</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">
+            {isLoadingVisitStats ? "..." : siteVisitStats.total_visits.toLocaleString()}
+          </p>
+        </div>
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">고유 방문자</p>
+          <p className="mt-2 text-2xl font-black text-neutral-900">
+            {isLoadingVisitStats ? "..." : siteVisitStats.unique_visitors.toLocaleString()}
+          </p>
+        </div>
+        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
+          <p className="text-xs font-bold text-neutral-400">총 게시글 조회수</p>
           <p className="mt-2 text-2xl font-black text-neutral-900">{adminStats.totalViews.toLocaleString()}</p>
         </div>
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">게시글당 평균 조회</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">{adminStats.totalPosts ? Math.round(adminStats.totalViews / adminStats.totalPosts).toLocaleString() : 0}</p>
+      </div>
+
+      {visitStatsError && (
+        <p className="mt-3 text-xs font-bold text-red-500">{visitStatsError}</p>
+      )}
+
+      <div className="mt-5 rounded-[22px] bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-sm font-black text-neutral-800">최근 7일 방문 추이</p>
+          <p className="text-xs font-semibold text-neutral-400">한국 시간 기준</p>
         </div>
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">조회 발생 게시글</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">{drafts.filter((post) => (post.views || 0) > 0).length}</p>
-        </div>
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">최고 조회수</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">{Math.max(0, ...drafts.map((post) => post.views || 0)).toLocaleString()}</p>
+        <div className="h-[230px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={siteVisitStats.last_7_days.map((item) => ({
+                ...item,
+                label: item.date
+                  ? new Intl.DateTimeFormat("ko-KR", {
+                      month: "numeric",
+                      day: "numeric",
+                    }).format(new Date(`${item.date}T00:00:00+09:00`))
+                  : "",
+              }))}
+              margin={{ top: 18, right: 12, left: -18, bottom: 0 }}
+            >
+              <XAxis
+                dataKey="label"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#737373", fontSize: 12 }}
+              />
+              <YAxis
+                allowDecimals={false}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#737373", fontSize: 12 }}
+              />
+              <Tooltip
+                formatter={(value) => [`${Number(value).toLocaleString()}명`, "방문자"]}
+                contentStyle={{
+                  borderRadius: "16px",
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
+                }}
+              />
+              <Bar dataKey="visitors" fill="#10B981" radius={[10, 10, 4, 4]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
@@ -4404,7 +4526,7 @@ ACTIVITY
         <div>
           <p className="text-sm font-black text-neutral-800">데이터 업데이트 안내</p>
           <p className="mt-1 text-xs text-neutral-500">
-            통계 데이터는 등록된 콘텐츠 기준으로 자동 집계됩니다.
+            방문자와 게시글 조회 데이터는 자동으로 집계됩니다.
           </p>
         </div>
       </div>
