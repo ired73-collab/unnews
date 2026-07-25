@@ -708,6 +708,68 @@ const currentPolicy =
   );
 }, [selectedPost]);
 
+const incrementPostViews = async (post) => {
+  if (!post?.id) return;
+
+  const viewedKey = "unnews_viewed_posts";
+  const viewedPosts = JSON.parse(localStorage.getItem(viewedKey) || "[]");
+  const postId = String(post.id);
+
+  if (viewedPosts.includes(postId)) {
+    return;
+  }
+
+  const nextViews = (post.views || 0) + 1;
+
+  localStorage.setItem(viewedKey, JSON.stringify([...viewedPosts, postId]));
+
+  setDrafts((prev) =>
+    prev.map((item) =>
+      item.id === post.id ? { ...item, views: nextViews } : item
+    )
+  );
+
+  setSelectedPost((prev) =>
+    prev?.id === post.id ? { ...prev, views: nextViews } : prev
+  );
+
+  try {
+    const { data, error } = await supabase.rpc("increment_post_views", {
+      post_id: post.id,
+    });
+
+    if (error) throw error;
+
+    const savedViews = Number(data);
+
+    if (Number.isFinite(savedViews)) {
+      setDrafts((prev) =>
+        prev.map((item) =>
+          item.id === post.id ? { ...item, views: savedViews } : item
+        )
+      );
+
+      setSelectedPost((prev) =>
+        prev?.id === post.id ? { ...prev, views: savedViews } : prev
+      );
+    }
+  } catch (error) {
+    console.error("Supabase view count error:", error);
+
+    localStorage.setItem(viewedKey, JSON.stringify(viewedPosts));
+
+    setDrafts((prev) =>
+      prev.map((item) =>
+        item.id === post.id ? { ...item, views: post.views || 0 } : item
+      )
+    );
+
+    setSelectedPost((prev) =>
+      prev?.id === post.id ? { ...prev, views: post.views || 0 } : prev
+    );
+  }
+};
+
   useEffect(() => {
   if (typeof window === "undefined") return;
   if (isLoadingPosts) return;
@@ -746,6 +808,7 @@ if (policyPathMap[path]) {
     if (matchedPost) {
       setSelectedPost(matchedPost);
       setPage("post");
+      incrementPostViews(matchedPost);
     }
   }
 }, [allPosts, isLoadingPosts]);
@@ -1493,66 +1556,7 @@ const handleOpenPost = async (post) => {
   );
 
   setPage("post");
-
-  if (!post?.id) return;
-
-  const viewedKey = "unnews_viewed_posts";
-  const viewedPosts = JSON.parse(localStorage.getItem(viewedKey) || "[]");
-  const postId = String(post.id);
-
-  if (viewedPosts.includes(postId)) {
-    return;
-  }
-
-  const nextViews = (post.views || 0) + 1;
-
-  localStorage.setItem(viewedKey, JSON.stringify([...viewedPosts, postId]));
-
-  setDrafts((prev) =>
-    prev.map((item) =>
-      item.id === post.id ? { ...item, views: nextViews } : item
-    )
-  );
-
-  setSelectedPost((prev) =>
-    prev?.id === post.id ? { ...prev, views: nextViews } : prev
-  );
-
-  try {
-    const { data, error } = await supabase.rpc("increment_post_views", {
-      post_id: post.id,
-    });
-
-    if (error) throw error;
-
-    const savedViews = Number(data);
-
-    if (Number.isFinite(savedViews)) {
-      setDrafts((prev) =>
-        prev.map((item) =>
-          item.id === post.id ? { ...item, views: savedViews } : item
-        )
-      );
-
-      setSelectedPost((prev) =>
-        prev?.id === post.id ? { ...prev, views: savedViews } : prev
-      );
-    }
-  } catch (error) {
-    console.error("Supabase view count error:", error);
-
-    localStorage.setItem(viewedKey, JSON.stringify(viewedPosts));
-
-    setDrafts((prev) =>
-      prev.map((item) =>
-        item.id === post.id ? { ...item, views: post.views || 0 } : item
-      )
-    );
-
-    setSelectedPost((prev) =>
-      prev?.id === post.id ? { ...prev, views: post.views || 0 } : prev
-    );
-  }
+  await incrementPostViews(post);
 };
 
 const getCommentsArray = (post) => {
