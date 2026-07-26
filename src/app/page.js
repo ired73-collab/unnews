@@ -11,7 +11,6 @@ import {
 } from "firebase/auth";
 
 import {
-  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -39,8 +38,6 @@ import {
 } from "../utils/editor";
 
 import {
-  DndContext,
-  closestCenter,
   PointerSensor,
   KeyboardSensor,
   useSensor,
@@ -48,8 +45,6 @@ import {
 } from "@dnd-kit/core";
 
 import {
-  SortableContext,
-  verticalListSortingStrategy,
   arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
@@ -71,24 +66,14 @@ import {
 import { incrementPostViews } from "../services/viewService";
 
 import AdminStatistics from "../components/admin/AdminStatistics";
+import AdminDashboard from "../components/admin/AdminDashboard";
 
 import SlashMenu from "../components/editor/SlashMenu";
-
-import TextBlockEditor from "../components/editor/TextBlockEditor";
-
-import ImageBlockEditor from "../components/editor/ImageBlockEditor";
-
-import BlockToolbar from "../components/editor/BlockToolbar";
-
-import LinkBlockEditor from "../components/editor/LinkBlockEditor";
-
-import BlockTypeLabel from "../components/editor/BlockTypeLabel";
+import ArticleEditor from "../components/editor/ArticleEditor";
 
 import DraftRecovery from "../components/editor/DraftRecovery";
 
 import ArticlePreview from "../components/editor/ArticlePreview";
-
-import SortableBlock from "../components/editor/SortableBlock";
 
 import SiteFooter from "../components/SiteFooter";
 
@@ -3847,148 +3832,17 @@ ACTIVITY
       {page === "admin" && isAdmin && (
         <main className="mx-auto max-w-[1180px] px-5 py-8 md:px-8 md:py-10">
         <section className="mb-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
-  <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-    <div>
-      <p className="text-sm font-semibold text-[#4dbbff]">Admin Dashboard</p>
-      <h1 className="text-[2rem] font-black tracking-[-0.05em]">
-        관리자 대시보드
-      </h1>
-      <p className="mt-2 text-sm text-neutral-500">
-        등록된 콘텐츠의 조회수, 좋아요, 댓글 현황을 확인할 수 있습니다.
-      </p>
-    </div>
-
-    <div className="flex gap-2">
-      <button
-        type="button"
-        onClick={() => {
-          resetForm();
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-        className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white"
-      >
-        새 글 작성
-      </button>
-
-      <button
-        type="button"
-        onClick={handleAdminLogout}
-        className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-neutral-700"
-      >
-        로그아웃
-      </button>
-    </div>
-  </div>
-          <div className="mb-8 flex flex-wrap gap-2 border-b border-black/5 pb-4">
-  {[
-  { key: "dashboard", label: "대시보드" },
-  { key: "write", label: "글등록" },
-  { key: "posts", label: "글관리" },
-  { key: "skins", label: "스킨관리" },
-
-  ...(ENABLE_APPLICATION_SYSTEM
-    ? [{ key: "applications", label: "신청자관리" }]
-    : []),
-
-  { key: "stats", label: "통계" },
-].map((tab) => (
-    <button
-      key={tab.key}
-      type="button"
-      onClick={() => setAdminTab(tab.key)}
-      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-        adminTab === tab.key
-          ? "bg-neutral-950 text-white"
-          : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-      }`}
-    >
-      {tab.label}
-    </button>
-  ))}
-</div>
-
-  {adminTab === "dashboard" && (
-  <>
-    
-  <div className="grid gap-4 md:grid-cols-4">
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 게시글</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalPosts}</div>
-    </div>
-
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 조회수</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalViews}</div>
-    </div>
-
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 좋아요</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalLikes}</div>
-    </div>
-
-    <div className="rounded-[22px] bg-neutral-50 p-5">
-      <p className="text-xs font-semibold text-neutral-400">총 댓글</p>
-      <div className="mt-2 text-3xl font-black">{adminStats.totalComments}</div>
-    </div>
-  </div>
-
-  <div className="mt-6 grid gap-5 lg:grid-cols-2">
-    <div className="rounded-[22px] border border-black/5 bg-white p-5">
-      <h2 className="mb-4 text-lg font-black tracking-[-0.04em]">
-        인기글 TOP 5
-      </h2>
-
-      <div className="space-y-3">
-        {adminStats.topPosts.length === 0 ? (
-          <p className="text-sm text-neutral-400">아직 등록된 글이 없습니다.</p>
-        ) : (
-          adminStats.topPosts.map((post, index) => (
-            <div
-              key={post.id}
-              className="flex items-center justify-between gap-3 rounded-[16px] bg-neutral-50 px-4 py-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-neutral-900">
-                  {index + 1}. {post.title}
-                </p>
-                <p className="mt-1 text-xs text-neutral-400">
-                  조회 {post.views || 0} · 좋아요 {post.likes || 0} · 댓글 {(post.comments || []).length}
-                </p>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-
-    <div className="rounded-[22px] border border-black/5 bg-white p-5">
-      <h2 className="mb-4 text-lg font-black tracking-[-0.04em]">
-        카테고리별 게시글
-      </h2>
-
-      <div className="space-y-3">
-        {Object.keys(adminStats.categoryCounts).length === 0 ? (
-          <p className="text-sm text-neutral-400">카테고리 데이터가 없습니다.</p>
-        ) : (
-          Object.entries(adminStats.categoryCounts).map(([category, count]) => (
-            <div
-              key={category}
-              className="flex items-center justify-between rounded-[16px] bg-neutral-50 px-4 py-3"
-            >
-              <span className="text-sm font-semibold text-neutral-700">
-                {category}
-              </span>
-              <span className="text-sm font-black text-neutral-950">
-                {count}
-              </span>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  </div>
-          </>
-        )}
+          <AdminDashboard
+            adminTab={adminTab}
+            adminStats={adminStats}
+            enableApplicationSystem={ENABLE_APPLICATION_SYSTEM}
+            onAdminTabChange={setAdminTab}
+            onLogout={handleAdminLogout}
+            onNewPost={() => {
+              resetForm();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
         {adminTab === "posts" && (
   <section className="mt-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
     <div className="mb-6 flex items-end justify-between gap-4">
@@ -4812,174 +4666,35 @@ ACTIVITY
   
                   </div>
 
-
-                <div>
-                  <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-  <div>
-    <h3 className="text-sm font-bold text-neutral-800">
-      본문 블록 편집
-    </h3>
-    <p className="mt-1 text-xs leading-5 text-neutral-400">
-      텍스트와 이미지를 원하는 순서로 추가할 수 있습니다.
-    </p>
-  </div>
-
-  <div className="flex flex-wrap gap-2">
-    <button type="button" onClick={addTextBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
-      + 텍스트
-    </button>
-    <button type="button" onClick={addHeadingBlock} className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
-      + 소제목
-    </button>
-    <button type="button" onClick={addQuoteBlock} className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100">
-      + 인용문
-    </button>
-    <button type="button" onClick={addHighlightBlock} className="rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
-      + 강조박스
-    </button>
-    <button type="button" onClick={addLinkBlock} className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100">
-      + 링크버튼
-    </button>
-    <button type="button" onClick={addImageBlock} className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white">
-      + 이미지
-    </button>
-  </div>
-</div>
-
-<div
-  className={`space-y-3 rounded-[24px] ${
-    isDragging ? "ring-2 ring-blue-400 ring-offset-4" : ""
-  }`}
-  onPaste={handlePasteImage}
-  onDragOver={(e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }}
-  onDragLeave={() => setIsDragging(false)}
-  onDrop={handleDropImage}
->
-  <DndContext
-  sensors={sensors}
-  collisionDetection={closestCenter}
-  onDragEnd={handleBlockDragEnd}
->
-  <SortableContext
-    items={contentBlocks.map((block) => String(block.id))}
-    strategy={verticalListSortingStrategy}
-  >
-    {contentBlocks.map((block, index) => (
-  <Fragment key={String(block.id)}>
-    <div className="group/inserter relative flex h-5 items-center justify-center">
-      <div className="absolute left-0 right-0 h-px bg-transparent transition group-hover/inserter:bg-blue-200" />
-
-      <button
-        type="button"
-        onClick={() => insertBlockAt(index)}
-        className="
-          relative z-10 flex h-7 w-7 scale-75 items-center justify-center
-          rounded-full border border-blue-200 bg-white text-lg font-semibold
-          text-blue-600 opacity-0 shadow-sm transition
-          hover:scale-100 hover:border-blue-400 hover:bg-blue-50
-          group-hover/inserter:scale-100 group-hover/inserter:opacity-100
-        "
-        aria-label="이 위치에 블록 추가"
-        title="블록 추가"
-      >
-        +
-      </button>
-    </div>
-
-    <SortableBlock id={String(block.id)}>
-        <div
-  key={block.id}
-  onClick={() => setActiveBlockId(block.id)}
-  className={`group relative rounded-[20px] border p-4 transition ${
-    activeBlockId === block.id
-      ? "border-blue-300 bg-blue-50/40"
-      : "border-black/5 bg-neutral-50 hover:border-blue-200"
-  }`}
->
-                        <div className="mb-3 flex items-center justify-between gap-3">
-                          <BlockTypeLabel
-  block={block}
-  index={index}
-/>
-                          <div
-  className="
-  opacity-0
-  transition
-  group-hover:opacity-100
-  "
->
-    <BlockToolbar
-        block={block}
-        moveBlock={moveBlock}
-        duplicateBlock={duplicateBlock}
-        removeBlock={removeBlock}
-    />
-</div>
-                        </div>
-
-                        {["text", "heading", "quote", "highlight"].includes(block.type)
-  ? (
-    <div
-      data-editor-block-id={String(block.id)}
-      onKeyDownCapture={(event) =>
-        handleBlockEditorKeyDown(event, block, index)
-      }
-    >
-      <TextBlockEditor
-        block={block}
-        updateBlock={updateBlock}
-        insertTextBlock={insertTextBlock}
-        activeSlashBlockId={activeSlashBlockId}
-        setActiveSlashBlockId={setActiveSlashBlockId}
-        applySlashCommand={applySlashCommand}
-      />
-    </div>
-) 
-: block.type === "link" ? (
-  <LinkBlockEditor
-    block={block}
-    updateBlock={updateBlock}
-  />
-) : (
-  <ImageBlockEditor
-    block={block}
-    updateBlock={updateBlock}
-    uploadBlockImage={uploadBlockImage}
-    uploadingBlockId={uploadingBlockId}
-  />
-)}
-                      </div>
-                        </SortableBlock>
-  </Fragment>
-))}
-
-<div className="group/inserter relative flex h-8 items-center justify-center">
-  <div className="absolute left-0 right-0 h-px bg-transparent transition group-hover/inserter:bg-blue-200" />
-
-  <button
-    type="button"
-    onClick={() => insertBlockAt(contentBlocks.length)}
-    className="
-      relative z-10 flex h-7 w-7 scale-75 items-center justify-center
-      rounded-full border border-blue-200 bg-white text-lg font-semibold
-      text-blue-600 opacity-0 shadow-sm transition
-      hover:scale-100 hover:border-blue-400 hover:bg-blue-50
-      group-hover/inserter:scale-100 group-hover/inserter:opacity-100
-    "
-    aria-label="마지막에 블록 추가"
-    title="블록 추가"
-  >
-    +
-  </button>
-</div>
-
-                </SortableContext>
-              </DndContext>
-                  </div>
-                </div>
+                <ArticleEditor
+                  activeBlockId={activeBlockId}
+                  activeSlashBlockId={activeSlashBlockId}
+                  addHeadingBlock={addHeadingBlock}
+                  addHighlightBlock={addHighlightBlock}
+                  addImageBlock={addImageBlock}
+                  addLinkBlock={addLinkBlock}
+                  addQuoteBlock={addQuoteBlock}
+                  addTextBlock={addTextBlock}
+                  applySlashCommand={applySlashCommand}
+                  contentBlocks={contentBlocks}
+                  duplicateBlock={duplicateBlock}
+                  handleBlockDragEnd={handleBlockDragEnd}
+                  handleBlockEditorKeyDown={handleBlockEditorKeyDown}
+                  handleDropImage={handleDropImage}
+                  handlePasteImage={handlePasteImage}
+                  insertBlockAt={insertBlockAt}
+                  insertTextBlock={insertTextBlock}
+                  isDragging={isDragging}
+                  moveBlock={moveBlock}
+                  removeBlock={removeBlock}
+                  sensors={sensors}
+                  setActiveBlockId={setActiveBlockId}
+                  setActiveSlashBlockId={setActiveSlashBlockId}
+                  setIsDragging={setIsDragging}
+                  updateBlock={updateBlock}
+                  uploadBlockImage={uploadBlockImage}
+                  uploadingBlockId={uploadingBlockId}
+                />
 
                 <div className="rounded-[22px] border border-black/5 bg-neutral-50 p-4">
                   <div className="mb-3 flex items-center justify-between">
