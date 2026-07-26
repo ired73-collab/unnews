@@ -18,18 +18,6 @@ import {
   useState,
 } from "react";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-
 import { clip, fallbackSummary, createSlug } from "../utils/text";
 
 import {
@@ -71,6 +59,18 @@ import Link from "next/link";
 import { normalizePost } from "../services/postService";
 
 import { uploadImageToCloudinary } from "../services/uploadService";
+
+import {
+  calculateAdminStats,
+  getAdminChartData,
+  getAdminPieData,
+  getSiteVisitStats,
+  recordSiteVisit,
+} from "../services/statisticsService";
+
+import { incrementPostViews } from "../services/viewService";
+
+import AdminStatistics from "../components/admin/AdminStatistics";
 
 import SlashMenu from "../components/editor/SlashMenu";
 
@@ -322,24 +322,9 @@ const [seoImage, setSeoImage] = useState(
     if (typeof window === "undefined") return;
 
     const recordVisit = async () => {
-      const tokenKey = "unnews_visitor_token";
-      let browserToken = localStorage.getItem(tokenKey);
-
-      if (!browserToken) {
-        browserToken =
-          typeof crypto !== "undefined" && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random()
-                .toString(36)
-                .slice(2)}`;
-        localStorage.setItem(tokenKey, browserToken);
-      }
-
-      const { error } = await supabase.rpc("record_site_visit", {
-        browser_token: browserToken,
-      });
-
-      if (error) {
+      try {
+        await recordSiteVisit();
+      } catch (error) {
         console.error("Supabase site visit error:", error);
       }
     };
@@ -355,21 +340,7 @@ const [seoImage, setSeoImage] = useState(
         setIsLoadingVisitStats(true);
         setVisitStatsError("");
 
-        const { data, error } = await supabase.rpc("get_site_visit_stats");
-
-        if (error) throw error;
-
-        setSiteVisitStats({
-          today_visitors: Number(data?.today_visitors) || 0,
-          total_visits: Number(data?.total_visits) || 0,
-          unique_visitors: Number(data?.unique_visitors) || 0,
-          last_7_days: Array.isArray(data?.last_7_days)
-            ? data.last_7_days.map((item) => ({
-                date: item.date,
-                visitors: Number(item.visitors) || 0,
-              }))
-            : [],
-        });
+        setSiteVisitStats(await getSiteVisitStats());
       } catch (error) {
         console.error("Load site visit stats error:", error);
         setVisitStatsError("접속통계를 불러오지 못했습니다.");
@@ -422,42 +393,8 @@ setSelectedPost(null);
   };
 }, []);
 
-  const adminChartData = [
-  {
-    name: "뉴스",
-    posts: drafts.filter((post) => post.category1 === "뉴스").length,
-  },
-  {
-    name: "커뮤니티",
-    posts: drafts.filter((post) => post.category1 === "커뮤니티").length,
-  },
-  {
-    name: "취업",
-    posts: drafts.filter((post) => post.category1 === "취업/공모전").length,
-  },
-  {
-    name: "트렌드",
-    posts: drafts.filter((post) => post.category1 === "트렌드").length,
-  },
-];
-
-const adminPieData = [
-  {
-    name: "조회수",
-    value: drafts.reduce((sum, post) => sum + (post.views || 0), 0),
-  },
-  {
-    name: "좋아요",
-    value: drafts.reduce((sum, post) => sum + (post.likes || 0), 0),
-  },
-  {
-    name: "댓글",
-    value: drafts.reduce(
-      (sum, post) => sum + ((post.comments?.length) || 0),
-      0
-    ),
-  },
-];
+  const adminChartData = getAdminChartData(drafts);
+  const adminPieData = getAdminPieData(drafts);
 
   const [form, setForm] = useState({
     title: "",
@@ -660,41 +597,10 @@ const trendingPosts = useMemo(() => {
   allPosts[0] ||
   POSTS[0];
 
-  const adminStats = useMemo(() => {
-  const posts = drafts || [];
-
-  const totalPosts = posts.length;
-  const totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0);
-  const totalLikes = posts.reduce((sum, post) => sum + (post.likes || 0), 0);
-  const totalComments = posts.reduce(
-    (sum, post) => sum + ((post.comments || []).length || 0),
-    0
+  const adminStats = useMemo(
+    () => calculateAdminStats(drafts || [], getCategory1),
+    [drafts]
   );
-  
-
-  const topPosts = [...posts]
-    .sort((a, b) => {
-      const scoreA = (a.views || 0) + (a.likes || 0) * 3;
-      const scoreB = (b.views || 0) + (b.likes || 0) * 3;
-      return scoreB - scoreA;
-    })
-    .slice(0, 5);
-
-  const categoryCounts = posts.reduce((acc, post) => {
-    const category = getCategory1(post) || "기타";
-    acc[category] = (acc[category] || 0) + 1;
-    return acc;
-  }, {});
-
-  return {
-    totalPosts,
-    totalViews,
-    totalLikes,
-    totalComments,
-    topPosts,
-    categoryCounts,
-  };
-}, [drafts]);
   
 const currentPolicy =
   POLICY_PAGES?.[policyType] ||
@@ -1590,13 +1496,7 @@ const handleOpenPost = async (post) => {
   );
 
   try {
-    const { data, error } = await supabase.rpc("increment_post_views", {
-      post_id: post.id,
-    });
-
-    if (error) throw error;
-
-    const savedViews = Number(data);
+    const savedViews = await incrementPostViews(post.id);
 
     if (Number.isFinite(savedViews)) {
       setDrafts((prev) =>
@@ -4298,248 +4198,14 @@ ACTIVITY
 )}
 
 {adminTab === "stats" && (
-  <section className="mt-8 rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_24px_70px_rgba(79,70,229,0.10)] backdrop-blur">
-    <div className="mb-8">
-      <p className="text-sm font-bold text-[#4dbbff]">Statistics</p>
-      <h2 className="mt-2 text-[2rem] font-black tracking-[-0.05em]">
-        통계 시각화
-      </h2>
-      <p className="mt-3 text-sm leading-6 text-neutral-500">
-        카테고리별 게시글과 반응 데이터를 한눈에 확인할 수 있습니다.
-      </p>
-    </div>
-
-    <div className="mb-6 rounded-[28px] border border-emerald-100 bg-[linear-gradient(145deg,#ffffff,#f4fffb)] p-5 shadow-[0_18px_40px_rgba(16,185,129,0.08)]">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
-            👥
-          </div>
-          <div>
-            <h3 className="text-sm font-black text-neutral-800">접속·조회 통계</h3>
-            <p className="mt-1 text-xs text-neutral-500">같은 브라우저는 하루에 한 번 방문자로 집계됩니다.</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">오늘 방문자</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">
-            {isLoadingVisitStats ? "..." : siteVisitStats.today_visitors.toLocaleString()}
-          </p>
-        </div>
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">누적 방문</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">
-            {isLoadingVisitStats ? "..." : siteVisitStats.total_visits.toLocaleString()}
-          </p>
-        </div>
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">고유 방문자</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">
-            {isLoadingVisitStats ? "..." : siteVisitStats.unique_visitors.toLocaleString()}
-          </p>
-        </div>
-        <div className="rounded-[20px] bg-white px-4 py-4 shadow-sm">
-          <p className="text-xs font-bold text-neutral-400">총 게시글 조회수</p>
-          <p className="mt-2 text-2xl font-black text-neutral-900">{adminStats.totalViews.toLocaleString()}</p>
-        </div>
-      </div>
-
-      {visitStatsError && (
-        <p className="mt-3 text-xs font-bold text-red-500">{visitStatsError}</p>
-      )}
-
-      <div className="mt-5 rounded-[22px] bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-sm font-black text-neutral-800">최근 7일 방문 추이</p>
-          <p className="text-xs font-semibold text-neutral-400">한국 시간 기준</p>
-        </div>
-        <div className="h-[230px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={siteVisitStats.last_7_days.map((item) => ({
-                ...item,
-                label: item.date
-                  ? new Intl.DateTimeFormat("ko-KR", {
-                      month: "numeric",
-                      day: "numeric",
-                    }).format(new Date(`${item.date}T00:00:00+09:00`))
-                  : "",
-              }))}
-              margin={{ top: 18, right: 12, left: -18, bottom: 0 }}
-            >
-              <XAxis
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#737373", fontSize: 12 }}
-              />
-              <YAxis
-                allowDecimals={false}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#737373", fontSize: 12 }}
-              />
-              <Tooltip
-                formatter={(value) => [`${Number(value).toLocaleString()}명`, "방문자"]}
-                contentStyle={{
-                  borderRadius: "16px",
-                  border: "1px solid rgba(0,0,0,0.06)",
-                  boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
-                }}
-              />
-              <Bar dataKey="visitors" fill="#10B981" radius={[10, 10, 4, 4]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
-
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-[28px] border border-violet-100 bg-[linear-gradient(145deg,#ffffff,#f8f7ff)] p-5 shadow-[0_18px_40px_rgba(124,58,237,0.08)]">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
-            📊
-          </div>
-          <h3 className="text-sm font-black text-neutral-800">
-            카테고리별 게시글
-          </h3>
-        </div>
-
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={adminChartData} margin={{ top: 18, right: 18, left: -10, bottom: 0 }}>
-              <XAxis
-                dataKey="name"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#737373", fontSize: 13 }}
-              />
-              <YAxis
-                allowDecimals={false}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#737373", fontSize: 12 }}
-              />
-              <Tooltip
-                cursor={{ fill: "rgba(124,58,237,0.06)" }}
-                contentStyle={{
-                  borderRadius: "16px",
-                  border: "1px solid rgba(0,0,0,0.06)",
-                  boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
-                }}
-              />
-              <Bar
-                dataKey="posts"
-                radius={[14, 14, 8, 8]}
-                label={{ position: "top", fill: "#111827", fontSize: 13, fontWeight: 700 }}
-              >
-                {adminChartData.map((entry, index) => (
-                  <Cell
-                    key={`bar-${entry.name}`}
-                    fill={["#8B5CF6", "#3B82F6", "#34D399", "#FBBF24"][index % 4]}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="rounded-[28px] border border-sky-100 bg-[linear-gradient(145deg,#ffffff,#f4fbff)] p-5 shadow-[0_18px_40px_rgba(14,165,233,0.08)]">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
-            ◔
-          </div>
-          <h3 className="text-sm font-black text-neutral-800">
-            반응 데이터 비율
-          </h3>
-        </div>
-
-        <div className="grid items-center gap-4 md:grid-cols-[1fr_150px]">
-          <div className="relative h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={adminPieData}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={68}
-                  outerRadius={112}
-                  paddingAngle={3}
-                >
-                  {adminPieData.map((entry, index) => (
-                    <Cell
-                      key={`pie-${entry.name}`}
-                      fill={["#4F46E5", "#14B8A6", "#F59E0B"][index % 3]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "16px",
-                    border: "1px solid rgba(0,0,0,0.06)",
-                    boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div className="pointer-events-none absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-              <span className="text-xs font-bold text-neutral-400">총 반응</span>
-              <span className="text-2xl font-black text-neutral-900">
-                {adminPieData.reduce((sum, item) => sum + item.value, 0)}
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {adminPieData.map((item, index) => (
-              <div
-                key={item.name}
-                className="flex items-center justify-between rounded-2xl bg-white/80 px-4 py-3 shadow-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{
-                      backgroundColor: ["#4F46E5", "#14B8A6", "#F59E0B"][index % 3],
-                    }}
-                  />
-                  <span className="text-sm font-bold text-neutral-700">{item.name}</span>
-                </div>
-                <span className="text-sm font-black text-neutral-900">{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div className="mt-6 flex items-center justify-between rounded-[24px] bg-[linear-gradient(90deg,#f5f7ff,#f8fbff)] px-5 py-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">
-          ✨
-        </div>
-        <div>
-          <p className="text-sm font-black text-neutral-800">데이터 업데이트 안내</p>
-          <p className="mt-1 text-xs text-neutral-500">
-            방문자와 게시글 조회 데이터는 자동으로 집계됩니다.
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => window.location.reload()}
-        className="rounded-full bg-white px-4 py-2 text-xs font-bold text-neutral-600 shadow-sm transition hover:bg-neutral-950 hover:text-white"
-      >
-        새로고침
-      </button>
-    </div>
-  </section>
+  <AdminStatistics
+    adminStats={adminStats}
+    chartData={adminChartData}
+    pieData={adminPieData}
+    siteVisitStats={siteVisitStats}
+    isLoadingVisitStats={isLoadingVisitStats}
+    visitStatsError={visitStatsError}
+  />
 )}
 
 {adminTab === "skins" && (
