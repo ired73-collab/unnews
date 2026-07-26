@@ -5,6 +5,8 @@ export default function SlashMenu({ onSelect }) {
     { type: "image", label: "이미지", icon: "🖼", desc: "본문 이미지를 삽입합니다." },
     { type: "quote", label: "인용", icon: "💬", desc: "인용문을 강조합니다." },
     { type: "highlight", label: "강조", icon: "⭐", desc: "핵심 문장을 강조합니다." },
+    { type: "bullet", label: "아이콘 목록", icon: "✅", desc: "아이콘이 있는 목록을 만듭니다." },
+    { type: "callout", label: "아이콘 강조", icon: "📌", desc: "핵심·체크·팁·주의 박스를 만듭니다." },
     { type: "link", label: "링크", icon: "🔗", desc: "관련 링크를 추가합니다." },
   ];
 

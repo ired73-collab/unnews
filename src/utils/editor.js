@@ -27,7 +27,7 @@ export function moveBlockById(blocks, blockId, direction) {
 export function getPlainBodyFromBlocks(blocks = [], fallbackBody = "") {
   const text = blocks
     .filter((block) =>
-      ["text", "heading", "quote", "highlight"].includes(block.type)
+      ["text", "heading", "quote", "highlight", "bullet", "callout"].includes(block.type)
     )
     .map((block) => block.value || "")
     .join("\n\n")
@@ -39,10 +39,17 @@ export function getPlainBodyFromBlocks(blocks = [], fallbackBody = "") {
   export function getCleanContentBlocks(contentBlocks = []) {
   return contentBlocks
     .map((block) => {
-      if (["text", "heading", "quote", "highlight"].includes(block.type)) {
+      if (["text", "heading", "quote", "highlight", "bullet", "callout"].includes(block.type)) {
         return {
           type: block.type,
           value: (block.value || "").trim(),
+          ...(block.fontFamily ? { fontFamily: block.fontFamily } : {}),
+          ...(block.type === "bullet"
+            ? { bulletStyle: block.bulletStyle || "dot" }
+            : {}),
+          ...(block.type === "callout"
+            ? { calloutStyle: block.calloutStyle || "key" }
+            : {}),
         };
       }
 
@@ -61,7 +68,7 @@ export function getPlainBodyFromBlocks(blocks = [], fallbackBody = "") {
       };
     })
     .filter((block) => {
-      if (["text", "heading", "quote", "highlight"].includes(block.type)) {
+      if (["text", "heading", "quote", "highlight", "bullet", "callout"].includes(block.type)) {
         return block.value;
       }
 

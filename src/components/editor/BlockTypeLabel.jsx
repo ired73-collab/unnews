@@ -3,6 +3,8 @@ const LABELS = {
   heading: "소제목",
   quote: "인용문",
   highlight: "강조박스",
+  bullet: "아이콘 목록",
+  callout: "아이콘 강조",
   link: "링크버튼",
   image: "이미지",
 };

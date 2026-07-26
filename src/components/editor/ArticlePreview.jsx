@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import {
+  getBulletOption,
+  getCalloutOption,
+  getFontFamily,
+} from "./editorOptions";
 
 export default function ArticlePreview({
   form,
@@ -106,12 +111,14 @@ export default function ArticlePreview({
       <div className="mt-10 space-y-7">
 
 {contentBlocks.map((block)=>{
+    const fontStyle = { fontFamily: getFontFamily(block.fontFamily) };
 
     if(block.type==="text"){
         return(
             <p
                 key={block.id}
                 className="whitespace-pre-line leading-8 text-neutral-700"
+                style={fontStyle}
             >
                 {block.value || ""}
             </p>
@@ -123,6 +130,7 @@ export default function ArticlePreview({
         <h2
             key={block.id}
             className="text-3xl font-black"
+            style={fontStyle}
         >
             {block.value || "소제목"}
         </h2>
@@ -134,6 +142,7 @@ if(block.type==="quote"){
         <blockquote
             key={block.id}
             className="border-l-4 border-blue-500 pl-5 italic text-xl text-neutral-700"
+            style={fontStyle}
         >
             {block.value || "인용문"}
         </blockquote>
@@ -145,10 +154,47 @@ if(block.type==="highlight"){
         <div
             key={block.id}
             className="rounded-2xl bg-blue-50 p-5 text-blue-900"
+            style={fontStyle}
         >
             {block.value || "강조 내용"}
         </div>
     );
+}
+
+if (block.type === "bullet") {
+  const bullet = getBulletOption(block.bulletStyle);
+  const items = (block.value || "").split("\n").filter((item) => item.trim());
+
+  return (
+    <ul key={block.id} className="space-y-3" style={fontStyle}>
+      {items.map((item, index) => (
+        <li key={`${block.id}-${index}`} className="flex gap-3 leading-8 text-neutral-700">
+          <span className="shrink-0 font-black text-blue-600">{bullet.icon}</span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+if (block.type === "callout") {
+  const callout = getCalloutOption(block.calloutStyle);
+
+  return (
+    <div
+      key={block.id}
+      className={`rounded-2xl border p-5 ${callout.className}`}
+      style={fontStyle}
+    >
+      <div className="flex gap-3">
+        <span className="text-xl">{callout.icon}</span>
+        <div>
+          <strong className="block text-sm font-black">{callout.label}</strong>
+          <p className="mt-1 whitespace-pre-line leading-7">{block.value || "내용을 입력하세요"}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 if (block.type === "image") {

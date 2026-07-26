@@ -74,6 +74,11 @@ import ArticleEditor from "../components/editor/ArticleEditor";
 import DraftRecovery from "../components/editor/DraftRecovery";
 
 import ArticlePreview from "../components/editor/ArticlePreview";
+import {
+  getBulletOption,
+  getCalloutOption,
+  getFontFamily,
+} from "../components/editor/editorOptions";
 
 import SiteFooter from "../components/SiteFooter";
 
@@ -966,6 +971,32 @@ const addHighlightBlock = () => {
   ]);
 };
 
+const addBulletBlock = () => {
+  setContentBlocks((prev) => [
+    ...prev,
+    {
+      id: Date.now() + Math.random(),
+      type: "bullet",
+      value: "",
+      bulletStyle: "check",
+      fontFamily: "pretendard",
+    },
+  ]);
+};
+
+const addCalloutBlock = () => {
+  setContentBlocks((prev) => [
+    ...prev,
+    {
+      id: Date.now() + Math.random(),
+      type: "callout",
+      value: "",
+      calloutStyle: "key",
+      fontFamily: "pretendard",
+    },
+  ]);
+};
+
 const addLinkBlock = () => {
   setContentBlocks((prev) => [
     ...prev,
@@ -1036,6 +1067,10 @@ const applySlashCommand = (blockId, type) => {
       ? { type: "image", url: "", caption: "", value: "" }
       : type === "link"
         ? { type: "link", text: "", url: "", value: "" }
+        : type === "bullet"
+          ? { type: "bullet", value: "", bulletStyle: "check" }
+          : type === "callout"
+            ? { type: "callout", value: "", calloutStyle: "key" }
         : { type, value: "" };
 
   updateBlock(blockId, base);
@@ -1083,7 +1118,7 @@ const handleBlockEditorKeyDown = (event, block, index) => {
   if (event.key !== "Enter") return;
   if (event.shiftKey) return;
   if (event.nativeEvent?.isComposing) return;
-  if (!["text", "heading", "quote", "highlight"].includes(block.type)) return;
+  if (!["text", "heading", "quote", "highlight", "bullet", "callout"].includes(block.type)) return;
 
   const target = event.target;
   const isEditableTarget =
@@ -1408,6 +1443,9 @@ setPage("post");
           url: block.url || "",
           caption: block.caption || "",
           text: block.text || "",
+          fontFamily: block.fontFamily || "pretendard",
+          bulletStyle: block.bulletStyle || "dot",
+          calloutStyle: block.calloutStyle || "key",
         }))
       : [
           {
@@ -3411,6 +3449,7 @@ ACTIVITY
                 {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
                   <div className="space-y-6">
                     {selectedPost.contentBlocks.map((block, index) => {
+  const blockFontStyle = { fontFamily: getFontFamily(block.fontFamily) };
   if (block.type === "image") {
   if (!block.url?.trim()) return null;
 
@@ -3448,6 +3487,7 @@ ACTIVITY
         md:pl-5
         md:text-[2rem]
       "
+      style={blockFontStyle}
     >
       {block.value}
     </h2>
@@ -3459,6 +3499,7 @@ ACTIVITY
       <blockquote
         key={index}
         className="my-8 rounded-[24px] border-l-4 border-[#4DBBFF] bg-[#f8fbff] px-6 py-5 text-[18px] font-semibold leading-9 text-blue-900 shadow-[0_12px_30px_rgba(37,99,235,0.06)]"
+        style={blockFontStyle}
       >
         “{block.value}”
       </blockquote>
@@ -3470,9 +3511,50 @@ ACTIVITY
       <div
         key={index}
         className="rounded-[22px] border border-amber-100 bg-amber-50 px-5 py-4 text-[16px] font-semibold leading-8 text-amber-900"
+        style={blockFontStyle}
       >
         {block.value}
       </div>
+    );
+  }
+
+  if (block.type === "bullet") {
+    const bullet = getBulletOption(block.bulletStyle);
+    const items = (block.value || "")
+      .split("\n")
+      .filter((item) => item.trim());
+
+    return (
+      <ul key={index} className="my-7 space-y-3" style={blockFontStyle}>
+        {items.map((item, itemIndex) => (
+          <li key={`${index}-${itemIndex}`} className="flex gap-3">
+            <span className="shrink-0 font-black text-[#2563eb]">
+              {bullet.icon}
+            </span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (block.type === "callout") {
+    const callout = getCalloutOption(block.calloutStyle);
+
+    return (
+      <aside
+        key={index}
+        className={`rounded-[22px] border px-5 py-5 text-[16px] leading-8 ${callout.className}`}
+        style={blockFontStyle}
+      >
+        <div className="flex gap-3">
+          <span className="pt-0.5 text-xl">{callout.icon}</span>
+          <div>
+            <strong className="block text-sm font-black">{callout.label}</strong>
+            <p className="mt-1 whitespace-pre-line">{block.value}</p>
+          </div>
+        </div>
+      </aside>
     );
   }
 
@@ -3491,7 +3573,7 @@ ACTIVITY
   }
 
   return (
-    <p key={index} className="whitespace-pre-line">
+    <p key={index} className="whitespace-pre-line" style={blockFontStyle}>
       {block.value}
     </p>
   );
@@ -4670,6 +4752,8 @@ ACTIVITY
                   activeBlockId={activeBlockId}
                   activeSlashBlockId={activeSlashBlockId}
                   addHeadingBlock={addHeadingBlock}
+                  addBulletBlock={addBulletBlock}
+                  addCalloutBlock={addCalloutBlock}
                   addHighlightBlock={addHighlightBlock}
                   addImageBlock={addImageBlock}
                   addLinkBlock={addLinkBlock}

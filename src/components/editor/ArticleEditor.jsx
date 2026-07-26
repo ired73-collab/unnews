@@ -23,6 +23,8 @@ export default function ArticleEditor({
   addHeadingBlock,
   addHighlightBlock,
   addImageBlock,
+  addBulletBlock,
+  addCalloutBlock,
   addLinkBlock,
   addQuoteBlock,
   addTextBlock,
@@ -57,6 +59,20 @@ export default function ArticleEditor({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={addBulletBlock}
+            className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+          >
+            + 아이콘 목록
+          </button>
+          <button
+            type="button"
+            onClick={addCalloutBlock}
+            className="rounded-full border border-rose-100 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100"
+          >
+            + 아이콘 강조
+          </button>
           <button
             type="button"
             onClick={addTextBlock}
@@ -159,7 +175,7 @@ export default function ArticleEditor({
                       </div>
                     </div>
 
-                    {["text", "heading", "quote", "highlight"].includes(
+                    {["text", "heading", "quote", "highlight", "bullet", "callout"].includes(
                       block.type
                     ) ? (
                       <div
