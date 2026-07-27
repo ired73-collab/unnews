@@ -53,7 +53,10 @@ import Link from "next/link";
 
 import { normalizePost } from "../services/postService";
 
-import { uploadImageToCloudinary } from "../services/uploadService";
+import {
+  getImageUploadErrorMessage,
+  uploadImageToCloudinary,
+} from "../services/uploadService";
 
 import {
   calculateAdminStats,
@@ -912,7 +915,13 @@ alert("스킨 설정이 저장되었습니다.");
   }, [form.body, contentBlocks]);
 
   const handleImageFile = async (file) => {
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert(
+        `[${file.name}] 이미지 파일만 업로드할 수 있습니다. JPG, PNG, WebP 등 일반 이미지 형식으로 변환해주세요.`
+      );
+      return;
+    }
 
     try {
       setIsUploading(true);
@@ -931,7 +940,7 @@ alert("스킨 설정이 저장되었습니다.");
       }));
     } catch (error) {
       console.error(error);
-      alert("이미지 업로드에 실패했습니다. Cloudinary preset과 cloud name을 확인해주세요.");
+      alert(getImageUploadErrorMessage(error, file.name));
     } finally {
       setIsUploading(false);
     }
@@ -1160,26 +1169,50 @@ const handleBlockEditorKeyDown = (event, block, index) => {
 
 
   const uploadBlockImage = async (blockId, selectedFiles) => {
-    const files = Array.from(
+    const selected = Array.from(
       selectedFiles instanceof FileList ? selectedFiles : [selectedFiles]
-    ).filter((file) => file?.type?.startsWith("image/"));
+    ).filter(Boolean);
+    const files = selected.filter((file) => file?.type?.startsWith("image/"));
+    const invalidFiles = selected.filter(
+      (file) => !file?.type?.startsWith("image/")
+    );
 
-    if (files.length === 0) return;
+    if (files.length === 0) {
+      alert(
+        invalidFiles.length > 0
+          ? invalidFiles
+              .map(
+                (file) =>
+                  `[${file.name}] 이미지 파일만 업로드할 수 있습니다. JPG, PNG, WebP 등 일반 이미지 형식으로 변환해주세요.`
+              )
+              .join("\n")
+          : "업로드할 이미지 파일을 선택해주세요."
+      );
+      return;
+    }
 
     try {
       setUploadingBlockId(blockId);
       const uploadedImages = [];
+      const uploadErrors = invalidFiles.map(
+        (file) => `[${file.name}] 이미지 파일만 업로드할 수 있습니다.`
+      );
 
       for (const file of files) {
-        const imageUrl = await uploadImageToCloudinary(
-          file,
-          CLOUDINARY_CLOUD_NAME,
-          CLOUDINARY_UPLOAD_PRESET
-        );
-        uploadedImages.push({ imageUrl, fileName: file.name });
+        try {
+          const imageUrl = await uploadImageToCloudinary(
+            file,
+            CLOUDINARY_CLOUD_NAME,
+            CLOUDINARY_UPLOAD_PRESET
+          );
+          uploadedImages.push({ imageUrl, fileName: file.name });
+        } catch (error) {
+          console.error(error);
+          uploadErrors.push(getImageUploadErrorMessage(error, file.name));
+        }
       }
 
-      setContentBlocks((prev) => {
+      if (uploadedImages.length > 0) setContentBlocks((prev) => {
         const targetIndex = prev.findIndex((block) => block.id === blockId);
         if (targetIndex < 0) return prev;
 
@@ -1202,9 +1235,14 @@ const handleBlockEditorKeyDown = (event, block, index) => {
           ...prev.slice(targetIndex + 1),
         ];
       });
-    } catch (error) {
-      console.error(error);
-      alert("본문 이미지 업로드에 실패했습니다. 이미지 파일을 확인한 뒤 다시 시도해주세요.");
+
+      if (uploadErrors.length > 0) {
+        const resultSummary =
+          uploadedImages.length > 0
+            ? `${uploadedImages.length}장은 업로드되었고, ${uploadErrors.length}장은 실패했습니다.`
+            : `선택한 이미지 ${uploadErrors.length}장을 업로드하지 못했습니다.`;
+        alert(`${resultSummary}\n\n${uploadErrors.join("\n")}`);
+      }
     } finally {
       setUploadingBlockId(null);
     }
@@ -1232,7 +1270,7 @@ const handleBlockEditorKeyDown = (event, block, index) => {
     insertImageBlockAfter(activeBlockId, imageUrl, "붙여넣은 이미지");
   } catch (error) {
     console.error(error);
-    alert("붙여넣은 이미지 업로드에 실패했습니다.");
+    alert(getImageUploadErrorMessage(error, file.name || "붙여넣은 이미지"));
   }
 };
 
@@ -1240,24 +1278,35 @@ const handleDropImage = async (e) => {
   e.preventDefault();
   setIsDragging(false);
 
-  const files = Array.from(e.dataTransfer?.files || []).filter((item) =>
-    item.type.startsWith("image/")
-  );
+  const selected = Array.from(e.dataTransfer?.files || []);
+  const files = selected.filter((item) => item.type.startsWith("image/"));
 
-  if (files.length === 0) return;
+  if (files.length === 0) {
+    alert("이미지 파일만 드래그하여 업로드할 수 있습니다.");
+    return;
+  }
 
   try {
     const uploadedImages = [];
+    const uploadErrors = selected
+      .filter((item) => !item.type.startsWith("image/"))
+      .map((item) => `[${item.name}] 이미지 파일만 업로드할 수 있습니다.`);
+
     for (const file of files) {
-      const imageUrl = await uploadImageToCloudinary(
-        file,
-        CLOUDINARY_CLOUD_NAME,
-        CLOUDINARY_UPLOAD_PRESET
-      );
-      uploadedImages.push({ imageUrl, fileName: file.name || "드래그 이미지" });
+      try {
+        const imageUrl = await uploadImageToCloudinary(
+          file,
+          CLOUDINARY_CLOUD_NAME,
+          CLOUDINARY_UPLOAD_PRESET
+        );
+        uploadedImages.push({ imageUrl, fileName: file.name || "드래그 이미지" });
+      } catch (error) {
+        console.error(error);
+        uploadErrors.push(getImageUploadErrorMessage(error, file.name));
+      }
     }
 
-    setContentBlocks((prev) => {
+    if (uploadedImages.length > 0) setContentBlocks((prev) => {
       const targetIndex = activeBlockId
         ? prev.findIndex((block) => block.id === activeBlockId)
         : prev.length - 1;
@@ -1280,9 +1329,16 @@ const handleDropImage = async (e) => {
         ...prev.slice(insertIndex),
       ];
     });
-  } catch (error) {
-    console.error(error);
-    alert("드래그한 이미지 업로드에 실패했습니다.");
+
+    if (uploadErrors.length > 0) {
+      const resultSummary =
+        uploadedImages.length > 0
+          ? `${uploadedImages.length}장은 업로드되었고, ${uploadErrors.length}장은 실패했습니다.`
+          : `선택한 이미지 ${uploadErrors.length}장을 업로드하지 못했습니다.`;
+      alert(`${resultSummary}\n\n${uploadErrors.join("\n")}`);
+    }
+  } finally {
+    setUploadingBlockId(null);
   }
 };
 
@@ -4757,6 +4813,11 @@ ACTIVITY
                       />
                     </label>
                   </div>
+                  <p className="mt-2 text-xs leading-5 text-amber-700">
+                    웹사이트의 이미지 크기·용량 제한이 적용됩니다. 업로드에
+                    실패하면 파일명과 함께 용량·크기·형식·네트워크 등의 원인과
+                    해결 방법을 안내합니다.
+                  </p>
                 </div>
 
                 <label className="flex items-center gap-3 rounded-[18px] border border-black/5 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">

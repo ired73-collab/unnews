@@ -60,6 +60,12 @@ export default function ImageBlockEditor({
         />
       </label>
 
+      <div className="rounded-[14px] bg-amber-50 px-3.5 py-3 text-xs leading-5 text-amber-800">
+        웹사이트의 이미지 크기·용량 제한이 적용됩니다. 여러 장 중 일부가
+        실패하면 성공한 이미지는 유지되며, 실패한 파일명과 원인·해결 방법을
+        안내합니다.
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-3">
         <select
           value={imageWidth}
