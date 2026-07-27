@@ -82,6 +82,13 @@ const classifyUploadError = (detail = "", status = 0) => {
   );
 };
 
+const formatBytesInMessage = (message = "") =>
+  String(message).replace(/\b(\d{6,})\s*bytes?\b/gi, (_, byteValue) => {
+    const megabytes = Number(byteValue) / (1024 * 1024);
+    const formatted = megabytes >= 10 ? megabytes.toFixed(1) : megabytes.toFixed(2);
+    return `${formatted.replace(/\.0$/, "")}MB`;
+  });
+
 export function getImageUploadErrorMessage(error, fileName = "") {
   const name = fileName ? `[${fileName}] ` : "";
 
@@ -98,7 +105,7 @@ export function getImageUploadErrorMessage(error, fileName = "") {
     const serverLimit =
       ["FILE_TOO_LARGE", "DIMENSIONS_TOO_LARGE"].includes(error.code) &&
       error.detail
-        ? ` (서버 제한 안내: ${error.detail})`
+        ? ` (서버 제한 안내: ${formatBytesInMessage(error.detail)})`
         : "";
 
     return `${name}${error.message}${serverLimit} ${guidance[error.code] || ""}`.trim();

@@ -77,6 +77,7 @@ import ArticleEditor from "../components/editor/ArticleEditor";
 import DraftRecovery from "../components/editor/DraftRecovery";
 
 import ArticlePreview from "../components/editor/ArticlePreview";
+import UploadResultDialog from "../components/editor/UploadResultDialog";
 import { isRenderableContentBlock } from "../utils/editor";
 import {
   getBulletOption,
@@ -406,6 +407,7 @@ setSelectedPost(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState(null);
   const [contentBlocks, setContentBlocks] = useState([
   { id: "block-1", type: "text", value: "" },
 ]);
@@ -917,9 +919,13 @@ alert("스킨 설정이 저장되었습니다.");
   const handleImageFile = async (file) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert(
-        `[${file.name}] 이미지 파일만 업로드할 수 있습니다. JPG, PNG, WebP 등 일반 이미지 형식으로 변환해주세요.`
-      );
+      setUploadResult({
+        title: "대표 이미지 업로드 실패",
+        successCount: 0,
+        errors: [
+          `[${file.name}] 이미지 파일만 업로드할 수 있습니다. JPG, PNG, WebP 등 일반 이미지 형식으로 변환해주세요.`,
+        ],
+      });
       return;
     }
 
@@ -940,7 +946,11 @@ alert("스킨 설정이 저장되었습니다.");
       }));
     } catch (error) {
       console.error(error);
-      alert(getImageUploadErrorMessage(error, file.name));
+      setUploadResult({
+        title: "대표 이미지 업로드 실패",
+        successCount: 0,
+        errors: [getImageUploadErrorMessage(error, file.name)],
+      });
     } finally {
       setIsUploading(false);
     }
@@ -1178,16 +1188,17 @@ const handleBlockEditorKeyDown = (event, block, index) => {
     );
 
     if (files.length === 0) {
-      alert(
-        invalidFiles.length > 0
-          ? invalidFiles
-              .map(
+      setUploadResult({
+        title: "본문 이미지 업로드 실패",
+        successCount: 0,
+        errors:
+          invalidFiles.length > 0
+            ? invalidFiles.map(
                 (file) =>
                   `[${file.name}] 이미지 파일만 업로드할 수 있습니다. JPG, PNG, WebP 등 일반 이미지 형식으로 변환해주세요.`
               )
-              .join("\n")
-          : "업로드할 이미지 파일을 선택해주세요."
-      );
+            : ["업로드할 이미지 파일을 선택해주세요."],
+      });
       return;
     }
 
@@ -1237,11 +1248,14 @@ const handleBlockEditorKeyDown = (event, block, index) => {
       });
 
       if (uploadErrors.length > 0) {
-        const resultSummary =
-          uploadedImages.length > 0
-            ? `${uploadedImages.length}장은 업로드되었고, ${uploadErrors.length}장은 실패했습니다.`
-            : `선택한 이미지 ${uploadErrors.length}장을 업로드하지 못했습니다.`;
-        alert(`${resultSummary}\n\n${uploadErrors.join("\n")}`);
+        setUploadResult({
+          title:
+            uploadedImages.length > 0
+              ? "일부 이미지를 업로드하지 못했습니다"
+              : "본문 이미지 업로드 실패",
+          successCount: uploadedImages.length,
+          errors: uploadErrors,
+        });
       }
     } finally {
       setUploadingBlockId(null);
@@ -1270,7 +1284,13 @@ const handleBlockEditorKeyDown = (event, block, index) => {
     insertImageBlockAfter(activeBlockId, imageUrl, "붙여넣은 이미지");
   } catch (error) {
     console.error(error);
-    alert(getImageUploadErrorMessage(error, file.name || "붙여넣은 이미지"));
+    setUploadResult({
+      title: "붙여넣은 이미지 업로드 실패",
+      successCount: 0,
+      errors: [
+        getImageUploadErrorMessage(error, file.name || "붙여넣은 이미지"),
+      ],
+    });
   }
 };
 
@@ -1282,7 +1302,11 @@ const handleDropImage = async (e) => {
   const files = selected.filter((item) => item.type.startsWith("image/"));
 
   if (files.length === 0) {
-    alert("이미지 파일만 드래그하여 업로드할 수 있습니다.");
+    setUploadResult({
+      title: "드래그 이미지 업로드 실패",
+      successCount: 0,
+      errors: ["이미지 파일만 드래그하여 업로드할 수 있습니다."],
+    });
     return;
   }
 
@@ -1331,11 +1355,14 @@ const handleDropImage = async (e) => {
     });
 
     if (uploadErrors.length > 0) {
-      const resultSummary =
-        uploadedImages.length > 0
-          ? `${uploadedImages.length}장은 업로드되었고, ${uploadErrors.length}장은 실패했습니다.`
-          : `선택한 이미지 ${uploadErrors.length}장을 업로드하지 못했습니다.`;
-      alert(`${resultSummary}\n\n${uploadErrors.join("\n")}`);
+      setUploadResult({
+        title:
+          uploadedImages.length > 0
+            ? "일부 이미지를 업로드하지 못했습니다"
+            : "드래그 이미지 업로드 실패",
+        successCount: uploadedImages.length,
+        errors: uploadErrors,
+      });
     }
   } finally {
     setUploadingBlockId(null);
@@ -2050,6 +2077,10 @@ const handleReportComment = async (commentId) => {
       className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f7f5_45%,_#f3f2ef_100%)] text-neutral-900"
       style={{ fontFamily: "Pretendard, Inter, system-ui, sans-serif" }}
     >
+      <UploadResultDialog
+        result={uploadResult}
+        onClose={() => setUploadResult(null)}
+      />
       <Header
   activeCategory={activeCategory}
   setActiveCategory={setActiveCategory}
