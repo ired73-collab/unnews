@@ -36,6 +36,28 @@ export function getPlainBodyFromBlocks(blocks = [], fallbackBody = "") {
   return text || fallbackBody.trim();
 }
 
+export function isRenderableContentBlock(block) {
+  if (!block || typeof block !== "object") return false;
+
+  if (
+    ["text", "heading", "quote", "highlight", "bullet", "callout"].includes(
+      block.type
+    )
+  ) {
+    return Boolean((block.value || "").trim());
+  }
+
+  if (block.type === "image") {
+    return Boolean((block.url || "").trim());
+  }
+
+  if (block.type === "link") {
+    return Boolean((block.text || "").trim() && (block.url || "").trim());
+  }
+
+  return Boolean((block.value || "").trim());
+}
+
   export function getCleanContentBlocks(contentBlocks = []) {
   return contentBlocks
     .map((block) => {

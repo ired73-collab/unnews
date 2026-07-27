@@ -74,6 +74,7 @@ import ArticleEditor from "../components/editor/ArticleEditor";
 import DraftRecovery from "../components/editor/DraftRecovery";
 
 import ArticlePreview from "../components/editor/ArticlePreview";
+import { isRenderableContentBlock } from "../utils/editor";
 import {
   getBulletOption,
   getCalloutOption,
@@ -3448,7 +3449,9 @@ ACTIVITY
               <div className="mt-12 text-[19px] leading-[2.1] tracking-[-0.01em] text-neutral-700">
                 {Array.isArray(selectedPost.contentBlocks) && selectedPost.contentBlocks.length > 0 ? (
                   <div className="space-y-6">
-                    {selectedPost.contentBlocks.map((block, index) => {
+                    {selectedPost.contentBlocks
+                      .filter(isRenderableContentBlock)
+                      .map((block, index) => {
   const blockFontStyle = { fontFamily: getFontFamily(block.fontFamily) };
   if (block.type === "image") {
   if (!block.url?.trim()) return null;

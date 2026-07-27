@@ -6,6 +6,7 @@ import {
   getCalloutOption,
   getFontFamily,
 } from "./editorOptions";
+import { isRenderableContentBlock } from "../../utils/editor";
 
 export default function ArticlePreview({
   form,
@@ -110,7 +111,7 @@ export default function ArticlePreview({
 
       <div className="mt-10 space-y-7">
 
-{contentBlocks.map((block)=>{
+{contentBlocks.filter(isRenderableContentBlock).map((block)=>{
     const fontStyle = { fontFamily: getFontFamily(block.fontFamily) };
 
     if(block.type==="text"){
@@ -198,17 +199,6 @@ if (block.type === "callout") {
 }
 
 if (block.type === "image") {
-  if (!block.url?.trim()) {
-    return (
-      <div
-        key={block.id}
-        className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-black/10 bg-neutral-50 text-sm text-neutral-400"
-      >
-        이미지가 업로드되면 여기에 표시됩니다.
-      </div>
-    );
-  }
-
   return (
     <figure key={block.id}>
       <img
