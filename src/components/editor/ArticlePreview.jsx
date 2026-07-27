@@ -199,16 +199,31 @@ if (block.type === "callout") {
 }
 
 if (block.type === "image") {
+  const widthClass =
+    block.imageWidth === "small"
+      ? "mx-auto max-w-sm"
+      : block.imageWidth === "medium"
+        ? "mx-auto max-w-xl"
+        : "w-full";
+  const imageClass =
+    block.imageFit === "cover"
+      ? "h-64 w-full rounded-2xl object-cover"
+      : "h-auto max-h-[620px] w-full rounded-2xl object-contain";
+
   return (
-    <figure key={block.id}>
+    <figure key={block.id} className={widthClass}>
       <img
         src={block.url}
-        alt={block.caption || "본문 이미지"}
-        className="w-full rounded-2xl"
+        alt={block.alt || block.caption || "본문 이미지"}
+        className={imageClass}
       />
 
       {block.caption && (
-        <figcaption className="mt-2 text-center text-sm text-neutral-500">
+        <figcaption
+          className={`mt-2 text-sm text-neutral-500 ${
+            block.captionAlign === "left" ? "text-left" : "text-center"
+          }`}
+        >
           {block.caption}
         </figcaption>
       )}

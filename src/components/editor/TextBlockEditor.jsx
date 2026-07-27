@@ -106,6 +106,10 @@ export default function TextBlockEditor({
                 type: "image",
                 url: "",
                 caption: "",
+                alt: "",
+                imageWidth: "full",
+                imageFit: "natural",
+                captionAlign: "center",
                 value: "",
               });
               return;

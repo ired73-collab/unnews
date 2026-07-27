@@ -954,7 +954,16 @@ const addHeadingBlock = () => {
 const addImageBlock = () => {
   setContentBlocks((prev) => [
     ...prev,
-    { id: Date.now() + Math.random(), type: "image", url: "", caption: "" },
+    {
+      id: Date.now() + Math.random(),
+      type: "image",
+      url: "",
+      caption: "",
+      alt: "",
+      imageWidth: "full",
+      imageFit: "natural",
+      captionAlign: "center",
+    },
   ]);
 };
 
@@ -1045,6 +1054,10 @@ const insertImageBlockAfter = (targetBlockId, imageUrl, fileName = "이미지") 
     type: "image",
     url: imageUrl,
     caption: "",
+    alt: "",
+    imageWidth: "full",
+    imageFit: "natural",
+    captionAlign: "center",
     fileName,
   };
 
@@ -1065,7 +1078,16 @@ const insertImageBlockAfter = (targetBlockId, imageUrl, fileName = "이미지") 
 const applySlashCommand = (blockId, type) => {
   const base =
     type === "image"
-      ? { type: "image", url: "", caption: "", value: "" }
+      ? {
+          type: "image",
+          url: "",
+          caption: "",
+          alt: "",
+          imageWidth: "full",
+          imageFit: "natural",
+          captionAlign: "center",
+          value: "",
+        }
       : type === "link"
         ? { type: "link", text: "", url: "", value: "" }
         : type === "bullet"
@@ -1137,20 +1159,52 @@ const handleBlockEditorKeyDown = (event, block, index) => {
 };
 
 
-  const uploadBlockImage = async (blockId, file) => {
-    if (!file || !file.type.startsWith("image/")) return;
+  const uploadBlockImage = async (blockId, selectedFiles) => {
+    const files = Array.from(
+      selectedFiles instanceof FileList ? selectedFiles : [selectedFiles]
+    ).filter((file) => file?.type?.startsWith("image/"));
+
+    if (files.length === 0) return;
 
     try {
       setUploadingBlockId(blockId);
-      const imageUrl = await uploadImageToCloudinary(
-  file,
-  CLOUDINARY_CLOUD_NAME,
-  CLOUDINARY_UPLOAD_PRESET
-);
-      updateBlock(blockId, { url: imageUrl, fileName: file.name });
+      const uploadedImages = [];
+
+      for (const file of files) {
+        const imageUrl = await uploadImageToCloudinary(
+          file,
+          CLOUDINARY_CLOUD_NAME,
+          CLOUDINARY_UPLOAD_PRESET
+        );
+        uploadedImages.push({ imageUrl, fileName: file.name });
+      }
+
+      setContentBlocks((prev) => {
+        const targetIndex = prev.findIndex((block) => block.id === blockId);
+        if (targetIndex < 0) return prev;
+
+        const current = prev[targetIndex];
+        const imageBlocks = uploadedImages.map((item, index) => ({
+          id: index === 0 ? current.id : Date.now() + index + Math.random(),
+          type: "image",
+          url: item.imageUrl,
+          caption: index === 0 ? current.caption || "" : "",
+          alt: index === 0 ? current.alt || "" : "",
+          imageWidth: index === 0 ? current.imageWidth || "full" : "full",
+          imageFit: index === 0 ? current.imageFit || "natural" : "natural",
+          captionAlign: index === 0 ? current.captionAlign || "center" : "center",
+          fileName: item.fileName,
+        }));
+
+        return [
+          ...prev.slice(0, targetIndex),
+          ...imageBlocks,
+          ...prev.slice(targetIndex + 1),
+        ];
+      });
     } catch (error) {
       console.error(error);
-      alert("본문 이미지 업로드에 실패했습니다.");
+      alert("본문 이미지 업로드에 실패했습니다. 이미지 파일을 확인한 뒤 다시 시도해주세요.");
     } finally {
       setUploadingBlockId(null);
     }
@@ -1186,20 +1240,46 @@ const handleDropImage = async (e) => {
   e.preventDefault();
   setIsDragging(false);
 
-  const file = Array.from(e.dataTransfer?.files || []).find((item) =>
+  const files = Array.from(e.dataTransfer?.files || []).filter((item) =>
     item.type.startsWith("image/")
   );
 
-  if (!file) return;
+  if (files.length === 0) return;
 
   try {
-    const imageUrl = await uploadImageToCloudinary(
-      file,
-      CLOUDINARY_CLOUD_NAME,
-      CLOUDINARY_UPLOAD_PRESET
-    );
+    const uploadedImages = [];
+    for (const file of files) {
+      const imageUrl = await uploadImageToCloudinary(
+        file,
+        CLOUDINARY_CLOUD_NAME,
+        CLOUDINARY_UPLOAD_PRESET
+      );
+      uploadedImages.push({ imageUrl, fileName: file.name || "드래그 이미지" });
+    }
 
-    insertImageBlockAfter(activeBlockId, imageUrl, file.name || "드래그 이미지");
+    setContentBlocks((prev) => {
+      const targetIndex = activeBlockId
+        ? prev.findIndex((block) => block.id === activeBlockId)
+        : prev.length - 1;
+      const insertIndex = targetIndex < 0 ? prev.length : targetIndex + 1;
+      const newBlocks = uploadedImages.map((item, index) => ({
+        id: Date.now() + index + Math.random(),
+        type: "image",
+        url: item.imageUrl,
+        caption: "",
+        alt: "",
+        imageWidth: "full",
+        imageFit: "natural",
+        captionAlign: "center",
+        fileName: item.fileName,
+      }));
+
+      return [
+        ...prev.slice(0, insertIndex),
+        ...newBlocks,
+        ...prev.slice(insertIndex),
+      ];
+    });
   } catch (error) {
     console.error(error);
     alert("드래그한 이미지 업로드에 실패했습니다.");
@@ -1443,6 +1523,10 @@ setPage("post");
           value: block.value || "",
           url: block.url || "",
           caption: block.caption || "",
+          alt: block.alt || "",
+          imageWidth: block.imageWidth || "full",
+          imageFit: block.imageFit || "natural",
+          captionAlign: block.captionAlign || "center",
           text: block.text || "",
           fontFamily: block.fontFamily || "pretendard",
           bulletStyle: block.bulletStyle || "dot",
@@ -3456,15 +3540,33 @@ ACTIVITY
   if (block.type === "image") {
   if (!block.url?.trim()) return null;
 
+  const imageWidthClass =
+    block.imageWidth === "small"
+      ? "mx-auto max-w-md"
+      : block.imageWidth === "medium"
+        ? "mx-auto max-w-2xl"
+        : "w-full";
+  const articleImageClass =
+    block.imageFit === "cover"
+      ? "h-64 w-full object-cover md:h-[420px]"
+      : "h-auto max-h-[680px] w-full object-contain";
+
   return (
-    <figure key={index} className="overflow-hidden rounded-[24px] bg-neutral-50">
+    <figure
+      key={index}
+      className={`overflow-hidden rounded-[24px] bg-neutral-50 ${imageWidthClass}`}
+    >
       <img
         src={block.url}
-        alt={block.caption || selectedPost.title || "본문 이미지"}
-        className="max-h-[520px] w-full object-cover"
+        alt={block.alt || block.caption || selectedPost.title || "본문 이미지"}
+        className={articleImageClass}
       />
         {block.caption && (
-          <figcaption className="px-4 py-3 text-xs text-neutral-500">
+          <figcaption
+            className={`px-4 py-3 text-xs text-neutral-500 ${
+              block.captionAlign === "left" ? "text-left" : "text-center"
+            }`}
+          >
             {block.caption}
           </figcaption>
         )}

@@ -54,7 +54,7 @@ export default function ArticleEditor({
         <div>
           <h3 className="text-sm font-bold text-neutral-800">본문 블록 편집</h3>
           <p className="mt-1 text-xs leading-5 text-neutral-400">
-            텍스트와 이미지를 원하는 순서로 추가할 수 있습니다.
+            텍스트와 여러 이미지를 원하는 순서로 추가할 수 있습니다.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default function ArticleEditor({
             onClick={addImageBlock}
             className="rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white"
           >
-            + 이미지
+            + 다중 이미지
           </button>
         </div>
       </div>

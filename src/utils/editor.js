@@ -87,6 +87,16 @@ export function isRenderableContentBlock(block) {
         type: "image",
         url: block.url || "",
         caption: (block.caption || "").trim(),
+        ...(block.alt?.trim() ? { alt: block.alt.trim() } : {}),
+        ...(block.imageWidth && block.imageWidth !== "full"
+          ? { imageWidth: block.imageWidth }
+          : {}),
+        ...(block.imageFit && block.imageFit !== "natural"
+          ? { imageFit: block.imageFit }
+          : {}),
+        ...(block.captionAlign && block.captionAlign !== "center"
+          ? { captionAlign: block.captionAlign }
+          : {}),
       };
     })
     .filter((block) => {
