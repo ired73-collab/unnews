@@ -1,5 +1,5 @@
 export const metadata = {
-  metadataBase: new URL("https://unnews.vercel.app"),
+  metadataBase: new URL("http://unnews.co.kr/"),
 
   title: {
     default: "대학연합신문 (UNNEWS)",
@@ -25,7 +25,7 @@ export const metadata = {
     title: "대학연합신문 (UNNEWS)",
     description:
       "대학생을 위한 뉴스, 교육, AI, 취업, 공모전, 창업 정보를 제공하는 대학연합신문",
-    url: "https://unnews.vercel.app",
+    url: "http://unnews.co.kr/",
     siteName: "UNNEWS",
     locale: "ko_KR",
     type: "website",
