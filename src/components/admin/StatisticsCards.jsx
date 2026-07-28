@@ -11,11 +11,11 @@ export default function StatisticsCards({
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-[20px] bg-white px-4 py-4 shadow-sm"
+          className="min-w-0 rounded-[20px] bg-white px-4 py-4 shadow-sm"
         >
           <p className="text-xs font-bold text-neutral-400">{card.label}</p>
           <p className="mt-2 text-2xl font-black text-neutral-900">

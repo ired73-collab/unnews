@@ -4104,8 +4104,8 @@ ACTIVITY
       )}
 
       {page === "admin" && isAdmin && (
-        <main className="mx-auto max-w-[1180px] px-5 py-8 md:px-8 md:py-10">
-        <section className="mb-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
+        <main className="mx-auto min-w-0 max-w-[1180px] overflow-x-hidden px-4 py-8 sm:px-5 md:px-8 md:py-10">
+        <section className="mb-8 min-w-0 rounded-[28px] border border-white/70 bg-white/85 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur sm:p-6">
           <AdminDashboard
             adminTab={adminTab}
             adminStats={adminStats}
@@ -4671,19 +4671,19 @@ ACTIVITY
 
           {adminTab === "write" && (
   <>
-    <div className="mb-6 flex items-center justify-between">
-      <div>
+    <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
         <p className="text-sm text-neutral-500">Admin</p>
-        <h1 className="text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.045em]">
+        <h1 className="text-[2rem] font-semibold leading-[1.08] tracking-[-0.045em] sm:text-[2.3rem]">
           {editingId ? "콘텐츠 수정" : "콘텐츠 관리"}
         </h1>
       </div>
 
-      <div className="flex gap-2">
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
         <button
           type="button"
           onClick={() => setPage("home")}
-          className="rounded-full border border-black/10 bg-white/90 px-4 py-2 text-sm text-neutral-700"
+          className="whitespace-nowrap rounded-full border border-black/10 bg-white/90 px-3 py-2 text-sm text-neutral-700 sm:px-4"
         >
           사이트로 이동
         </button>
@@ -4691,7 +4691,7 @@ ACTIVITY
         <button
           type="button"
           onClick={handleAdminLogout}
-          className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white"
+          className="whitespace-nowrap rounded-full bg-neutral-950 px-3 py-2 text-sm font-semibold text-white sm:px-4"
         >
           로그아웃
         </button>

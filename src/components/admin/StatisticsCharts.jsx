@@ -72,8 +72,8 @@ export function VisitTrendChart({ data }) {
 
 export function ContentStatisticsCharts({ chartData, pieData }) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-[28px] border border-violet-100 bg-[linear-gradient(145deg,#ffffff,#f8f7ff)] p-5 shadow-[0_18px_40px_rgba(124,58,237,0.08)]">
+    <div className="grid min-w-0 gap-6 lg:grid-cols-2">
+      <div className="min-w-0 overflow-hidden rounded-[28px] border border-violet-100 bg-[linear-gradient(145deg,#ffffff,#f8f7ff)] p-4 shadow-[0_18px_40px_rgba(124,58,237,0.08)] md:p-5">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
             📊
@@ -130,7 +130,7 @@ export function ContentStatisticsCharts({ chartData, pieData }) {
         </div>
       </div>
 
-      <div className="rounded-[28px] border border-sky-100 bg-[linear-gradient(145deg,#ffffff,#f4fbff)] p-5 shadow-[0_18px_40px_rgba(14,165,233,0.08)]">
+      <div className="min-w-0 rounded-[28px] border border-sky-100 bg-[linear-gradient(145deg,#ffffff,#f4fbff)] p-4 shadow-[0_18px_40px_rgba(14,165,233,0.08)] md:p-5">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
             ◔
@@ -139,16 +139,16 @@ export function ContentStatisticsCharts({ chartData, pieData }) {
             반응 데이터 비율
           </h3>
         </div>
-        <div className="grid items-center gap-4 md:grid-cols-[1fr_150px]">
-          <div className="relative h-[300px]">
+        <div className="grid min-w-0 items-center gap-4 md:grid-cols-[minmax(0,1fr)_150px]">
+          <div className="relative z-0 h-[260px] min-w-0 sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={pieData}
                   dataKey="value"
                   nameKey="name"
-                  innerRadius={68}
-                  outerRadius={112}
+                  innerRadius="40%"
+                  outerRadius="68%"
                   paddingAngle={3}
                 >
                   {pieData.map((entry, index) => (
@@ -159,6 +159,8 @@ export function ContentStatisticsCharts({ chartData, pieData }) {
                   ))}
                 </Pie>
                 <Tooltip
+                  allowEscapeViewBox={{ x: true, y: true }}
+                  wrapperStyle={{ zIndex: 30 }}
                   contentStyle={{
                     borderRadius: "16px",
                     border: "1px solid rgba(0,0,0,0.06)",
@@ -167,7 +169,7 @@ export function ContentStatisticsCharts({ chartData, pieData }) {
                 />
               </PieChart>
             </ResponsiveContainer>
-            <div className="pointer-events-none absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+            <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] sm:h-24 sm:w-24">
               <span className="text-xs font-bold text-neutral-400">총 반응</span>
               <span className="text-2xl font-black text-neutral-900">
                 {pieData.reduce((sum, item) => sum + item.value, 0)}
