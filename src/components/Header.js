@@ -70,7 +70,9 @@ export default function Header({
   type="button"
   onClick={() => setIsMenuOpen((prev) => !prev)}
   className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-neutral-900 shadow-sm md:hidden"
-  aria-label="모바일 메뉴 열기"
+  aria-label={isMenuOpen ? "모바일 메뉴 닫기" : "모바일 메뉴 열기"}
+  aria-expanded={isMenuOpen}
+  aria-controls="mobile-navigation"
 >
   <span className="text-2xl leading-none">
     {isMenuOpen ? "×" : "☰"}
@@ -106,7 +108,10 @@ export default function Header({
       </div>
 
 {isMenuOpen && (
-  <div className="border-t border-black/5 bg-white px-5 py-4 md:hidden">
+  <div
+    id="mobile-navigation"
+    className="border-t border-black/5 bg-white px-5 py-4 md:hidden"
+  >
     <div className="grid gap-2">
       {PRIMARY_CATEGORIES.slice(1).map((item) => (
         <button
@@ -133,6 +138,43 @@ export default function Header({
       >
         관리자
       </button>
+
+      <div className="mt-2 border-t border-slate-200 pt-4">
+        <p className="mb-3 text-center text-xs font-bold tracking-[-0.02em] text-slate-500">
+          대학연합신문 SNS
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <a
+            href="https://tv.naver.com/withmagazine"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsMenuOpen(false)}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 transition active:scale-95"
+            aria-label="네이버TV 새 창으로 열기"
+          >
+            <img
+              src="/naver_tv.png"
+              alt=""
+              className="h-9 w-9 rounded-[10px] object-cover"
+            />
+          </a>
+
+          <a
+            href="https://www.instagram.com/withcomm_official/"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsMenuOpen(false)}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 transition active:scale-95"
+            aria-label="인스타그램 새 창으로 열기"
+          >
+            <img
+              src="/instagram.png"
+              alt=""
+              className="h-9 w-9 rounded-[10px] object-cover"
+            />
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 )}
