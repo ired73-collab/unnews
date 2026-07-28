@@ -4117,10 +4117,10 @@ ACTIVITY
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           />
-        {adminTab === "posts" && (
-  <section className="mt-8 rounded-[28px] border border-white/70 bg-white/85 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur">
-    <div className="mb-6 flex items-end justify-between gap-4">
-      <div>
+{adminTab === "posts" && (
+  <section className="mt-8 min-w-0 rounded-[28px] border border-white/70 bg-white/85 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.06)] backdrop-blur sm:p-6">
+    <div className="mb-6">
+      <div className="min-w-0">
         <p className="text-sm font-semibold text-[#4dbbff]">Post Management</p>
         <h2 className="text-[2rem] font-black tracking-[-0.05em]">
           글관리
@@ -4137,13 +4137,82 @@ ACTIVITY
           setAdminTab("write");
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
-        className="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white"
+        className="mt-4 inline-flex min-w-[112px] items-center justify-center whitespace-nowrap rounded-full bg-neutral-950 px-5 py-2.5 text-sm font-semibold leading-none text-white"
       >
         새 글 작성
       </button>
     </div>
 
-    <div className="overflow-hidden rounded-[22px] border border-black/5 bg-white">
+    <div className="overflow-hidden rounded-[22px] border border-black/5 bg-white sm:hidden">
+      <div className="grid grid-cols-[56px_minmax(0,1fr)_44px] items-center gap-3 border-b border-black/5 bg-neutral-50 px-3 py-3 text-center text-[11px] font-bold leading-none text-neutral-500">
+        <div className="whitespace-nowrap">이미지</div>
+        <div className="whitespace-nowrap text-left">제목 / 카테고리</div>
+        <div className="whitespace-nowrap">조회수</div>
+      </div>
+
+      {drafts.length === 0 ? (
+        <div className="px-4 py-10 text-center text-sm text-neutral-400">
+          등록된 글이 없습니다.
+        </div>
+      ) : (
+        drafts.map((post) => (
+          <div
+            key={post.id}
+            className="grid grid-cols-[56px_minmax(0,1fr)_44px] items-start gap-3 border-b border-black/5 px-3 py-4 last:border-b-0"
+          >
+            <img
+              src={post.image}
+              alt={post.title}
+              className="h-12 w-14 rounded-[12px] object-cover"
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80";
+              }}
+            />
+
+            <div className="min-w-0">
+              <p className="line-clamp-2 break-keep text-sm font-semibold leading-5 text-neutral-900">
+                {post.title}
+              </p>
+              <p className="mt-1 truncate text-[11px] font-medium text-neutral-500">
+                {getCategory1(post)} · {getCategory2(post)}
+              </p>
+
+              <div className="mt-3 flex min-w-0 flex-wrap items-center gap-1.5">
+                <span className="mr-1 whitespace-nowrap text-[11px] font-medium text-neutral-400">
+                  좋아요 {post.likes || 0}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleEditPost(post);
+                    setAdminTab("write");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="whitespace-nowrap rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold leading-none text-blue-600"
+                >
+                  수정
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDeletePost(post.id)}
+                  className="whitespace-nowrap rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold leading-none text-red-600"
+                >
+                  삭제
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-0.5 text-center text-sm font-bold text-neutral-700">
+              {post.views || 0}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+
+    <div className="hidden overflow-hidden rounded-[22px] border border-black/5 bg-white sm:block">
       <div className="grid grid-cols-[80px_1fr_120px_90px_90px_140px] gap-3 border-b border-black/5 bg-neutral-50 px-4 py-3 text-xs font-bold text-neutral-500">
         <div>이미지</div>
         <div>제목</div>
