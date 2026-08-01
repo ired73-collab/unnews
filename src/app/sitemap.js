@@ -10,7 +10,7 @@ function createSlug(text = "") {
 }
 
 export default async function sitemap() {
-  const baseUrl = "https://unnews.co.kr/";
+  const baseUrl = "https://unnews.vercel.app";
 
   const { data } = await supabase
     .from("posts")

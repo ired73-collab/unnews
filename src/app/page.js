@@ -3231,12 +3231,12 @@ ACTIVITY
         }`}
       >
         <div className="grid gap-0 md:grid-cols-2">
-          <div className="overflow-hidden bg-slate-100">
+          <div className="overflow-hidden bg-slate-100 md:h-full">
             <img
               src={post.image}
               alt={post.title}
               className={`w-full object-cover transition duration-500 group-hover:scale-105 ${
-                index === 0 ? "h-80" : "h-56"
+                index === 0 ? "h-80 md:h-full" : "h-56 md:h-full"
               }`}
               onError={(e) => {
                 e.currentTarget.src =
